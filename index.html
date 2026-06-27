@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mur de l'enquête — Les Grosses Putes">
+  <title>Les Grosses Putes — Mur de l'Enquête</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cork: #9a7420;
+      --cork-dark: #6b5010;
+      --red: #c41e1e;
+      --red-dark: #8b1a1a;
+      --paper: #f5f0e8;
+      --sticky: #fff9c4;
+      --gold: #e8d5b0;
+      --shadow: rgba(0, 0, 0, 0.55);
+    }
+
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      font-synthesis: none;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #0a0806;
+      font-family: 'IBM Plex Mono', 'Segoe UI', monospace;
+      color: #2a1f14;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── Room & lighting ── */
+    .room {
+      position: relative;
+      min-height: 100vh;
+      padding: 2.5rem 1rem 5rem;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 200, 100, 0.14) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 80%, rgba(255, 80, 40, 0.07) 0%, transparent 40%),
+        linear-gradient(180deg, #1a1410 0%, #0d0a08 100%);
+    }
+
+    .lamp-glow {
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(255, 210, 120, 0.22) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+      animation: lampFlicker 6s ease-in-out infinite;
+    }
+
+    @keyframes lampFlicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.88; }
+      52% { opacity: 0.95; }
+      54% { opacity: 0.85; }
+    }
+
+    .spotlight {
+      position: fixed;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 220, 140, 0.09) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 50;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s;
+      mix-blend-mode: screen;
+    }
+
+    /* ── Header ── */
+    header {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeDown 0.8s ease-out;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .stamp {
+      display: inline-block;
+      border: 3px solid var(--red-dark);
+      color: var(--red-dark);
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.35em;
+      padding: 0.45rem 1.4rem;
+      transform: rotate(-3deg);
+      opacity: 0.9;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.2rem, 9vw, 6.5rem);
+      letter-spacing: 0.06em;
+      color: var(--gold);
+      text-shadow:
+        0 2px 4px rgba(0,0,0,0.9),
+        0 4px 30px rgba(0,0,0,0.6),
+        0 0 80px rgba(200, 100, 50, 0.25);
+      line-height: 1;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .subtitle {
+      margin-top: 0.8rem;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 500;
+      font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+      color: #b89870;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    .case-info {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+      font-weight: 500;
+      color: #9a8060;
+      letter-spacing: 0.08em;
+    }
+
+    .case-info span {
+      border-bottom: 1px dashed #6a5040;
+      padding-bottom: 3px;
+      transition: color 0.2s;
+    }
+
+    .case-info span:hover { color: var(--gold); }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      z-index: 10;
+      position: relative;
+      animation: fadeDown 0.8s ease-out 0.2s both;
+    }
+
+    .btn {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 500;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.2rem;
+      border: 1px solid rgba(200, 160, 100, 0.35);
+      background: rgba(30, 22, 14, 0.75);
+      color: var(--gold);
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .btn:hover {
+      background: rgba(139, 26, 26, 0.5);
+      border-color: var(--red);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(196, 30, 30, 0.3);
+    }
+
+    .btn.active {
+      background: rgba(139, 26, 26, 0.65);
+      border-color: var(--red);
+    }
+
+    /* ── Board ── */
+    .board-wrapper {
+      position: relative;
+      z-index: 5;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 1rem;
+      animation: fadeUp 1s ease-out 0.3s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .board {
+      position: relative;
+      min-height: 920px;
+      border: 14px solid #3d2a18;
+      border-radius: 6px;
+      box-shadow:
+        inset 0 0 100px rgba(0,0,0,0.45),
+        0 25px 80px rgba(0,0,0,0.75),
+        0 0 0 2px #2a1c10;
+      background-color: var(--cork);
+      background-image:
+        url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236b4f0a' fill-opacity='0.35'%3E%3Ccircle cx='12' cy='18' r='1.2'/%3E%3Ccircle cx='45' cy='8' r='0.8'/%3E%3Ccircle cx='68' cy='32' r='1'/%3E%3Ccircle cx='25' cy='55' r='1.1'/%3E%3Ccircle cx='60' cy='62' r='0.9'/%3E%3Ccircle cx='8' cy='72' r='1'/%3E%3C/g%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 30% 20%, rgba(255,220,120,0.18) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(0,0,0,0.25) 0%, transparent 60%),
+        linear-gradient(135deg, #a88028 0%, #7a5c10 40%, var(--cork) 60%, var(--cork-dark) 100%);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .board.drag-mode { cursor: grab; }
+    .board.drag-mode .evidence { cursor: grab; }
+    .board.drag-mode .evidence:active { cursor: grabbing; }
+
+    /* ── Strings ── */
+    .strings {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .strings line {
+      stroke: var(--red);
+      stroke-width: 2;
+      opacity: 0.4;
+      transition: opacity 0.3s, stroke-width 0.3s;
+    }
+
+    .strings line.highlight {
+      opacity: 0.95;
+      stroke-width: 3;
+      filter: drop-shadow(0 0 4px rgba(196, 30, 30, 0.8));
+    }
+
+    /* ── Evidence cards ── */
+    .evidence, .center-poster {
+      position: absolute;
+      z-index: 3;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.35s,
+                  filter 0.35s;
+      will-change: transform;
+    }
+
+    .evidence {
+      width: 175px;
+      cursor: pointer;
+    }
+
+    .evidence:hover, .center-poster:hover {
+      z-index: 20;
+      filter: drop-shadow(0 12px 30px rgba(0,0,0,0.5));
+    }
+
+    .evidence.active {
+      z-index: 25;
+      filter: drop-shadow(0 0 20px rgba(196, 30, 30, 0.6));
+    }
+
+    .pin {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 22px;
+      height: 22px;
+      background: radial-gradient(circle at 35% 30%, #ff5555, #cc0000 55%, #770000);
+      border-radius: 50%;
+      box-shadow: 0 4px 8px var(--shadow), inset 0 -3px 5px rgba(0,0,0,0.35);
+      z-index: 5;
+      transition: transform 0.2s;
+    }
+
+    .evidence:hover .pin, .center-poster:hover .pin {
+      transform: translateX(-50%) scale(1.15);
+    }
+
+    .pin::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 5px;
+      width: 7px;
+      height: 5px;
+      background: rgba(255,255,255,0.45);
+      border-radius: 50%;
+    }
+
+    .photo-frame {
+      background: var(--paper);
+      padding: 8px 8px 34px;
+      box-shadow: 4px 6px 20px var(--shadow);
+      position: relative;
+      transition: box-shadow 0.3s;
+    }
+
+    .evidence:hover .photo-frame {
+      box-shadow: 6px 10px 30px rgba(0,0,0,0.55);
+    }
+
+    .photo-frame img {
+      display: block;
+      width: 100%;
+      height: 145px;
+      object-fit: cover;
+      filter: sepia(12%) contrast(1.06) saturate(1.05);
+      transition: filter 0.3s;
+      image-rendering: auto;
+    }
+
+    .evidence:hover .photo-frame img,
+    .center-poster:hover .photo-frame img {
+      filter: sepia(0%) contrast(1.1) saturate(1.15);
+    }
+
+    .dossier-label {
+      position: absolute;
+      bottom: 6px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 600;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      color: #333;
+      text-transform: uppercase;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sticky-note {
+      position: absolute;
+      bottom: -36px;
+      left: 50%;
+      transform: translateX(-50%) rotate(var(--note-rot, 2deg));
+      background: var(--sticky);
+      padding: 7px 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      box-shadow: 2px 3px 8px rgba(0,0,0,0.35);
+      color: #2a2a2a;
+      z-index: 4;
+      transition: transform 0.3s, box-shadow 0.3s;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .evidence:hover .sticky-note {
+      transform: translateX(-50%) rotate(0deg) scale(1.05);
+      box-shadow: 3px 5px 12px rgba(0,0,0,0.4);
+    }
+
+    .clip {
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      width: 16px;
+      height: 32px;
+      border: 2.5px solid #777;
+      border-radius: 0 0 10px 10px;
+      border-top: none;
+      z-index: 6;
+    }
+
+    /* ── Center poster ── */
+    .center-poster {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      text-align: center;
+      width: 240px;
+      cursor: pointer;
+    }
+
+    .center-poster .photo-frame {
+      padding: 10px 10px 40px;
+      border: 3px solid var(--red-dark);
+    }
+
+    .center-poster .photo-frame img { height: 200px; }
+
+    .center-poster .wanted {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: var(--red-dark);
+      letter-spacing: 0.2em;
+      margin-top: 8px;
+      animation: pulse 2s ease-in-out infinite;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* ── Positions ── */
+    .evidence:nth-child(2)  { top: 4%;   left: 3%;   --base-rot: -4deg; transform: rotate(-4deg); --note-rot: -1deg; }
+    .evidence:nth-child(3)  { top: 3%;   left: 20%;  --base-rot: 3deg;  transform: rotate(3deg);  --note-rot: 3deg; }
+    .evidence:nth-child(4)  { top: 5%;   left: 38%;  --base-rot: -2deg; transform: rotate(-2deg); --note-rot: -2deg; }
+    .evidence:nth-child(5)  { top: 2%;   right: 22%; --base-rot: 5deg;  transform: rotate(5deg);  --note-rot: 1deg; }
+    .evidence:nth-child(6)  { top: 4%;   right: 3%;  --base-rot: -3deg; transform: rotate(-3deg); --note-rot: -3deg; }
+    .evidence:nth-child(7)  { top: 32%;  left: 2%;   --base-rot: 6deg;  transform: rotate(6deg);  --note-rot: 2deg; }
+    .evidence:nth-child(8)  { top: 30%;  left: 18%;  --base-rot: -5deg; transform: rotate(-5deg); --note-rot: -2deg; }
+    .evidence:nth-child(9)  { top: 28%;  right: 18%; --base-rot: 4deg;  transform: rotate(4deg);  --note-rot: 3deg; }
+    .evidence:nth-child(10) { top: 32%;  right: 2%;  --base-rot: -6deg; transform: rotate(-6deg); --note-rot: -1deg; }
+    .evidence:nth-child(11) { bottom: 8%; left: 3%;   --base-rot: 3deg;  transform: rotate(3deg);  --note-rot: 2deg; }
+    .evidence:nth-child(12) { bottom: 6%; left: 20%;  --base-rot: -4deg; transform: rotate(-4deg); --note-rot: -3deg; }
+    .evidence:nth-child(13) { bottom: 8%; left: 38%;  --base-rot: 2deg;  transform: rotate(2deg);  --note-rot: 1deg; }
+    .evidence:nth-child(14) { bottom: 6%; right: 22%; --base-rot: -3deg; transform: rotate(-3deg); --note-rot: -2deg; }
+    .evidence:nth-child(15) { bottom: 8%; right: 3%;  --base-rot: 5deg;  transform: rotate(5deg);  --note-rot: 3deg; }
+
+    .evidence:not(.dragging):hover {
+      transform: scale(1.1) rotate(0deg) !important;
+    }
+
+    .evidence.dragging {
+      z-index: 100 !important;
+      transition: none;
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+    }
+
+    /* entrance animation */
+    .evidence, .center-poster {
+      animation: pinDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .evidence:nth-child(2)  { animation-delay: 0.05s; }
+    .evidence:nth-child(3)  { animation-delay: 0.10s; }
+    .evidence:nth-child(4)  { animation-delay: 0.15s; }
+    .evidence:nth-child(5)  { animation-delay: 0.20s; }
+    .evidence:nth-child(6)  { animation-delay: 0.25s; }
+    .evidence:nth-child(7)  { animation-delay: 0.30s; }
+    .evidence:nth-child(8)  { animation-delay: 0.35s; }
+    .evidence:nth-child(9)  { animation-delay: 0.40s; }
+    .evidence:nth-child(10) { animation-delay: 0.45s; }
+    .evidence:nth-child(11) { animation-delay: 0.50s; }
+    .evidence:nth-child(12) { animation-delay: 0.55s; }
+    .evidence:nth-child(13) { animation-delay: 0.60s; }
+    .evidence:nth-child(14) { animation-delay: 0.65s; }
+    .evidence:nth-child(15) { animation-delay: 0.70s; }
+    .center-poster           { animation-delay: 0.75s; }
+
+    @keyframes pinDrop {
+      from { opacity: 0; transform: translateY(-60px) rotate(0deg) scale(0.8); }
+      to   { opacity: 1; }
+    }
+
+    /* ── Modal / lightbox ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-width: 900px;
+      width: 100%;
+      background: var(--paper);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .modal-overlay.open .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-photo {
+      position: relative;
+      overflow: hidden;
+      background: #111;
+    }
+
+    .modal-photo img {
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .modal-photo .stamp-overlay {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      border: 4px solid var(--red-dark);
+      color: var(--red-dark);
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.25em;
+      padding: 0.4rem 1rem;
+      transform: rotate(12deg);
+      opacity: 0.85;
+      text-transform: uppercase;
+    }
+
+    .modal-info {
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .modal-info h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem;
+      letter-spacing: 0.08em;
+      color: #1a1a1a;
+      line-height: 1.1;
+    }
+
+    .modal-info .note-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--red-dark);
+      letter-spacing: 0.05em;
+      padding: 0.8rem 1rem;
+      background: var(--sticky);
+      display: inline-block;
+      box-shadow: 2px 3px 8px rgba(0,0,0,0.15);
+      transform: rotate(-1deg);
+    }
+
+    .modal-details {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.8;
+      color: #444;
+    }
+
+    .modal-details dt {
+      font-weight: 600;
+      color: #222;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.75rem;
+      margin-top: 0.6rem;
+    }
+
+    .modal-details dd { margin-left: 0; }
+
+    .modal-close {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--red-dark);
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      transition: transform 0.2s, background 0.2s;
+      z-index: 10;
+    }
+
+    .modal-close:hover {
+      transform: scale(1.1);
+      background: var(--red);
+    }
+
+    .typewriter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.85rem;
+      color: #666;
+      border-left: 3px solid var(--red);
+      padding-left: 1rem;
+      min-height: 3em;
+      line-height: 1.6;
+    }
+
+    /* ── Credits ── */
+    footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      margin-top: 3rem;
+      padding: 2rem 1rem 1.5rem;
+      animation: fadeUp 1s ease-out 0.8s both;
+    }
+
+    footer::before {
+      content: '';
+      display: block;
+      width: 120px;
+      height: 1px;
+      margin: 0 auto 1.8rem;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.6;
+    }
+
+    .credits-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: 0.72rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: #6a5840;
+      margin-bottom: 0.9rem;
+    }
+
+    .credits-names {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+      letter-spacing: 0.18em;
+      line-height: 1.4;
+      background: linear-gradient(135deg, #f0ddb0 0%, var(--gold) 45%, #c9a060 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 2px 12px rgba(200, 160, 80, 0.25));
+    }
+
+    .credits-names span {
+      opacity: 0.45;
+      -webkit-text-fill-color: #a08060;
+      font-size: 0.85em;
+      letter-spacing: 0.1em;
+      margin: 0 0.3em;
+    }
+
+    .credits-wallah {
+      display: block;
+      margin-top: 1rem;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #8a7050;
+      font-style: italic;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .board { min-height: 1500px; }
+      .evidence { width: 140px; }
+      .evidence .photo-frame img { height: 110px; }
+
+      .evidence:nth-child(2)  { top: 2%;   left: 2%;   bottom: auto; }
+      .evidence:nth-child(3)  { top: 2%;   left: 35%;  bottom: auto; }
+      .evidence:nth-child(4)  { top: 2%;   right: 2%;  left: auto; bottom: auto; }
+      .evidence:nth-child(5)  { top: 14%;  left: 18%;  bottom: auto; }
+      .evidence:nth-child(6)  { top: 14%;  right: 2%;  left: auto; bottom: auto; }
+      .evidence:nth-child(7)  { top: 26%;  left: 2%;   bottom: auto; }
+      .evidence:nth-child(8)  { top: 26%;  left: 35%;  bottom: auto; }
+      .evidence:nth-child(9)  { top: 26%;  right: 2%;  left: auto; bottom: auto; }
+      .evidence:nth-child(10) { top: 38%;  left: 18%;  bottom: auto; }
+      .evidence:nth-child(11) { top: 50%;  left: 2%;   bottom: auto; }
+      .evidence:nth-child(12) { top: 50%;  left: 35%;  bottom: auto; }
+      .evidence:nth-child(13) { top: 50%;  right: 2%;  left: auto; bottom: auto; }
+      .evidence:nth-child(14) { top: 62%;  left: 18%;  bottom: auto; }
+      .evidence:nth-child(15) { top: 74%;  left: 2%;   bottom: auto; }
+      .center-poster { top: 74%; transform: translate(-50%, 0); }
+      .strings { display: none; }
+
+      .modal { grid-template-columns: 1fr; }
+      .modal-photo img { min-height: 280px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="spotlight" id="spotlight"></div>
+  <div class="room">
+    <div class="lamp-glow"></div>
+
+    <header>
+      <div class="stamp">CONFIDENTIEL</div>
+      <h1>Les Grosses Putes</h1>
+      <p class="subtitle">MUR DES VIOLÉS — Dossier #4CHAN</p>
+      <div class="case-info">
+        <span>Affaire : GP-2026</span>
+        <span>Statut : VIOLEZ</span>
+        <span>Suspects : 14</span>
+        <span>Classé : REGLER</span>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <button class="btn" id="btnDrag">Déplacer les photos</button>
+      <button class="btn" id="btnReset">Réinitialiser</button>
+      <button class="btn" id="btnShuffle">Mélanger</button>
+    </div>
+
+    <div class="board-wrapper">
+      <div class="board" id="board">
+
+        <svg class="strings" id="strings" viewBox="0 0 1400 900" preserveAspectRatio="none"></svg>
+
+        <div class="center-poster" data-id="0" data-dossier="TROU DU CUL ORIGINEL" data-note="FILS DE PUTE" data-status="RECHERCHÉ" data-img="./images/photo-12.png">
+          <div class="pin"></div>
+          <div class="photo-frame">
+            <img src="./images/photo-12.png" alt="Suspect principal" draggable="false">
+            <div class="dossier-label">SUSPECT PRINCIPAL</div>
+          </div>
+          <div class="wanted">RECHERCHÉ</div>
+        </div>
+
+        <div class="evidence" data-id="1"  data-dossier="Dossier #001" data-note="T'AS EU MAL TOI" data-status="SUSPECT" data-img="./images/photo-01.png"><div class="pin"></div><div class="photo-frame"><img src="./images/photo-01.png" alt="Indice 01" draggable="false"><div class="dossier-label">Dossier #001</div></div><div class="sticky-note">T'AS EU MAL TOI</div></div>
+        <div class="evidence" data-id="2"  data-dossier="Dossier #002" data-note="VIOLER" data-status="SUSPECT" data-img="./images/photo-02.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><img src="./images/photo-02.png" alt="Indice 02" draggable="false"><div class="dossier-label">Dossier #002</div></div><div class="sticky-note">VIOLER</div></div>
+        <div class="evidence" data-id="3"  data-dossier="Dossier #003" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="./images/photo-03.png"><div class="pin"></div><div class="photo-frame"><img src="./images/photo-03.png" alt="Indice 03" draggable="false"><div class="dossier-label">Dossier #003</div></div><div class="sticky-note">FILS DE PUTE</div></div>
+        <div class="evidence" data-id="4"  data-dossier="Dossier #004" data-note="TROU DU CUL" data-status="SUSPECT" data-img="./images/photo-04.png"><div class="pin"></div><div class="photo-frame"><img src="./images/photo-04.png" alt="Indice 04" draggable="false"><div class="dossier-label">Dossier #004</div></div><div class="sticky-note">TROU DU CUL</div></div>
+        <div class="evidence" data-id="5"  data-dossier="Dossier #005" data-note="VIOLER" data-status="SUSPECT" data-img="./images/photo-05.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><img src="./images/photo-05.png" alt="Indice 05" draggable="false"><div class="dossier-label">Dossier #005</div></div><div class="sticky-note">VIOLER</div></div>
+        <div class="evidence" data-id="6"  data-dossier="Dossier #006" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="./images/photo-06.png"><div class="pin"></div><div class="photo-frame"><img src="./images/photo-06.png" alt="Indice 06" draggable="false"><div class="dossier-label">Dossier #006</div></div><div class="sticky-note">FILS DE PUTE</div></div>
+        <div class="evidence" data-id="7"  data-dossier="Dossier #007" data-note="TROU DU CUL" data-status="SUSPECT" data-img="./images/photo-07.png"><div class="pin"></div><div class="photo-frame"><img src="./images/photo-07.png" alt="Indice 07" draggable="false"><div class="dossier-label">Dossier #007</div></div><div class="sticky-note">TROU DU CUL</div></div>
+        <div class="evidence" data-id="8"  data-dossier="Dossier #008" data-note="VIOLER" data-status="SUSPECT" data-img="./images/photo-08.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><img src="./images/photo-08.png" alt="Indice 08" draggable="false"><div class="dossier-label">Dossier #008</div></div><div class="sticky-note">VIOLER</div></div>
+        <div class="evidence" data-id="9"  data-dossier="Dossier #009" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="./images/photo-09.png"><div class="pin"></div><div class="photo-frame"><img src="./images/photo-09.png" alt="Indice 09" draggable="false"><div class="dossier-label">Dossier #009</div></div><div class="sticky-note">FILS DE PUTE</div></div>
+        <div class="evidence" data-id="10" data-dossier="Dossier #010" data-note="TROU DU CUL" data-status="SUSPECT" data-img="./images/photo-10.png"><div class="pin"></div><div class="photo-frame"><img src="./images/photo-10.png" alt="Indice 10" draggable="false"><div class="dossier-label">Dossier #010</div></div><div class="sticky-note">TROU DU CUL</div></div>
+        <div class="evidence" data-id="11" data-dossier="Dossier #011" data-note="VIOLER" data-status="SUSPECT" data-img="./images/photo-11.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><img src="./images/photo-11.png" alt="Indice 11" draggable="false"><div class="dossier-label">Dossier #011</div></div><div class="sticky-note">VIOLER</div></div>
+        <div class="evidence" data-id="12" data-dossier="Dossier #012" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="./images/photo-13.png"><div class="pin"></div><div class="photo-frame"><img src="./images/photo-13.png" alt="Indice 13" draggable="false"><div class="dossier-label">Dossier #012</div></div><div class="sticky-note">FILS DE PUTE</div></div>
+        <div class="evidence" data-id="13" data-dossier="Dossier #013" data-note="TROU DU CUL" data-status="SUSPECT" data-img="./images/photo-14.png"><div class="pin"></div><div class="photo-frame"><img src="./images/photo-14.png" alt="Indice 14" draggable="false"><div class="dossier-label">Dossier #013</div></div><div class="sticky-note">TROU DU CUL</div></div>
+        <div class="evidence" data-id="14" data-dossier="Dossier #014" data-note="VIOLER" data-status="SUSPECT" data-img="./images/photo-15.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><img src="./images/photo-15.png" alt="Indice 15" draggable="false"><div class="dossier-label">Dossier #014</div></div><div class="sticky-note">VIOLER</div></div>
+
+      </div>
+    </div>
+
+    <footer>
+      <p class="credits-label">LES VIOLEURS :</p>
+      <p class="credits-names">4CHAN <span>·</span> HAMZA <span>·</span> SOFIANE <span>·</span> SAFIR <span>·</span> SINCE</p>
+      <span class="credits-wallah">wAllah</span>
+    </footer>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <button class="modal-close" id="modalClose" aria-label="Fermer">✕</button>
+      <div class="modal-photo">
+        <img id="modalImg" src="" alt="">
+        <div class="stamp-overlay">PREUVE</div>
+      </div>
+      <div class="modal-info">
+        <h2 id="modalTitle">Dossier</h2>
+        <div class="note-text" id="modalNote"></div>
+        <dl class="modal-details">
+          <dt>Statut</dt>
+          <dd id="modalStatus">—</dd>
+          <dt>Affaire</dt>
+          <dd>GP-2026 / #4CHAN</dd>
+          <dt>Agent assigné</dt>
+          <dd>Inspecteur Hamza</dd>
+        </dl>
+        <div class="typewriter" id="typewriter"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const board = document.getElementById('board');
+    const stringsSvg = document.getElementById('strings');
+    const spotlight = document.getElementById('spotlight');
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modalImg');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalNote = document.getElementById('modalNote');
+    const modalStatus = document.getElementById('modalStatus');
+    const typewriter = document.getElementById('typewriter');
+    const btnDrag = document.getElementById('btnDrag');
+    const btnReset = document.getElementById('btnReset');
+    const btnShuffle = document.getElementById('btnShuffle');
+
+    const cards = [...board.querySelectorAll('.evidence, .center-poster')];
+    const defaultPositions = new Map();
+
+    cards.forEach(card => {
+      defaultPositions.set(card, {
+        top: card.style.top,
+        left: card.style.left,
+        right: card.style.right,
+        bottom: card.style.bottom,
+        transform: getComputedStyle(card).transform
+      });
+    });
+
+    /* ── Dynamic red strings ── */
+    function updateStrings() {
+      stringsSvg.innerHTML = '';
+      const boardRect = board.getBoundingClientRect();
+      const center = board.querySelector('.center-poster');
+      const cx = center.offsetLeft + center.offsetWidth / 2;
+      const cy = center.offsetTop + center.offsetHeight / 2;
+
+      board.querySelectorAll('.evidence').forEach((ev, i) => {
+        const ex = ev.offsetLeft + ev.offsetWidth / 2;
+        const ey = ev.offsetTop + ev.offsetHeight / 2;
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', ex);
+        line.setAttribute('y1', ey);
+        line.setAttribute('x2', cx);
+        line.setAttribute('y2', cy);
+        line.dataset.index = i;
+        stringsSvg.appendChild(line);
+      });
+
+      stringsSvg.setAttribute('viewBox', `0 0 ${board.offsetWidth} ${board.offsetHeight}`);
+    }
+
+    window.addEventListener('load', updateStrings);
+    window.addEventListener('resize', updateStrings);
+
+    /* ── Spotlight follows mouse ── */
+    document.addEventListener('mousemove', e => {
+      spotlight.style.left = e.clientX + 'px';
+      spotlight.style.top = e.clientY + 'px';
+    });
+
+    /* ── Highlight strings on hover ── */
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        if (card.classList.contains('center-poster')) {
+          stringsSvg.querySelectorAll('line').forEach(l => l.classList.add('highlight'));
+          return;
+        }
+        const idx = [...board.querySelectorAll('.evidence')].indexOf(card);
+        stringsSvg.querySelectorAll('line').forEach((l, i) => {
+          l.classList.toggle('highlight', i === idx);
+        });
+      });
+
+      card.addEventListener('mouseleave', () => {
+        stringsSvg.querySelectorAll('line').forEach(l => l.classList.remove('highlight'));
+      });
+    });
+
+    let typeInterval;
+
+    function openModal(card) {
+      modalImg.src = card.dataset.img;
+      modalTitle.textContent = card.dataset.dossier;
+      modalNote.textContent = card.dataset.note;
+      modalStatus.textContent = card.dataset.note;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      clearInterval(typeInterval);
+      typewriter.textContent = '';
+      const text = 'Verdict : ' + card.dataset.note + '.';
+      let i = 0;
+      typeInterval = setInterval(() => {
+        typewriter.textContent += text[i];
+        i++;
+        if (i >= text.length) clearInterval(typeInterval);
+      }, 25);
+    }
+
+    function closeModal() {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+      clearInterval(typeInterval);
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('click', e => {
+        if (dragMode) return;
+        cards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        openModal(card);
+      });
+    });
+
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    /* ── Drag & drop ── */
+    let dragMode = false;
+    let dragging = null;
+    let offsetX, offsetY;
+
+    btnDrag.addEventListener('click', () => {
+      dragMode = !dragMode;
+      btnDrag.classList.toggle('active', dragMode);
+      board.classList.toggle('drag-mode', dragMode);
+      btnDrag.textContent = dragMode ? 'Mode déplacement actif' : 'Déplacer les photos';
+    });
+
+    cards.forEach(card => {
+      card.addEventListener('mousedown', e => {
+        if (!dragMode || e.button !== 0) return;
+        e.preventDefault();
+        dragging = card;
+        card.classList.add('dragging');
+        const rect = card.getBoundingClientRect();
+        const boardRect = board.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        card.style.right = 'auto';
+        card.style.bottom = 'auto';
+      });
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const boardRect = board.getBoundingClientRect();
+      let x = e.clientX - boardRect.left - offsetX;
+      let y = e.clientY - boardRect.top - offsetY;
+      x = Math.max(0, Math.min(x, board.offsetWidth - dragging.offsetWidth));
+      y = Math.max(0, Math.min(y, board.offsetHeight - dragging.offsetHeight));
+      dragging.style.left = x + 'px';
+      dragging.style.top = y + 'px';
+      dragging.style.transform = `rotate(${Math.random() * 10 - 5}deg)`;
+      updateStrings();
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (dragging) {
+        dragging.classList.remove('dragging');
+        dragging = null;
+      }
+    });
+
+    /* ── Reset positions ── */
+    btnReset.addEventListener('click', () => {
+      cards.forEach(card => {
+        card.style.top = '';
+        card.style.left = '';
+        card.style.right = '';
+        card.style.bottom = '';
+        card.style.transform = '';
+        card.classList.remove('active');
+      });
+      setTimeout(updateStrings, 50);
+    });
+
+    /* ── Shuffle ── */
+    btnShuffle.addEventListener('click', () => {
+      const bw = board.offsetWidth;
+      const bh = board.offsetHeight;
+      cards.forEach(card => {
+        const w = card.offsetWidth;
+        const h = card.offsetHeight;
+        card.style.right = 'auto';
+        card.style.bottom = 'auto';
+        card.style.left = Math.random() * (bw - w) + 'px';
+        card.style.top = Math.random() * (bh - h) + 'px';
+        card.style.transform = `rotate(${Math.random() * 16 - 8}deg)`;
+      });
+      updateStrings();
+    });
+  </script>
+</body>
+</html>
