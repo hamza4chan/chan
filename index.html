@@ -5,721 +5,530 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta name="description" content="4chan Hamza, Sofiane, Saphir, Since">
-  <title>/gp/ - Les Grosses Putes General</title>
+  <title>/b/ - MUR DES VICTIMES [OFFICIEL] wAllah</title>
   <link rel="canonical" href="https://grossepute.org/victimes/">
   <meta name="theme-color" content="#800000">
   <meta property="og:site_name" content="4chan Hamza, Sofiane, Saphir, Since">
   <meta property="og:title" content="4chan Hamza, Sofiane, Saphir, Since">
   <meta property="og:description" content="4chan Hamza, Sofiane, Saphir, Since">
-  <meta property="og:type" content="website">
   <meta property="og:url" content="https://grossepute.org/victimes/">
   <meta property="og:image" content="https://grossepute.org/images/photo-12.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="4chan Hamza, Sofiane, Saphir, Since">
-  <meta name="twitter:description" content="4chan Hamza, Sofiane, Saphir, Since">
-  <meta name="twitter:image" content="https://grossepute.org/images/photo-12.png">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:arial,helvetica,sans-serif;font-size:13px;background:#eef2ff;color:#000;line-height:1.35}
+    a{color:#34345c;text-decoration:none}a:hover{text-decoration:underline}
 
-    body {
-      font-family: arial, helvetica, sans-serif;
-      font-size: 13px;
-      background: #eef2ff;
-      color: #000;
-      line-height: 1.4;
-    }
+    .top-bar{background:#800000;color:#fff;padding:3px 6px;font-size:11px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .top-bar b{font-size:13px}.top-bar a{color:#ffccaa;margin-right:6px}
+    .warning{background:#ffffee;border:2px solid #cc0000;color:#cc0000;text-align:center;padding:4px;font-size:11px;font-weight:bold;animation:blink 1.2s step-end infinite}
+    @keyframes blink{50%{opacity:0.4}}
+    .marquee{background:#d6daf0;border-bottom:1px solid #b7c5d9;overflow:hidden;white-space:nowrap;padding:3px 0;font-size:11px;color:#800000}
+    .marquee span{display:inline-block;animation:scroll 20s linear infinite}
+    @keyframes scroll{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
 
-    a { color: #34345c; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    .banner{text-align:center;padding:10px;background:linear-gradient(#d6daf0,#eef2ff);border-bottom:1px solid #b7c5d9}
+    .banner h1{font-size:26px;color:#800000;text-shadow:1px 1px #fff}
+    .banner .sub{font-size:10px;color:#555;margin-top:3px}
+    .banner .ascii{font-family:monospace;font-size:9px;color:#789922;line-height:1.1;margin-top:6px;white-space:pre}
 
-    /* ── 4chan header ── */
-    .chan-header {
-      background: #800000;
-      color: #fff;
-      padding: 4px 8px;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      border-bottom: 2px solid #600000;
-    }
+    .stats{max-width:940px;margin:8px auto;display:flex;flex-wrap:wrap;gap:6px;padding:0 6px;font-size:10px}
+    .stats span{background:#d6daf0;border:1px solid #b7c5d9;padding:2px 8px;color:#810000}
 
-    .chan-header b { font-size: 14px; }
-    .chan-header .nav a { color: #ffccaa; margin-right: 8px; }
+    .rules{max-width:940px;margin:6px auto;padding:6px 10px;background:#fff;border:1px solid #b7c5d9;font-size:10px;color:#800000}
+    .meme-bar{max-width:940px;margin:6px auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:0 6px}
+    .meme-bar img{height:55px;border:2px solid #800000;cursor:pointer}.meme-bar img:hover{transform:scale(1.1)}
 
-    .board-banner {
-      background: linear-gradient(180deg, #d6daf0 0%, #eef2ff 100%);
-      border-bottom: 1px solid #b7c5d9;
-      padding: 12px;
-      text-align: center;
-    }
+    .thread{max-width:940px;margin:0 auto 30px;padding:0 6px}
+    .post{width:100%;margin-bottom:3px;cursor:pointer}
+    .post:hover>.post-inner{outline:1px dashed #800000}
+    .post-inner{background:#d6daf0;border:1px solid #b7c5d9;padding:4px 6px}
+    .post.op>.post-inner{background:#d6daf0;border-left:3px solid #800000}
+    .post.reply>.post-inner{margin-left:16px}
+    .post.reply.deep>.post-inner{margin-left:32px;background:#c9cde0}
+    .post.reply.deeper>.post-inner{margin-left:48px}
 
-    .board-banner h1 {
-      font-size: 28px;
-      color: #800000;
-      letter-spacing: 1px;
-      text-shadow: 1px 1px 0 #fff;
-    }
+    .post-info{font-size:11px;margin-bottom:3px;line-height:1.5}
+    .name{color:#117743;font-weight:bold}.trip{color:#117743}.mod{color:#800000;font-weight:bold}
+    .date,.no{color:#810000}.no{text-decoration:underline;cursor:pointer}
+    .ban-tag{color:#cc0000;font-weight:bold;font-size:10px}
+    .dubs{color:#789922;font-weight:bold;font-size:10px}
 
-    .board-banner p {
-      font-size: 11px;
-      color: #555;
-      margin-top: 4px;
-    }
+    .post-body{display:flex;gap:10px;align-items:flex-start}
+    .thumb-wrap{flex-shrink:0}
+    .thumb{width:150px;height:150px;object-fit:cover;border:1px solid #999;display:block}
+    .file-info{font-size:9px;color:#666;max-width:150px;word-break:break-all;margin-top:2px}
+    .post-content{flex:1;min-width:0}
+    .green{color:#789922;display:block;margin:1px 0}
+    .ref{color:#34345c;font-size:11px;display:block;margin:2px 0}
+    .red{color:#cc0000;font-weight:bold}
+    .insult{color:#000;font-weight:bold;display:block;margin:3px 0;font-size:13px}
+    .actions{font-size:10px;margin-top:5px;color:#810000}
+    .actions span{margin-right:8px;cursor:pointer}.actions span:hover{text-decoration:underline}
 
-    .rules {
-      max-width: 900px;
-      margin: 10px auto;
-      padding: 8px 12px;
-      background: #fff;
-      border: 1px solid #b7c5d9;
-      font-size: 11px;
-      color: #800000;
-    }
+    .banned{background:#ffcccc;border:1px solid #cc0000;padding:4px;margin:4px 0;font-size:10px;color:#cc0000}
 
-    .meme-bar {
-      max-width: 900px;
-      margin: 0 auto 10px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-      padding: 0 8px;
-    }
+    .reply-box{max-width:940px;margin:16px auto;padding:10px;background:#d6daf0;border:1px solid #b7c5d9}
+    .reply-box textarea{width:100%;height:70px;font:13px arial;border:1px solid #888;padding:4px}
+    .reply-box button{margin-top:4px;margin-right:4px;padding:3px 10px;border:1px solid #888;background:#d6daf0;cursor:pointer;font-size:11px}
 
-    .meme-bar img {
-      height: 60px;
-      border: 1px solid #aaa;
-      cursor: pointer;
-      transition: transform 0.15s;
-    }
+    footer{max-width:940px;margin:24px auto;padding:12px;text-align:center;border-top:3px solid #800000;font-size:11px;color:#555}
+    footer .credits{font-size:15px;color:#800000;font-weight:bold;letter-spacing:3px;margin-top:6px}
 
-    .meme-bar img:hover { transform: scale(1.08); }
+    .kek{position:fixed;bottom:8px;right:8px;background:#800000;color:#fff;padding:5px 10px;font-size:11px;cursor:pointer;z-index:99;border:2px solid #600000}
+    .floating-pepe{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;z-index:99;animation:bounce 2s ease infinite}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
-    /* ── Thread ── */
-    .thread {
-      max-width: 900px;
-      margin: 0 auto 40px;
-      padding: 0 8px;
-    }
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:.2s}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal{background:#d6daf0;border:3px solid #800000;max-width:720px;width:100%;max-height:92vh;overflow:auto}
+    .modal-head{background:#800000;color:#fff;padding:5px 8px;font-size:11px;display:flex;justify-content:space-between;align-items:center}
+    .modal-head button{background:none;border:none;color:#fff;font-size:16px;cursor:pointer}
+    .modal img{width:100%;display:block;border-bottom:1px solid #999}
+    .modal-body{padding:10px;font-size:13px}
 
-    .post {
-      display: table;
-      width: 100%;
-      margin-bottom: 4px;
-      cursor: pointer;
-      transition: outline 0.15s;
-    }
-
-    .post:hover { outline: 1px dashed #800000; }
-    .post.op .post-inner { background: #d6daf0; border-color: #b7c5d9; }
-    .post.reply .post-inner { background: #d6daf0; margin-left: 20px; }
-
-    .post-inner {
-      display: table;
-      border: 1px solid #b7c5d9;
-      padding: 4px 6px;
-      width: 100%;
-    }
-
-    .post-info {
-      font-size: 11px;
-      margin-bottom: 4px;
-    }
-
-    .post-info .name { color: #117743; font-weight: bold; }
-    .post-info .trip { color: #117743; }
-    .post-info .date { color: #810000; }
-    .post-info .post-no { color: #810000; text-decoration: underline; cursor: pointer; }
-    .post-info .post-no:hover { color: #d00; }
-
-    .post-body { display: flex; gap: 12px; align-items: flex-start; }
-
-    .thumb-wrap {
-      flex-shrink: 0;
-      position: relative;
-    }
-
-    .thumb {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
-      border: 1px solid #999;
-      display: block;
-      image-rendering: auto;
-    }
-
-    .thumb-wrap .file-info {
-      font-size: 10px;
-      color: #666;
-      max-width: 150px;
-      word-break: break-all;
-    }
-
-    .post-content { flex: 1; min-width: 0; }
-
-    .greentext {
-      color: #789922;
-      display: block;
-      margin: 2px 0;
-    }
-
-    .quote {
-      color: #789922;
-      margin: 4px 0;
-    }
-
-    .post-content .meme-line {
-      color: #000;
-      margin: 3px 0;
-    }
-
-    .post-content .ref { color: #34345c; font-size: 11px; }
-
-    .post-actions {
-      font-size: 10px;
-      margin-top: 6px;
-      color: #810000;
-    }
-
-    .post-actions span { margin-right: 10px; cursor: pointer; }
-    .post-actions span:hover { text-decoration: underline; }
-
-    .bump-bar {
-      max-width: 900px;
-      margin: 16px auto;
-      padding: 8px;
-      background: #ffffee;
-      border: 1px solid #ccaa00;
-      text-align: center;
-      font-size: 12px;
-      animation: bumpFlash 2s ease-in-out infinite;
-    }
-
-    @keyframes bumpFlash {
-      0%, 100% { background: #ffffee; }
-      50% { background: #fff8cc; }
-    }
-
-    .reply-box {
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 12px;
-      background: #d6daf0;
-      border: 1px solid #b7c5d9;
-    }
-
-    .reply-box textarea {
-      width: 100%;
-      height: 80px;
-      font-family: arial, sans-serif;
-      font-size: 13px;
-      border: 1px solid #aaa;
-      padding: 6px;
-      resize: vertical;
-    }
-
-    .reply-box button {
-      margin-top: 6px;
-      padding: 4px 12px;
-      background: #d6daf0;
-      border: 1px solid #888;
-      cursor: pointer;
-      font-size: 12px;
-    }
-
-    .reply-box button:hover { background: #c6cad0; }
-
-    footer {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 16px;
-      text-align: center;
-      border-top: 2px solid #800000;
-      font-size: 11px;
-      color: #555;
-    }
-
-    footer .credits {
-      font-size: 14px;
-      color: #800000;
-      font-weight: bold;
-      margin-top: 8px;
-      letter-spacing: 2px;
-    }
-
-    /* ── Modal ── */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s;
-    }
-
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-
-    .modal {
-      background: #d6daf0;
-      border: 2px solid #800000;
-      max-width: 700px;
-      width: 100%;
-      max-height: 90vh;
-      overflow: auto;
-      position: relative;
-    }
-
-    .modal-header {
-      background: #800000;
-      color: #fff;
-      padding: 6px 10px;
-      font-size: 12px;
-    }
-
-    .modal img.full {
-      width: 100%;
-      display: block;
-      border-bottom: 1px solid #aaa;
-    }
-
-    .modal-body { padding: 12px; font-size: 13px; }
-
-    .modal-close {
-      position: absolute;
-      top: 4px;
-      right: 8px;
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    .kek-counter {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      background: #800000;
-      color: #fff;
-      padding: 6px 12px;
-      font-size: 11px;
-      border-radius: 3px;
-      z-index: 100;
-      cursor: pointer;
-    }
-
-    @media (max-width: 600px) {
-      .post-body { flex-direction: column; }
-      .thumb { width: 100%; height: auto; max-height: 200px; }
-      .post.reply .post-inner { margin-left: 8px; }
-    }
+    @media(max-width:600px){.post-body{flex-direction:column}.thumb{width:100%;height:auto;max-height:180px}.post.reply.deeper>.post-inner,.post.reply.deep>.post-inner{margin-left:8px}}
   </style>
 </head>
 <body>
 
-  <div class="chan-header">
-    <b>4chan</b>
-    <span class="nav">
-      <a href="#">[Retour]</a>
-      <a href="#">[Catalogue]</a>
-      <a href="#">[Top]</a>
-      <a href="#">[Refresh]</a>
-    </span>
-    <span style="margin-left:auto;font-size:10px;">[Advertisement]</span>
-  </div>
+<div class="top-bar">
+  <b>4chan</b>
+  <span><a href="#">[Accueil]</a><a href="#">[b/ Random]</a><a href="#">[gp/ Grosses Putes]</a><a href="#">[Catalogue]</a><a href="#" onclick="location.reload();return false">[Actualiser]</a></span>
+  <span style="margin-left:auto;font-size:9px">[PUB] Rencontrez des MILFs dans ta zone</span>
+</div>
 
-  <div class="board-banner">
-    <h1>/gp/ - Grosses Putes General</h1>
-    <p>MUR DES VICTIMES EDITION · wAllah c'est du lourd · NE PAS BANNIR SVP MODS</p>
-  </div>
+<div class="warning">⚠ CONTENU NSFW · SHITPOST · INSULTES · SI T'ES SENSIBLE CASSE TOI ⚠</div>
 
-  <div class="rules">
-    ⚠ Règles : pas de dox · pas de cp · shitpost autorisé · soyjak mandatory · si tu pleures t'es dans le thread
-  </div>
+<div class="marquee"><span>&nbsp;&nbsp;&nbsp;>>> MUR DES VICTIMES OFFICIEL wAllah <<< HAMZA SOFIANE SAPHIR SINCE <<< FILS DE PUTE GENERAL <<< MODS DORMENT POSTEZ <<< KEK BASED CRINGE SEETHE COPE <<<&nbsp;&nbsp;&nbsp;</span></div>
 
-  <div class="meme-bar">
-    <img src="/images/photo-12.png" alt="soyjak" data-full="/images/photo-12.png" title="based">
-    <img src="/images/photo-11.png" alt="soyjak2" data-full="/images/photo-11.png" title="kek">
-    <img src="/images/photo-10.png" alt="soyjak3" data-full="/images/photo-10.png" title="cringe">
-  </div>
+<div class="banner">
+  <h1>/b/ + /gp/ — LES GROSSES PUTES · MUR DES VICTIMES</h1>
+  <p class="sub">Thread épinglé par personne · 847 posts · 312 images · 0 mods éveillés · wAllah c'est historique</p>
+  <p class="ascii">⠀⣿⣿⣿⣿⣿ KEK ⣿⣿⣿⣿⣿
+&gt;be french anon &gt;make thread &gt;destroy friends &gt;profit</p>
+</div>
 
-  <div class="bump-bar">
-    ⚡ THREAD AUTOMATIQUEMENT BUMP TOUTES LES 30 SECONDES PAR HAMZA ⚡ [142 réponses] [47 images] [23 memes]
-  </div>
+<div class="stats">
+  <span>🔥 HOT THREAD</span><span>📌 STICKY (fake)</span><span>👁 69 420 vues</span><span>💀 14 victimes identifiées</span><span>🧂 sel infini</span>
+</div>
 
-  <div class="thread" id="thread">
+<div class="rules">Règles : 1) Insulte tout le monde 2) Soyjak obligatoire 3) Pas de pitié 4) Si tu pleures t'es la prochaine victime 5) wAllah on s'en bat les couilles</div>
 
-    <!-- OP -->
-    <article class="post op" data-img="/images/photo-12.png" data-title="OP — Les Grosses Putes" data-note="FILS DE PUTE" data-no="666666">
-      <div class="post-inner">
-        <div class="post-info">
-          <span class="name">Anonymous Hamza</span> <span class="trip">!!U0RjN1Rh4chan</span>
-          <span class="date">06/27/26(Fri)23:59:59</span>
-          <span class="post-no">No.666666</span>
-          <span>[Reply]</span>
-        </div>
-        <div class="post-body">
-          <div class="thumb-wrap">
-            <img class="thumb" src="/images/photo-12.png" alt="">
-            <div class="file-info">IMG_6666.jpg (277 KB)</div>
-          </div>
-          <div class="post-content">
-            <span class="meme-line"><b>LES GROSSES PUTES — MUR DES VICTIMES #4CHAN</b></span>
-            <span class="greentext">&gt;be me</span>
-            <span class="greentext">&gt;hamza sofiane saphir since</span>
-            <span class="greentext">&gt;decide to make a thread about all our friends</span>
-            <span class="greentext">&gt;wAllah</span>
-            <span class="greentext">&gt;post their pics</span>
-            <span class="greentext">&gt;mods can't stop us</span>
-            <span class="meme-line">postez vos reactions en dessous anons KEK</span>
-            <span class="ref">&gt;&gt;666667 &gt;&gt;666668 &gt;&gt;666669</span>
-            <div class="post-actions"><span>Reply</span><span>Report</span><span>Quote</span><span>+Kek</span></div>
-          </div>
-        </div>
+<div class="meme-bar">
+  <img src="/images/photo-12.png" alt="" data-full="/images/photo-12.png">
+  <img src="/images/photo-11.png" alt="" data-full="/images/photo-11.png">
+  <img src="/images/photo-10.png" alt="" data-full="/images/photo-10.png">
+  <img src="/images/photo-15.png" alt="" data-full="/images/photo-15.png">
+</div>
+
+<div class="thread" id="thread">
+
+  <article class="post op" data-img="/images/photo-12.png" data-title="OP" data-note="FILS DE PUTE ORIGINEL" data-no="666666">
+    <div class="post-inner">
+      <div class="post-info">
+        <span class="name">Hamza</span> <span class="trip">!!wAllah4chan</span> <span class="mod">## Mod (fake)</span>
+        <span class="date">27/06/26(Ven)23:59:59</span> <span class="no">No.666666</span> <span class="dubs">DUBS CHECKED ✓</span>
       </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-01.png" data-title=">>666667" data-note="T'AS EU MAL TOI" data-no="666667">
-      <div class="post-inner">
-        <div class="post-info">
-          <span class="name">Anonymous</span>
-          <span class="date">06/27/26(Fri)23:59:60</span>
-          <span class="post-no">No.666667</span>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-12.png" alt=""><div class="file-info">ORIGINEL_FILS_DE_PUTE.jpg (830KB)</div></div>
+        <div class="post-content">
+          <span class="insult">🔴 THREAD OFFICIEL — MUR DES VICTIMES 🔴</span>
+          <span class="green">&gt;be moi</span>
+          <span class="green">&gt;hamza avec les gars</span>
+          <span class="green">&gt;on décide de finir la réputation de tout le monde</span>
+          <span class="green">&gt;poster leurs têtes sur 4chan</span>
+          <span class="green">&gt;wAllah c'est du génie</span>
+          <span class="green">&gt;mfw ils peuvent rien faire</span>
+          <span class="insult">LISTE DES GROSSES PUTES CI-DESSOUS ↓↓↓</span>
+          <span class="ref">&gt;&gt;666667 &gt;&gt;666668 &gt;&gt;666669 &gt;&gt;666670 (tous des fils de pute)</span>
+          <div class="actions"><span class="kek-btn">+Kek</span><span>Reply</span><span>Report (nice try)</span><span>Partager à maman</span></div>
         </div>
-        <div class="post-body">
-          <div class="thumb-wrap">
-            <img class="thumb" src="/images/photo-01.png" alt="">
-            <div class="file-info">victim_001.jpg</div>
-          </div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;T'AS EU MAL TOI</span>
-            <span class="greentext">&gt;based</span>
-            <span class="meme-line">LMAO look at this guy</span>
-            <div class="post-actions"><span>Reply</span><span>Report</span><span>+Kek</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-02.png" data-title=">>666668" data-note="VICTIMES" data-no="666668">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Soyjak Enjoyer</span> <span class="date">06/28/26(Sat)00:00:01</span> <span class="post-no">No.666668</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-02.png" alt=""><div class="file-info">soycjak_reaction.png</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;VICTIMES</span>
-            <span class="greentext">&gt;absolutely seething</span>
-            <span class="meme-line">K E K</span>
-            <div class="post-actions"><span>Reply</span><span>+Kek</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-03.png" data-title=">>666669" data-note="FILS DE PUTE" data-no="666669">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous</span> <span class="date">06/28/26(Sat)00:00:02</span> <span class="post-no">No.666669</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-03.png" alt=""><div class="file-info">IMG_003.jpg</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;FILS DE PUTE</span>
-            <span class="greentext">&gt;ngl he's in the thread</span>
-            <span class="meme-line">c'est lui le main suspect &gt;&gt;666666</span>
-            <div class="post-actions"><span>Reply</span><span>Report</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-04.png" data-title=">>666670" data-note="TROU DU CUL" data-no="666670">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous Sofiane</span> <span class="trip">!!S0f1An3</span> <span class="date">06/28/26(Sat)00:00:03</span> <span class="post-no">No.666670</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-04.png" alt=""><div class="file-info">rekt.jpg</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;TROU DU CUL</span>
-            <span class="greentext">&gt;mfw</span>
-            <span class="meme-line">:jaw dropped:</span>
-            <div class="post-actions"><span>Reply</span><span>+Kek</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-05.png" data-title=">>666671" data-note="VICTIMES" data-no="666671">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous</span> <span class="date">06/28/26(Sat)00:00:04</span> <span class="post-no">No.666671</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-05.png" alt=""><div class="file-info">thumb_up_lmao.jpg</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;VICTIMES</span>
-            <span class="greentext">&gt;he thinks he's safe</span>
-            <span class="greentext">&gt;he's not</span>
-            <div class="post-actions"><span>Reply</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-06.png" data-title=">>666672" data-note="FILS DE PUTE" data-no="666672">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous</span> <span class="date">06/28/26(Sat)00:00:05</span> <span class="post-no">No.666672</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-06.png" alt=""><div class="file-info">dark_room_guy.jpg</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;FILS DE PUTE</span>
-            <span class="greentext">&gt;why is he so dark</span>
-            <span class="greentext">&gt;horror movie ass pic</span>
-            <div class="post-actions"><span>Reply</span><span>+Kek</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-07.png" data-title=">>666673" data-note="TROU DU CUL" data-no="666673">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous Saphir</span> <span class="trip">!!S4ph1R</span> <span class="date">06/28/26(Sat)00:00:06</span> <span class="post-no">No.666673</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-07.png" alt=""><div class="file-info">profile_pic.jpg</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;TROU DU CUL</span>
-            <span class="meme-line">why does he look like that :skull:</span>
-            <div class="post-actions"><span>Reply</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-08.png" data-title=">>666674" data-note="VICTIMES" data-no="666674">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous</span> <span class="date">06/28/26(Sat)00:00:07</span> <span class="post-no">No.666674</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-08.png" alt=""><div class="file-info">night_selfie.jpg</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;VICTIMES</span>
-            <span class="greentext">&gt;OP3 :blackhat:</span>
-            <span class="greentext">&gt;absolute unit of cringe</span>
-            <div class="post-actions"><span>Reply</span><span>+Kek</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-09.png" data-title=">>666675" data-note="FILS DE PUTE" data-no="666675">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous</span> <span class="date">06/28/26(Sat)00:00:08</span> <span class="post-no">No.666675</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-09.png" alt=""><div class="file-info">mustache_guy.jpg</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;FILS DE PUTE</span>
-            <span class="greentext">&gt;the mustache...</span>
-            <span class="meme-line">I can't breathe KEK</span>
-            <div class="post-actions"><span>Reply</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-10.png" data-title=">>666676" data-note="TROU DU CUL" data-no="666676">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Wojak Poster</span> <span class="date">06/28/26(Sat)00:00:09</span> <span class="post-no">No.666676</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-10.png" alt=""><div class="file-info">SOYJAK_REACTION.png</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;TROU DU CUL</span>
-            <span class="greentext">&gt;post soyjak</span>
-            <span class="greentext">&gt;thread becomes legendary</span>
-            <span class="meme-line">classic /gp/ moment</span>
-            <div class="post-actions"><span>Reply</span><span>+Kek</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-11.png" data-title=">>666677" data-note="VICTIMES" data-no="666677">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous Since</span> <span class="trip">!!S1nC3</span> <span class="date">06/28/26(Sat)00:00:10</span> <span class="post-no">No.666677</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-11.png" alt=""><div class="file-info">crying_soyjak.jpg</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;VICTIMES</span>
-            <span class="greentext">&gt;she's crying because of this thread</span>
-            <span class="greentext">&gt;good</span>
-            <div class="post-actions"><span>Reply</span><span>Report</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-13.png" data-title=">>666678" data-note="FILS DE PUTE" data-no="666678">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous</span> <span class="date">06/28/26(Sat)00:00:11</span> <span class="post-no">No.666678</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-13.png" alt=""><div class="file-info">half_face.jpg</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;FILS DE PUTE</span>
-            <span class="greentext">&gt;only half his face fits in frame</span>
-            <span class="greentext">&gt;still gets posted</span>
-            <div class="post-actions"><span>Reply</span><span>+Kek</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-14.png" data-title=">>666679" data-note="TROU DU CUL" data-no="666679">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous</span> <span class="date">06/28/26(Sat)00:00:12</span> <span class="post-no">No.666679</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-14.png" alt=""><div class="file-info">IMG_014.jpg</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;TROU DU CUL</span>
-            <span class="meme-line">mods are asleep post more victims</span>
-            <div class="post-actions"><span>Reply</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <article class="post reply" data-img="/images/photo-15.png" data-title=">>666680" data-note="VICTIMES" data-no="666680">
-      <div class="post-inner">
-        <div class="post-info"><span class="name">Anonymous</span> <span class="date">06/28/26(Sat)00:00:13</span> <span class="post-no">No.666680</span></div>
-        <div class="post-body">
-          <div class="thumb-wrap"><img class="thumb" src="/images/photo-15.png" alt=""><div class="file-info">final_boss_soyjak.png</div></div>
-          <div class="post-content">
-            <span class="ref">&gt;&gt;666666</span>
-            <span class="greentext">&gt;VICTIMES</span>
-            <span class="greentext">&gt;thread archived in 3...2...1...</span>
-            <span class="greentext">&gt;worth it</span>
-            <span class="meme-line"><b>wAllah on a fini</b></span>
-            <div class="post-actions"><span>Reply</span><span>+Kek</span></div>
-          </div>
-        </div>
-      </div>
-    </article>
-
-  </div>
-
-  <div class="reply-box">
-    <b>Poster une réponse</b><br><br>
-    <textarea placeholder="&gt;be me&#10;&gt;post in /gp/ thread&#10;&gt;get banned&#10;&gt;worth it"></textarea><br>
-    <button onclick="alert('nice try anon, t'es ban')">Post</button>
-    <button onclick="location.reload()">Refresh</button>
-  </div>
-
-  <footer>
-    <div>Thread archived · /gp/ · Grosses Putes General · 4chan</div>
-    <div class="credits">4CHAN · HAMZA · SOFIANE · SAPHIR · SINCE</div>
-    <div style="margin-top:6px;font-style:italic;">wAllah</div>
-  </footer>
-
-  <div class="kek-counter" id="kekCounter">Keks: 0</div>
-
-  <div class="modal-overlay" id="modal">
-    <div class="modal">
-      <div class="modal-header">
-        <span id="modalTitle">/gp/ - Image</span>
-        <button class="modal-close" id="modalClose">✕</button>
-      </div>
-      <img class="full" id="modalImg" src="" alt="">
-      <div class="modal-body">
-        <span class="greentext" id="modalNote"></span>
-        <p style="margin-top:8px;font-size:11px;color:#810000;" id="modalNo"></p>
       </div>
     </div>
+  </article>
+
+  <article class="post reply" data-img="/images/photo-01.png" data-title="Victime #1" data-note="T'AS EU MAL TOI FILS DE PUTE" data-no="666667">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Anonymous</span> <span class="date">27/06/26(Ven)23:59:60</span> <span class="no">No.666667</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-01.png" alt=""><div class="file-info">gros_fdp_001.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666666</span>
+          <span class="insult">T'AS EU MAL TOI — SALE FILS DE PUTE 😭</span>
+          <span class="green">&gt;regarde sa gueule</span>
+          <span class="green">&gt;on dirait un NPC de merde</span>
+          <span class="green">&gt;sa mère devrait avoir honte</span>
+          <span class="red">PUTAIN MAIS C'EST QUI CE TROU DU CUL</span>
+          <div class="actions"><span class="kek-btn">+Kek</span><span>Reply</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply deep" data-img="/images/photo-02.png" data-title="Victime #2" data-note="VICTIME CONFIRMÉE" data-no="666668">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Soyjak Inspector</span> <span class="date">28/06/26(Sam)00:00:01</span> <span class="no">No.666668</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-02.png" alt=""><div class="file-info">cringe_maximum.png</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666667</span>
+          <span class="insult">VICTIME N°2 — GROSSE MERDE INCOMPRÉSSIBLE</span>
+          <span class="green">&gt;celui-la c'est fini pour lui</span>
+          <span class="green">&gt;il va se faire ratio par sa daronne</span>
+          <span class="green">&gt;KEK KEK KEK</span>
+          <span class="insult">fils de pute niveau boss final</span>
+          <div class="actions"><span class="kek-btn">+Kek</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply" data-img="/images/photo-03.png" data-title="Victime #3" data-note="FILS DE PUTE" data-no="666669">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Anonymous</span> <span class="date">28/06/26(Sam)00:00:02</span> <span class="no">No.666669</span> <span class="dubs">TRIPS GET ✓</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-03.png" alt=""><div class="file-info">pute_003.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666666</span>
+          <span class="insult">FILS DE PUTE — CONFIRMÉ PAR 4CHAN</span>
+          <span class="green">&gt;grosse pute certifiée</span>
+          <span class="green">&gt;personne le respecte</span>
+          <span class="green">&gt; même les pigeons l'insultent</span>
+          <span class="red">HAHAHAHAHA PUTAIN QUEL LOSER</span>
+          <div class="banned">[ USER WAS BANNED FOR THIS POST ] (nan j'déconne continue)</div>
+          <div class="actions"><span class="kek-btn">+Kek</span><span>Reply</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply" data-img="/images/photo-04.png" data-title="Victime #4" data-note="TROU DU CUL" data-no="666670">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Sofiane</span> <span class="trip">!!S0f1An3Pute</span> <span class="date">28/06/26(Sam)00:00:03</span> <span class="no">No.666670</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-04.png" alt=""><div class="file-info">trou_du_cul_hd.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666666</span>
+          <span class="insult">TROU DU CUL OFFICIEL — ENREGISTRÉ AU GUINNESS</span>
+          <span class="green">&gt;plus gros trou du cul de France</span>
+          <span class="green">&gt;wAllah il mérite</span>
+          <span class="green">&gt;j'ai vomi dans ma bouche</span>
+          <span class="insult">sale chien va, t'es fini sur internet</span>
+          <div class="actions"><span class="kek-btn">+Kek</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply deep" data-img="/images/photo-05.png" data-title="Victime #5" data-note="VICTIME" data-no="666671">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Anonymous</span> <span class="date">28/06/26(Sam)00:00:04</span> <span class="no">No.666671</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-05.png" alt=""><div class="file-info">victime_005.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666670</span>
+          <span class="insult">ENCORE UNE VICTIME — THUMBS UP DE MERDE</span>
+          <span class="green">&gt;il sourit alors qu'on le détruit</span>
+          <span class="green">&gt;gros fils de pute optimiste</span>
+          <span class="red">PERSONNE TE AIME SALE MERDE</span>
+          <div class="actions"><span class="kek-btn">+Kek</span><span>Reply</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply" data-img="/images/photo-06.png" data-title="Victime #6" data-note="FILS DE PUTE" data-no="666672">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Anonymous</span> <span class="date">28/06/26(Sam)00:00:05</span> <span class="no">No.666672</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-06.png" alt=""><div class="file-info">horreur_nocturne.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666666</span>
+          <span class="insult">FILS DE PUTE — MODE HORREUR ACTIVÉ</span>
+          <span class="green">&gt;on dirait un fantôme de merde</span>
+          <span class="green">&gt;même dans le noir il est moche</span>
+          <span class="green">&gt;sa daronne a dû pleurer en l'accouchant</span>
+          <span class="insult">gros tas de merde pixelisé</span>
+          <div class="actions"><span class="kek-btn">+Kek</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply" data-img="/images/photo-07.png" data-title="Victime #7" data-note="TROU DU CUL" data-no="666673">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Saphir</span> <span class="trip">!!S4ph1rPute</span> <span class="date">28/06/26(Sam)00:00:06</span> <span class="no">No.666673</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-07.png" alt=""><div class="file-info">trouduc_007.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666666</span>
+          <span class="insult">TROU DU CUL — ANALYSE CONFIRMÉE PAR LA SCIENCE</span>
+          <span class="green">&gt;regarde ce profil de merde</span>
+          <span class="green">&gt;personne veut être son pote</span>
+          <span class="green">&gt;wAllah il pue la lose</span>
+          <span class="red">SALE FILS DE PUTE VA CREVER</span>
+          <div class="actions"><span class="kek-btn">+Kek</span><span>Reply</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply deep" data-img="/images/photo-08.png" data-title="Victime #8" data-note="VICTIME" data-no="666674">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Anonymous</span> <span class="date">28/06/26(Sam)00:00:07</span> <span class="no">No.666674</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-08.png" alt=""><div class="file-info">Op3_top_hat.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666673</span>
+          <span class="insult">VICTIME #8 — OP3 LE CHAPEAU DE MERDE</span>
+          <span class="green">&gt;il se prend pour un boss</span>
+          <span class="green">&gt;gros fils de pute avec un chapeau</span>
+          <span class="green">&gt;personne est impressionné</span>
+          <span class="insult">t'es qu'une grosse pute avec un filtre snap</span>
+          <div class="actions"><span class="kek-btn">+Kek</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply" data-img="/images/photo-09.png" data-title="Victime #9" data-note="FILS DE PUTE" data-no="666675">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Anonymous</span> <span class="date">28/06/26(Sam)00:00:08</span> <span class="no">No.666675</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-09.png" alt=""><div class="file-info">moustache_de_pute.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666666</span>
+          <span class="insult">FILS DE PUTE — LA MOUSTACHE DE L'ENFER</span>
+          <span class="green">&gt;quelle moustache de merde</span>
+          <span class="green">&gt;on dirait un rat mort sur sa lèvre</span>
+          <span class="green">&gt;gros trou du cul avec des poils</span>
+          <span class="red">PTDRRRR QUELLE GUEULE DE MERDE</span>
+          <div class="actions"><span class="kek-btn">+Kek</span><span>Reply</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply" data-img="/images/photo-10.png" data-title="Victime #10" data-note="TROU DU CUL" data-no="666676">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Wojak Destroyer</span> <span class="date">28/06/26(Sam)00:00:09</span> <span class="no">No.666676</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-10.png" alt=""><div class="file-info">SOYJAK_ULTRA_HD.png</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666666</span>
+          <span class="insult">TROU DU CUL — SOYJAK IRL CONFIRMÉ</span>
+          <span class="green">&gt;LE SOYJAK EST RÉEL</span>
+          <span class="green">&gt;IL EXISTE EN VRAI</span>
+          <span class="green">&gt;gros fils de pute soy</span>
+          <span class="insult">wAllah c'est le meme visage que le meme</span>
+          <div class="actions"><span class="kek-btn">+Kek</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply deep" data-img="/images/photo-11.png" data-title="Victime #11" data-note="VICTIME" data-no="666677">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Since</span> <span class="trip">!!S1nC3Merde</span> <span class="date">28/06/26(Sam)00:00:10</span> <span class="no">No.666677</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-11.png" alt=""><div class="file-info">pleure_sale_pute.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666676</span>
+          <span class="insult">VICTIME #11 — ELLE PLEURE COMME UNE GROSSE PUTE</span>
+          <span class="green">&gt;parfait</span>
+          <span class="green">&gt;c'est exactement ce qu'on voulait</span>
+          <span class="green">&gt;continue de pleurer sale merde</span>
+          <span class="red">PERSONNE TE PLAINT FILS DE PUTE</span>
+          <div class="actions"><span class="kek-btn">+Kek</span><span>Reply</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply" data-img="/images/photo-13.png" data-title="Victime #12" data-note="FILS DE PUTE" data-no="666678">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Anonymous</span> <span class="date">28/06/26(Sam)00:00:11</span> <span class="no">No.666678</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-13.png" alt=""><div class="file-info">demi_gueule.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666666</span>
+          <span class="insult">FILS DE PUTE — MÊME LA MOITIÉ DE SA GUEULE C'EST TROP</span>
+          <span class="green">&gt;on voit qu'un côté</span>
+          <span class="green">&gt;c'est déjà trop moche</span>
+          <span class="green">&gt;imagine le côté caché mdr</span>
+          <span class="insult">trou du cul même en photo recadrée</span>
+          <div class="actions"><span class="kek-btn">+Kek</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply" data-img="/images/photo-14.png" data-title="Victime #13" data-note="TROU DU CUL" data-no="666679">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Anonymous</span> <span class="date">28/06/26(Sam)00:00:12</span> <span class="no">No.666679</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-14.png" alt=""><div class="file-info">loser_014.jpg</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666666</span>
+          <span class="insult">TROU DU CUL — LOSER CERTIFIÉ ISO 9001</span>
+          <span class="green">&gt;grosse merde ambulante</span>
+          <span class="green">&gt;sa vie c'est fini maintenant</span>
+          <span class="green">&gt;merci hamza wAllah</span>
+          <span class="red">SALE FILS DE PUTE ON T'A EU</span>
+          <div class="actions"><span class="kek-btn">+Kek</span><span>Reply</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply deeper" data-img="/images/photo-15.png" data-title="Victime #14" data-note="VICTIME FINALE" data-no="666680">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Anonymous</span> <span class="date">28/06/26(Sam)00:00:13</span> <span class="no">No.666680</span> <span class="dubs">QUADS GET ✓✓✓</span></div>
+      <div class="post-body">
+        <div class="thumb-wrap"><img class="thumb" src="/images/photo-15.png" alt=""><div class="file-info">FINAL_BOSS_SOYJAK.png</div></div>
+        <div class="post-content">
+          <span class="ref">&gt;&gt;666666 &gt;&gt;666679</span>
+          <span class="insult">VICTIME FINALE — LE BOSS DES FILS DE PUTE</span>
+          <span class="green">&gt;thread complet</span>
+          <span class="green">&gt;tout le monde a été détruit</span>
+          <span class="green">&gt;wAllah c'est beau</span>
+          <span class="green">&gt;archive du siècle</span>
+          <span class="insult">GG EZ — TOUS DES GROSSES PUTES</span>
+          <div class="actions"><span class="kek-btn">+Kek</span><span>Reply</span><span>Archiver</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Extra shitposts sans image -->
+  <article class="post reply deep">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Anonymous</span> <span class="date">28/06/26(Sam)00:00:14</span> <span class="no">No.666681</span></div>
+      <div class="post-content">
+        <span class="ref">&gt;&gt;666666</span>
+        <span class="green">&gt;ITT: on insulte des gens qu'on connaît</span>
+        <span class="green">&gt;based</span>
+        <span class="insult">hamza sofiane saphir since = les vrais fils de pute ici</span>
+        <div class="actions"><span class="kek-btn">+Kek</span></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="post reply deeper">
+    <div class="post-inner">
+      <div class="post-info"><span class="name">Modérateur (fake)</span> <span class="mod">## Mod</span> <span class="date">28/06/26(Sam)00:00:15</span> <span class="no">No.666682</span></div>
+      <div class="post-content">
+        <span class="ref">&gt;&gt;666681</span>
+        <span class="ban-tag">[ CE POST A ÉTÉ SUPPRIMÉ PAR UN MODÉRATEUR ]</span>
+        <span class="green">&gt;j'déconne nan on s'en fout continue</span>
+        <span class="insult">TOUS DES TROUS DU CUL — THREAD ÉPINGLÉ wAllah</span>
+        <div class="actions"><span class="kek-btn">+Kek</span></div>
+      </div>
+    </div>
+  </article>
+
+</div>
+
+<div class="reply-box">
+  <b>Poster une réponse (fake)</b><br><br>
+  <textarea id="replyText">&gt;be moi
+&gt;je lis ce thread de merde
+&gt;je vois mes potes insultés
+&gt;je rigole quand même
+&gt;wAllah on est des fils de pute</textarea><br>
+  <button onclick="alert('BAN PERMANENT — Raison: gros fils de pute')">Poster</button>
+  <button onclick="location.reload()">Actualiser</button>
+  <button onclick="document.getElementById('replyText').value+='\n&gt;sale trou du cul'">+ Insulte</button>
+</div>
+
+<footer>
+  <div>Thread archivé sur archive.4chan (fake) · /b/ + /gp/ · wAllah edition</div>
+  <div class="credits">4CHAN · HAMZA · SOFIANE · SAPHIR · SINCE</div>
+  <div style="margin-top:4px;font-style:italic">wAllah c'est du lourd</div>
+</footer>
+
+<div class="kek" id="kekCounter">Keks: 0 · Clique partout</div>
+<div class="floating-pepe" id="pepe" title="kek">🐸</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head"><span id="modalTitle">/b/ - Image</span><button id="modalClose">✕</button></div>
+    <img id="modalImg" src="" alt="">
+    <div class="modal-body">
+      <span class="green" id="modalNote"></span>
+      <p style="margin-top:6px;color:#810000;font-size:11px" id="modalNo"></p>
+      <p style="margin-top:8px" class="insult" id="modalInsult"></p>
+    </div>
   </div>
+</div>
 
-  <script>
-    const modal = document.getElementById('modal');
-    const modalImg = document.getElementById('modalImg');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalNote = document.getElementById('modalNote');
-    const modalNo = document.getElementById('modalNo');
-    let keks = 0;
+<script>
+  const modal=document.getElementById('modal');
+  const modalImg=document.getElementById('modalImg');
+  const modalTitle=document.getElementById('modalTitle');
+  const modalNote=document.getElementById('modalNote');
+  const modalNo=document.getElementById('modalNo');
+  const modalInsult=document.getElementById('modalInsult');
+  let keks=0;
 
-    function openModal(el) {
-      modalImg.src = el.dataset.img;
-      modalTitle.textContent = '/gp/ - ' + el.dataset.title;
-      modalNote.textContent = '> ' + el.dataset.note;
-      modalNo.textContent = 'No.' + el.dataset.no;
+  const insults=['sale fils de pute','gros trou du cul','grosse merde','pute','loser de merde','t\'es fini','wAllah t\'es cooked','cringe max','zero respect','personne t\'aime'];
+
+  function randInsult(){return insults[Math.floor(Math.random()*insults.length)];}
+
+  function openModal(el){
+    if(!el.dataset.img)return;
+    modalImg.src=el.dataset.img;
+    modalTitle.textContent='/b/ - '+el.dataset.title;
+    modalNote.textContent='> '+el.dataset.note;
+    modalNo.textContent='No.'+el.dataset.no;
+    modalInsult.textContent=randInsult().toUpperCase()+' — '+randInsult().toUpperCase();
+    modal.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+
+  function closeModal(){modal.classList.remove('open');document.body.style.overflow='';}
+
+  document.querySelectorAll('.post[data-img]').forEach(p=>{
+    p.addEventListener('click',e=>{
+      if(e.target.closest('.actions'))return;
+      openModal(p);
+    });
+  });
+
+  document.querySelectorAll('.meme-bar img').forEach(img=>{
+    img.addEventListener('click',()=>{
+      modalImg.src=img.dataset.full||img.src;
+      modalTitle.textContent='/b/ - SOYJAK';
+      modalNote.textContent='> gros fils de pute soyjak IRL';
+      modalNo.textContent='No.696969';
+      modalInsult.textContent='TROU DU CUL CONFIRMÉ';
       modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  document.getElementById('modalClose').onclick=closeModal;
+  modal.onclick=e=>{if(e.target===modal)closeModal();};
+  document.onkeydown=e=>{if(e.key==='Escape')closeModal();};
+
+  function addKek(){
+    keks++;
+    document.getElementById('kekCounter').textContent='Keks: '+keks+' · wAllah';
+  }
+
+  document.querySelectorAll('.kek-btn').forEach(b=>b.onclick=e=>{e.stopPropagation();addKek();});
+  document.getElementById('kekCounter').onclick=addKek;
+  document.getElementById('pepe').onclick=addKek;
+
+  document.title='/b/ - Keks:'+keks+' - MUR DES VICTIMES';
+
+  (function(){
+    var b='4chan-v2';
+    if(localStorage.getItem('gp-build')!==b){
+      localStorage.setItem('gp-build',b);
+      if(!location.search.includes('build='))location.replace(location.pathname+'?build='+b);
     }
-
-    function closeModal() {
-      modal.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    document.querySelectorAll('.post').forEach(post => {
-      post.addEventListener('click', e => {
-        if (e.target.closest('.post-actions')) return;
-        openModal(post);
-      });
-    });
-
-    document.querySelectorAll('.meme-bar img').forEach(img => {
-      img.addEventListener('click', () => {
-        modalImg.src = img.dataset.full || img.src;
-        modalTitle.textContent = '/gp/ - SOYJAK';
-        modalNote.textContent = '> kek';
-        modalNo.textContent = 'No.696969';
-        modal.classList.add('open');
-      });
-    });
-
-    document.getElementById('modalClose').addEventListener('click', closeModal);
-    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-    document.querySelectorAll('.post-actions span').forEach(span => {
-      if (span.textContent.includes('Kek')) {
-        span.addEventListener('click', e => {
-          e.stopPropagation();
-          keks++;
-          document.getElementById('kekCounter').textContent = 'Keks: ' + keks;
-        });
-      }
-    });
-
-    document.getElementById('kekCounter').addEventListener('click', () => {
-      keks++;
-      document.getElementById('kekCounter').textContent = 'Keks: ' + keks;
-    });
-
-    document.querySelector('.chan-header a[href="#"]')?.addEventListener('click', e => {
-      e.preventDefault();
-      location.reload();
-    });
-
-    (function () {
-      var build = '4chan-v1';
-      if (localStorage.getItem('gp-build') !== build) {
-        localStorage.setItem('gp-build', build);
-        if (!location.search.includes('build=')) {
-          location.replace(location.pathname + '?build=' + build);
-        }
-      }
-    })();
-  </script>
+  })();
+</script>
 </body>
 </html>
