@@ -6,7 +6,7 @@
   <meta name="description" content="4chan Hamza, Sofiane, Saphir, Since">
   <title>4chan Hamza, Sofiane, Saphir, Since</title>
   <link rel="canonical" href="https://grossepute.org/victimes/">
-  <meta name="theme-color" content="#0a0806">
+  <meta name="theme-color" content="#050505">
   <meta property="og:site_name" content="4chan Hamza, Sofiane, Saphir, Since">
   <meta property="og:title" content="4chan Hamza, Sofiane, Saphir, Since">
   <meta property="og:description" content="4chan Hamza, Sofiane, Saphir, Since">
@@ -22,79 +22,116 @@
   <meta name="twitter:image" content="https://grossepute.org/images/photo-12.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --cork: #9a7420;
-      --cork-dark: #6b5010;
-      --red: #c41e1e;
-      --red-dark: #8b1a1a;
-      --paper: #f5f0e8;
-      --sticky: #fff9c4;
-      --gold: #e8d5b0;
-      --shadow: rgba(0, 0, 0, 0.55);
+      --void: #030303;
+      --bg: #080808;
+      --surface: #0f0f0f;
+      --surface-2: #141414;
+      --border: #1e1e1e;
+      --blood: #8b0000;
+      --blood-bright: #cc1111;
+      --blood-glow: rgba(180, 0, 0, 0.45);
+      --ash: #3a3a3a;
+      --smoke: #6b6b6b;
+      --bone: #c8c0b8;
+      --text: #9a9590;
+      --text-dim: #5a5550;
     }
 
     html {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
-      font-synthesis: none;
     }
 
     body {
       min-height: 100vh;
-      background: #0a0806;
-      font-family: 'IBM Plex Mono', 'Segoe UI', monospace;
-      color: #2a1f14;
+      background: var(--void);
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
       overflow-x: hidden;
       cursor: crosshair;
     }
 
-    /* ── Room & lighting ── */
+    /* ── Atmospheric overlays ── */
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      pointer-events: none;
+      opacity: 0.07;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grainShift 0.5s steps(2) infinite;
+    }
+
+    @keyframes grainShift {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-2%, -1%); }
+    }
+
+    .vignette-global {
+      position: fixed;
+      inset: 0;
+      z-index: 9997;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.85) 100%);
+    }
+
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      z-index: 9996;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+    }
+
+    .spotlight {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 0, 0, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 50;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+    }
+
     .room {
       position: relative;
       min-height: 100vh;
       padding: 2.5rem 1rem 5rem;
       background:
-        radial-gradient(ellipse at 50% 0%, rgba(255, 200, 100, 0.14) 0%, transparent 55%),
-        radial-gradient(ellipse at 20% 80%, rgba(255, 80, 40, 0.07) 0%, transparent 40%),
-        linear-gradient(180deg, #1a1410 0%, #0d0a08 100%);
+        radial-gradient(ellipse at 50% 0%, rgba(139, 0, 0, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(139, 0, 0, 0.04) 0%, transparent 40%),
+        linear-gradient(180deg, #0a0a0a 0%, var(--void) 100%);
     }
 
-    .lamp-glow {
+    .blood-drip {
       position: fixed;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 500px;
-      background: radial-gradient(ellipse, rgba(255, 210, 120, 0.22) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 1;
-      animation: lampFlicker 6s ease-in-out infinite;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--blood-bright), var(--blood), transparent);
+      opacity: 0.6;
+      z-index: 100;
+      animation: dripPulse 4s ease-in-out infinite;
     }
 
-    @keyframes lampFlicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.88; }
-      52% { opacity: 0.95; }
-      54% { opacity: 0.85; }
-    }
-
-    .spotlight {
-      position: fixed;
-      width: 320px;
-      height: 320px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 220, 140, 0.09) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 50;
-      transform: translate(-50%, -50%);
-      transition: opacity 0.3s;
-      mix-blend-mode: screen;
+    @keyframes dripPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
     }
 
     /* ── Header ── */
@@ -103,112 +140,122 @@
       z-index: 10;
       text-align: center;
       margin-bottom: 2.5rem;
-      animation: fadeDown 0.8s ease-out;
+      animation: fadeDown 1s ease-out;
     }
 
     @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(-24px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .stamp {
       display: inline-block;
-      border: 3px solid var(--red-dark);
-      color: var(--red-dark);
-      font-family: 'Oswald', sans-serif;
+      border: 2px solid var(--blood-bright);
+      color: var(--blood-bright);
+      font-family: 'Cinzel', serif;
       font-weight: 700;
-      font-size: 1rem;
-      letter-spacing: 0.35em;
-      padding: 0.45rem 1.4rem;
-      transform: rotate(-3deg);
-      opacity: 0.9;
-      margin-bottom: 1rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.45em;
+      padding: 0.5rem 1.6rem;
+      margin-bottom: 1.2rem;
       text-transform: uppercase;
-      -webkit-font-smoothing: antialiased;
+      box-shadow: 0 0 20px var(--blood-glow), inset 0 0 20px rgba(139,0,0,0.1);
+      animation: stampFlicker 8s ease-in-out infinite;
+    }
+
+    @keyframes stampFlicker {
+      0%, 95%, 100% { opacity: 1; }
+      96% { opacity: 0.7; }
+      97% { opacity: 1; }
+      98% { opacity: 0.5; }
     }
 
     h1 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3.2rem, 9vw, 6.5rem);
-      letter-spacing: 0.06em;
-      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-weight: 900;
+      font-size: clamp(2.4rem, 7vw, 5rem);
+      letter-spacing: 0.12em;
+      color: var(--bone);
       text-shadow:
-        0 2px 4px rgba(0,0,0,0.9),
-        0 4px 30px rgba(0,0,0,0.6),
-        0 0 80px rgba(200, 100, 50, 0.25);
-      line-height: 1;
-      -webkit-font-smoothing: antialiased;
+        0 0 40px rgba(139, 0, 0, 0.5),
+        0 2px 0 #000,
+        0 4px 20px rgba(0,0,0,0.9);
+      line-height: 1.1;
+      text-transform: uppercase;
     }
 
     .subtitle {
-      margin-top: 0.8rem;
-      font-family: 'Oswald', sans-serif;
-      font-weight: 500;
-      font-size: clamp(0.95rem, 2.5vw, 1.15rem);
-      color: #b89870;
-      letter-spacing: 0.3em;
+      margin-top: 1rem;
+      font-family: 'Cinzel', serif;
+      font-weight: 600;
+      font-size: clamp(0.8rem, 2vw, 1rem);
+      color: var(--blood-bright);
+      letter-spacing: 0.35em;
       text-transform: uppercase;
+      opacity: 0.85;
     }
 
     .case-info {
       display: flex;
       justify-content: center;
-      gap: 2.5rem;
+      gap: 2rem;
       flex-wrap: wrap;
-      margin-top: 1.5rem;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+      margin-top: 1.8rem;
+      font-size: clamp(0.65rem, 1.5vw, 0.78rem);
       font-weight: 500;
-      color: #9a8060;
-      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
     .case-info span {
-      border-bottom: 1px dashed #6a5040;
-      padding-bottom: 3px;
-      transition: color 0.2s;
+      padding: 0.35rem 0.8rem;
+      border: 1px solid var(--border);
+      background: rgba(15,15,15,0.8);
+      transition: border-color 0.3s, color 0.3s;
     }
 
-    .case-info span:hover { color: var(--gold); }
+    .case-info span:hover {
+      border-color: var(--blood);
+      color: var(--bone);
+    }
 
     /* ── Toolbar ── */
     .toolbar {
       display: flex;
       justify-content: center;
-      gap: 0.75rem;
+      gap: 0.6rem;
       flex-wrap: wrap;
       margin-bottom: 1.5rem;
       z-index: 10;
       position: relative;
-      animation: fadeDown 0.8s ease-out 0.2s both;
+      animation: fadeDown 1s ease-out 0.15s both;
     }
 
     .btn {
-      font-family: 'Oswald', sans-serif;
-      font-weight: 500;
-      font-size: 0.85rem;
-      letter-spacing: 0.15em;
+      font-family: 'Cinzel', serif;
+      font-weight: 600;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      padding: 0.55rem 1.2rem;
-      border: 1px solid rgba(200, 160, 100, 0.35);
-      background: rgba(30, 22, 14, 0.75);
-      color: var(--gold);
+      padding: 0.6rem 1.3rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--smoke);
       cursor: pointer;
-      backdrop-filter: blur(8px);
-      transition: all 0.25s;
-      -webkit-font-smoothing: antialiased;
+      transition: all 0.3s;
     }
 
     .btn:hover {
-      background: rgba(139, 26, 26, 0.5);
-      border-color: var(--red);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(196, 30, 30, 0.3);
+      border-color: var(--blood);
+      color: var(--bone);
+      box-shadow: 0 0 24px var(--blood-glow);
     }
 
     .btn.active {
-      background: rgba(139, 26, 26, 0.65);
-      border-color: var(--red);
+      border-color: var(--blood-bright);
+      color: var(--blood-bright);
+      background: rgba(139, 0, 0, 0.15);
     }
 
     /* ── Board ── */
@@ -218,31 +265,37 @@
       max-width: 1500px;
       margin: 0 auto;
       padding: 1rem;
-      animation: fadeUp 1s ease-out 0.3s both;
+      animation: fadeUp 1.2s ease-out 0.2s both;
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .board {
       position: relative;
       min-height: 920px;
-      border: 14px solid #3d2a18;
-      border-radius: 6px;
+      border: 1px solid var(--border);
       box-shadow:
-        inset 0 0 100px rgba(0,0,0,0.45),
-        0 25px 80px rgba(0,0,0,0.75),
-        0 0 0 2px #2a1c10;
-      background-color: var(--cork);
+        inset 0 0 120px rgba(0,0,0,0.8),
+        0 0 60px rgba(139, 0, 0, 0.08),
+        0 30px 80px rgba(0,0,0,0.9);
+      background-color: var(--surface);
       background-image:
-        url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236b4f0a' fill-opacity='0.35'%3E%3Ccircle cx='12' cy='18' r='1.2'/%3E%3Ccircle cx='45' cy='8' r='0.8'/%3E%3Ccircle cx='68' cy='32' r='1'/%3E%3Ccircle cx='25' cy='55' r='1.1'/%3E%3Ccircle cx='60' cy='62' r='0.9'/%3E%3Ccircle cx='8' cy='72' r='1'/%3E%3C/g%3E%3C/svg%3E"),
-        radial-gradient(ellipse at 30% 20%, rgba(255,220,120,0.18) 0%, transparent 50%),
-        radial-gradient(ellipse at 70% 80%, rgba(0,0,0,0.25) 0%, transparent 60%),
-        linear-gradient(135deg, #a88028 0%, #7a5c10 40%, var(--cork) 60%, var(--cork-dark) 100%);
+        url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23080808'/%3E%3Cpath d='M0 20h40M20 0v40' stroke='%23111111' stroke-width='0.5'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at center, rgba(139,0,0,0.03) 0%, transparent 70%);
       overflow: hidden;
       user-select: none;
+    }
+
+    .board::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.7) 100%);
+      z-index: 1;
     }
 
     .board.drag-mode { cursor: grab; }
@@ -260,82 +313,77 @@
     }
 
     .strings line {
-      stroke: var(--red);
-      stroke-width: 2;
-      opacity: 0.4;
-      transition: opacity 0.3s, stroke-width 0.3s;
+      stroke: var(--blood-bright);
+      stroke-width: 1;
+      opacity: 0.25;
+      transition: opacity 0.4s, stroke-width 0.4s;
     }
 
     .strings line.highlight {
-      opacity: 0.95;
-      stroke-width: 3;
-      filter: drop-shadow(0 0 4px rgba(196, 30, 30, 0.8));
+      opacity: 0.9;
+      stroke-width: 2;
+      filter: drop-shadow(0 0 6px var(--blood-glow));
     }
 
     /* ── Evidence cards ── */
     .evidence, .center-poster {
       position: absolute;
       z-index: 3;
-      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  box-shadow 0.35s,
-                  filter 0.35s;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s;
       will-change: transform;
     }
 
-    .evidence {
-      width: 175px;
-      cursor: pointer;
-    }
+    .evidence { width: 175px; cursor: pointer; }
 
     .evidence:hover, .center-poster:hover {
       z-index: 20;
-      filter: drop-shadow(0 12px 30px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 0 30px var(--blood-glow));
     }
 
     .evidence.active {
       z-index: 25;
-      filter: drop-shadow(0 0 20px rgba(196, 30, 30, 0.6));
+      filter: drop-shadow(0 0 40px rgba(204, 17, 17, 0.7));
     }
 
     .pin {
       position: absolute;
-      top: -12px;
+      top: -10px;
       left: 50%;
       transform: translateX(-50%);
-      width: 22px;
-      height: 22px;
-      background: radial-gradient(circle at 35% 30%, #ff5555, #cc0000 55%, #770000);
+      width: 10px;
+      height: 10px;
+      background: var(--blood-bright);
       border-radius: 50%;
-      box-shadow: 0 4px 8px var(--shadow), inset 0 -3px 5px rgba(0,0,0,0.35);
+      box-shadow: 0 0 12px var(--blood-glow);
       z-index: 5;
-      transition: transform 0.2s;
-    }
-
-    .evidence:hover .pin, .center-poster:hover .pin {
-      transform: translateX(-50%) scale(1.15);
-    }
-
-    .pin::after {
-      content: '';
-      position: absolute;
-      top: 4px;
-      left: 5px;
-      width: 7px;
-      height: 5px;
-      background: rgba(255,255,255,0.45);
-      border-radius: 50%;
     }
 
     .photo-frame {
-      background: var(--paper);
-      padding: 8px 8px 34px;
-      box-shadow: 4px 6px 20px var(--shadow);
+      background: var(--surface-2);
+      padding: 3px 3px 32px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.8);
       position: relative;
-      transition: box-shadow 0.3s;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
 
-    .evidence:hover .photo-frame {
-      box-shadow: 6px 10px 30px rgba(0,0,0,0.55);
+    .evidence:hover .photo-frame,
+    .center-poster:hover .photo-frame {
+      border-color: var(--blood);
+      box-shadow: 0 8px 40px rgba(139,0,0,0.3);
+    }
+
+    .photo-wrap {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .photo-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.75) 100%);
+      pointer-events: none;
     }
 
     .photo-frame img {
@@ -343,14 +391,28 @@
       width: 100%;
       height: 145px;
       object-fit: cover;
-      filter: sepia(12%) contrast(1.06) saturate(1.05);
-      transition: filter 0.3s;
-      image-rendering: auto;
+      filter: grayscale(60%) contrast(1.15) brightness(0.75) sepia(20%);
+      transition: filter 0.4s;
     }
 
     .evidence:hover .photo-frame img,
     .center-poster:hover .photo-frame img {
-      filter: sepia(0%) contrast(1.1) saturate(1.15);
+      filter: grayscale(30%) contrast(1.2) brightness(0.85) sepia(30%);
+    }
+
+    .case-tag {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      font-size: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--blood-bright);
+      background: rgba(0,0,0,0.75);
+      padding: 2px 6px;
+      border: 1px solid var(--blood);
+      z-index: 2;
+      text-transform: uppercase;
     }
 
     .dossier-label {
@@ -359,47 +421,44 @@
       left: 0;
       right: 0;
       text-align: center;
-      font-family: 'IBM Plex Mono', monospace;
       font-weight: 600;
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      color: #333;
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      color: var(--smoke);
       text-transform: uppercase;
-      -webkit-font-smoothing: antialiased;
     }
 
     .sticky-note {
       position: absolute;
-      bottom: -36px;
+      bottom: -34px;
       left: 50%;
-      transform: translateX(-50%) rotate(var(--note-rot, 2deg));
-      background: var(--sticky);
-      padding: 7px 12px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-weight: 500;
-      font-size: 0.78rem;
-      letter-spacing: 0.04em;
+      transform: translateX(-50%) rotate(var(--note-rot, 1deg));
+      background: rgba(139, 0, 0, 0.2);
+      border: 1px solid var(--blood);
+      padding: 5px 10px;
+      font-weight: 600;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
       white-space: nowrap;
-      box-shadow: 2px 3px 8px rgba(0,0,0,0.35);
-      color: #2a2a2a;
+      color: var(--blood-bright);
       z-index: 4;
+      text-transform: uppercase;
       transition: transform 0.3s, box-shadow 0.3s;
-      -webkit-font-smoothing: antialiased;
     }
 
     .evidence:hover .sticky-note {
-      transform: translateX(-50%) rotate(0deg) scale(1.05);
-      box-shadow: 3px 5px 12px rgba(0,0,0,0.4);
+      transform: translateX(-50%) rotate(0deg);
+      box-shadow: 0 0 16px var(--blood-glow);
     }
 
     .clip {
       position: absolute;
-      top: -8px;
-      right: 12px;
-      width: 16px;
-      height: 32px;
-      border: 2.5px solid #777;
-      border-radius: 0 0 10px 10px;
+      top: -6px;
+      right: 10px;
+      width: 14px;
+      height: 26px;
+      border: 2px solid var(--ash);
+      border-radius: 0 0 8px 8px;
       border-top: none;
       z-index: 6;
     }
@@ -416,56 +475,55 @@
     }
 
     .center-poster .photo-frame {
-      padding: 10px 10px 40px;
-      border: 3px solid var(--red-dark);
+      padding: 4px 4px 36px;
+      border: 2px solid var(--blood);
+      box-shadow: 0 0 40px var(--blood-glow), 0 12px 40px rgba(0,0,0,0.9);
     }
 
     .center-poster .photo-frame img { height: 200px; }
 
     .center-poster .wanted {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.8rem;
-      color: var(--red-dark);
-      letter-spacing: 0.2em;
-      margin-top: 8px;
-      animation: pulse 2s ease-in-out infinite;
-      -webkit-font-smoothing: antialiased;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--blood-bright);
+      letter-spacing: 0.3em;
+      margin-top: 10px;
+      text-transform: uppercase;
+      animation: pulse 3s ease-in-out infinite;
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
+      0%, 100% { opacity: 1; text-shadow: 0 0 10px var(--blood-glow); }
+      50% { opacity: 0.6; text-shadow: none; }
     }
 
     /* ── Positions ── */
-    .evidence:nth-child(2)  { top: 4%;   left: 3%;   --base-rot: -4deg; transform: rotate(-4deg); --note-rot: -1deg; }
-    .evidence:nth-child(3)  { top: 3%;   left: 20%;  --base-rot: 3deg;  transform: rotate(3deg);  --note-rot: 3deg; }
-    .evidence:nth-child(4)  { top: 5%;   left: 38%;  --base-rot: -2deg; transform: rotate(-2deg); --note-rot: -2deg; }
-    .evidence:nth-child(5)  { top: 2%;   right: 22%; --base-rot: 5deg;  transform: rotate(5deg);  --note-rot: 1deg; }
-    .evidence:nth-child(6)  { top: 4%;   right: 3%;  --base-rot: -3deg; transform: rotate(-3deg); --note-rot: -3deg; }
-    .evidence:nth-child(7)  { top: 32%;  left: 2%;   --base-rot: 6deg;  transform: rotate(6deg);  --note-rot: 2deg; }
-    .evidence:nth-child(8)  { top: 30%;  left: 18%;  --base-rot: -5deg; transform: rotate(-5deg); --note-rot: -2deg; }
-    .evidence:nth-child(9)  { top: 28%;  right: 18%; --base-rot: 4deg;  transform: rotate(4deg);  --note-rot: 3deg; }
-    .evidence:nth-child(10) { top: 32%;  right: 2%;  --base-rot: -6deg; transform: rotate(-6deg); --note-rot: -1deg; }
-    .evidence:nth-child(11) { bottom: 8%; left: 3%;   --base-rot: 3deg;  transform: rotate(3deg);  --note-rot: 2deg; }
-    .evidence:nth-child(12) { bottom: 6%; left: 20%;  --base-rot: -4deg; transform: rotate(-4deg); --note-rot: -3deg; }
-    .evidence:nth-child(13) { bottom: 8%; left: 38%;  --base-rot: 2deg;  transform: rotate(2deg);  --note-rot: 1deg; }
-    .evidence:nth-child(14) { bottom: 6%; right: 22%; --base-rot: -3deg; transform: rotate(-3deg); --note-rot: -2deg; }
-    .evidence:nth-child(15) { bottom: 8%; right: 3%;  --base-rot: 5deg;  transform: rotate(5deg);  --note-rot: 3deg; }
+    .evidence:nth-child(2)  { top: 4%;   left: 3%;   transform: rotate(-3deg); --note-rot: -1deg; }
+    .evidence:nth-child(3)  { top: 3%;   left: 20%;  transform: rotate(2deg);  --note-rot: 2deg; }
+    .evidence:nth-child(4)  { top: 5%;   left: 38%;  transform: rotate(-1deg); --note-rot: -1deg; }
+    .evidence:nth-child(5)  { top: 2%;   right: 22%; transform: rotate(3deg);  --note-rot: 1deg; }
+    .evidence:nth-child(6)  { top: 4%;   right: 3%;  transform: rotate(-2deg); --note-rot: -2deg; }
+    .evidence:nth-child(7)  { top: 32%;  left: 2%;   transform: rotate(4deg);  --note-rot: 1deg; }
+    .evidence:nth-child(8)  { top: 30%;  left: 18%;  transform: rotate(-3deg); --note-rot: -2deg; }
+    .evidence:nth-child(9)  { top: 28%;  right: 18%; transform: rotate(3deg);  --note-rot: 2deg; }
+    .evidence:nth-child(10) { top: 32%;  right: 2%;  transform: rotate(-4deg); --note-rot: -1deg; }
+    .evidence:nth-child(11) { bottom: 8%; left: 3%;   transform: rotate(2deg);  --note-rot: 1deg; }
+    .evidence:nth-child(12) { bottom: 6%; left: 20%;  transform: rotate(-3deg); --note-rot: -2deg; }
+    .evidence:nth-child(13) { bottom: 8%; left: 38%;  transform: rotate(1deg);  --note-rot: 1deg; }
+    .evidence:nth-child(14) { bottom: 6%; right: 22%; transform: rotate(-2deg); --note-rot: -1deg; }
+    .evidence:nth-child(15) { bottom: 8%; right: 3%;  transform: rotate(3deg);  --note-rot: 2deg; }
 
-    .evidence:not(.dragging):hover {
-      transform: scale(1.1) rotate(0deg) !important;
-    }
+    .evidence:not(.dragging):hover { transform: scale(1.08) rotate(0deg) !important; }
 
     .evidence.dragging {
       z-index: 100 !important;
       transition: none;
-      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+      filter: drop-shadow(0 0 50px var(--blood-glow));
     }
 
-    /* entrance animation */
     .evidence, .center-poster {
-      animation: pinDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      animation: emerge 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
 
     .evidence:nth-child(2)  { animation-delay: 0.05s; }
@@ -484,76 +542,82 @@
     .evidence:nth-child(15) { animation-delay: 0.70s; }
     .center-poster           { animation-delay: 0.75s; }
 
-    @keyframes pinDrop {
-      from { opacity: 0; transform: translateY(-60px) rotate(0deg) scale(0.8); }
-      to   { opacity: 1; }
+    @keyframes emerge {
+      from { opacity: 0; transform: translateY(30px) scale(0.85); filter: blur(4px); }
+      to { opacity: 1; filter: blur(0); }
     }
 
-    /* ── Modal / lightbox ── */
+    /* ── Modal ── */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.88);
-      backdrop-filter: blur(12px);
-      z-index: 1000;
+      background: rgba(0, 0, 0, 0.94);
+      backdrop-filter: blur(20px);
+      z-index: 10000;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2rem;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.35s;
+      transition: opacity 0.4s;
     }
 
-    .modal-overlay.open {
-      opacity: 1;
-      pointer-events: all;
-    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
 
     .modal {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      max-width: 900px;
+      max-width: 920px;
       width: 100%;
-      background: var(--paper);
-      box-shadow: 0 30px 80px rgba(0,0,0,0.7);
-      transform: scale(0.9) translateY(20px);
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: 0 0 80px rgba(139,0,0,0.2), 0 40px 100px rgba(0,0,0,0.9);
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
     }
 
-    .modal-overlay.open .modal {
-      transform: scale(1) translateY(0);
-    }
+    .modal-overlay.open .modal { transform: scale(1) translateY(0); }
 
     .modal-photo {
       position: relative;
       overflow: hidden;
-      background: #111;
+      background: #000;
+    }
+
+    .modal-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.6) 100%);
+      pointer-events: none;
     }
 
     .modal-photo img {
       width: 100%;
       height: 100%;
-      min-height: 400px;
+      min-height: 420px;
       object-fit: cover;
       display: block;
+      filter: grayscale(50%) contrast(1.1) brightness(0.8);
     }
 
     .modal-photo .stamp-overlay {
       position: absolute;
       top: 20px;
       right: 20px;
-      border: 4px solid var(--red-dark);
-      color: var(--red-dark);
-      font-family: 'Oswald', sans-serif;
+      border: 2px solid var(--blood-bright);
+      color: var(--blood-bright);
+      font-family: 'Cinzel', serif;
       font-weight: 700;
-      font-size: 1.1rem;
-      letter-spacing: 0.25em;
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
       padding: 0.4rem 1rem;
-      transform: rotate(12deg);
-      opacity: 0.85;
+      transform: rotate(8deg);
+      z-index: 2;
       text-transform: uppercase;
+      background: rgba(0,0,0,0.6);
     }
 
     .modal-info {
@@ -561,83 +625,82 @@
       display: flex;
       flex-direction: column;
       gap: 1.2rem;
+      border-left: 1px solid var(--border);
     }
 
     .modal-info h2 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2.4rem;
-      letter-spacing: 0.08em;
-      color: #1a1a1a;
-      line-height: 1.1;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+      letter-spacing: 0.1em;
+      color: var(--bone);
+      line-height: 1.2;
+      text-transform: uppercase;
     }
 
     .modal-info .note-text {
-      font-family: 'IBM Plex Mono', monospace;
       font-weight: 600;
-      font-size: 1.05rem;
-      color: var(--red-dark);
-      letter-spacing: 0.05em;
-      padding: 0.8rem 1rem;
-      background: var(--sticky);
+      font-size: 0.85rem;
+      color: var(--blood-bright);
+      letter-spacing: 0.12em;
+      padding: 0.7rem 1rem;
+      border: 1px solid var(--blood);
+      background: rgba(139, 0, 0, 0.1);
       display: inline-block;
-      box-shadow: 2px 3px 8px rgba(0,0,0,0.15);
-      transform: rotate(-1deg);
+      text-transform: uppercase;
     }
 
     .modal-details {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.88rem;
-      line-height: 1.8;
-      color: #444;
+      font-size: 0.75rem;
+      line-height: 1.9;
+      color: var(--text-dim);
     }
 
     .modal-details dt {
       font-weight: 600;
-      color: #222;
+      color: var(--smoke);
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-size: 0.75rem;
-      margin-top: 0.6rem;
+      letter-spacing: 0.15em;
+      font-size: 0.6rem;
+      margin-top: 0.5rem;
     }
 
-    .modal-details dd { margin-left: 0; }
+    .modal-details dd { margin-left: 0; color: var(--text); }
 
     .modal-close {
       position: absolute;
-      top: -14px;
-      right: -14px;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: none;
-      background: var(--red-dark);
-      color: white;
-      font-size: 1.2rem;
+      top: -12px;
+      right: -12px;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--blood);
+      background: var(--void);
+      color: var(--blood-bright);
+      font-size: 1rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-      transition: transform 0.2s, background 0.2s;
+      transition: all 0.2s;
       z-index: 10;
     }
 
     .modal-close:hover {
-      transform: scale(1.1);
-      background: var(--red);
+      background: var(--blood);
+      color: var(--bone);
+      box-shadow: 0 0 20px var(--blood-glow);
     }
 
     .typewriter {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.85rem;
-      color: #666;
-      border-left: 3px solid var(--red);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      border-left: 2px solid var(--blood);
       padding-left: 1rem;
       min-height: 3em;
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
-    /* ── Credits ── */
+    /* ── Footer ── */
     footer {
       position: relative;
       z-index: 10;
@@ -650,53 +713,45 @@
     footer::before {
       content: '';
       display: block;
-      width: 120px;
+      width: 80px;
       height: 1px;
       margin: 0 auto 1.8rem;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
-      opacity: 0.6;
+      background: linear-gradient(90deg, transparent, var(--blood), transparent);
     }
 
     .credits-label {
-      font-family: 'IBM Plex Mono', monospace;
-      font-weight: 500;
-      font-size: 0.72rem;
+      font-family: 'Cinzel', serif;
+      font-weight: 600;
+      font-size: 0.65rem;
       letter-spacing: 0.4em;
       text-transform: uppercase;
-      color: #6a5840;
+      color: var(--text-dim);
       margin-bottom: 0.9rem;
     }
 
     .credits-names {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(1.6rem, 4.5vw, 2.4rem);
-      letter-spacing: 0.18em;
-      line-height: 1.4;
-      background: linear-gradient(135deg, #f0ddb0 0%, var(--gold) 45%, #c9a060 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: none;
-      filter: drop-shadow(0 2px 12px rgba(200, 160, 80, 0.25));
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+      letter-spacing: 0.2em;
+      color: var(--bone);
+      text-shadow: 0 0 30px rgba(139,0,0,0.3);
     }
 
     .credits-names span {
-      opacity: 0.45;
-      -webkit-text-fill-color: #a08060;
-      font-size: 0.85em;
-      letter-spacing: 0.1em;
-      margin: 0 0.3em;
+      color: var(--blood);
+      font-size: 0.8em;
+      margin: 0 0.2em;
     }
 
     .credits-wallah {
       display: block;
       margin-top: 1rem;
-      font-family: 'Oswald', sans-serif;
-      font-weight: 500;
-      font-size: 0.95rem;
-      letter-spacing: 0.35em;
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
       text-transform: uppercase;
-      color: #8a7050;
+      color: var(--text-dim);
       font-style: italic;
     }
 
@@ -722,81 +777,84 @@
       .evidence:nth-child(15) { top: 74%;  left: 2%;   bottom: auto; }
       .center-poster { top: 74%; transform: translate(-50%, 0); }
       .strings { display: none; }
-
       .modal { grid-template-columns: 1fr; }
       .modal-photo img { min-height: 280px; }
+      .modal-info { border-left: none; border-top: 1px solid var(--border); }
     }
   </style>
 </head>
 <body>
+  <div class="grain"></div>
+  <div class="vignette-global"></div>
+  <div class="scanlines"></div>
+  <div class="blood-drip"></div>
   <div class="spotlight" id="spotlight"></div>
-  <div class="room">
-    <div class="lamp-glow"></div>
 
+  <div class="room">
     <header>
-      <div class="stamp">CONFIDENTIEL</div>
+      <div class="stamp">Classifié — Niveau IV</div>
       <h1>Les Grosses Putes</h1>
-      <p class="subtitle">MUR DES VICTIMES — Dossier #4CHAN</p>
+      <p class="subtitle">Mur des Victimes — Dossier #4CHAN</p>
       <div class="case-info">
-        <span>Affaire : GP-2026</span>
-        <span>Statut : VIOLEZ</span>
-        <span>Suspects : 14</span>
-        <span>Classé : REGLER</span>
+        <span>Affaire GP-2026</span>
+        <span>14 sujets</span>
+        <span>Statut : actif</span>
+        <span>Accès restreint</span>
       </div>
     </header>
 
     <div class="toolbar">
-      <button class="btn" id="btnDrag">Déplacer les photos</button>
+      <button class="btn" id="btnDrag">Déplacer</button>
       <button class="btn" id="btnReset">Réinitialiser</button>
       <button class="btn" id="btnShuffle">Mélanger</button>
     </div>
 
     <div class="board-wrapper">
       <div class="board" id="board">
-
         <svg class="strings" id="strings" viewBox="0 0 1400 900" preserveAspectRatio="none"></svg>
 
-        <div class="center-poster" data-id="0" data-dossier="TROU DU CUL ORIGINEL" data-note="FILS DE PUTE" data-status="RECHERCHÉ" data-img="/images/photo-12.png">
+        <div class="center-poster" data-id="0" data-dossier="SUSPECT PRINCIPAL" data-note="FILS DE PUTE" data-status="RECHERCHÉ" data-img="/images/photo-12.png">
           <div class="pin"></div>
           <div class="photo-frame">
-            <img src="/images/photo-12.png" alt="Suspect principal" draggable="false">
-            <div class="dossier-label">SUSPECT PRINCIPAL</div>
+            <div class="photo-wrap">
+              <span class="case-tag">Priorité A</span>
+              <img src="/images/photo-12.png" alt="Suspect principal" draggable="false">
+            </div>
+            <div class="dossier-label">Suspect principal</div>
           </div>
-          <div class="wanted">RECHERCHÉ</div>
+          <div class="wanted">Recherché</div>
         </div>
 
-        <div class="evidence" data-id="1"  data-dossier="Dossier #001" data-note="T'AS EU MAL TOI" data-status="SUSPECT" data-img="/images/photo-01.png"><div class="pin"></div><div class="photo-frame"><img src="/images/photo-01.png" alt="Indice 01" draggable="false"><div class="dossier-label">Dossier #001</div></div><div class="sticky-note">T'AS EU MAL TOI</div></div>
-        <div class="evidence" data-id="2"  data-dossier="Dossier #002" data-note="VICTIMES" data-status="SUSPECT" data-img="/images/photo-02.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><img src="/images/photo-02.png" alt="Indice 02" draggable="false"><div class="dossier-label">Dossier #002</div></div><div class="sticky-note">VICTIMES</div></div>
-        <div class="evidence" data-id="3"  data-dossier="Dossier #003" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="/images/photo-03.png"><div class="pin"></div><div class="photo-frame"><img src="/images/photo-03.png" alt="Indice 03" draggable="false"><div class="dossier-label">Dossier #003</div></div><div class="sticky-note">FILS DE PUTE</div></div>
-        <div class="evidence" data-id="4"  data-dossier="Dossier #004" data-note="TROU DU CUL" data-status="SUSPECT" data-img="/images/photo-04.png"><div class="pin"></div><div class="photo-frame"><img src="/images/photo-04.png" alt="Indice 04" draggable="false"><div class="dossier-label">Dossier #004</div></div><div class="sticky-note">TROU DU CUL</div></div>
-        <div class="evidence" data-id="5"  data-dossier="Dossier #005" data-note="VICTIMES" data-status="SUSPECT" data-img="/images/photo-05.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><img src="/images/photo-05.png" alt="Indice 05" draggable="false"><div class="dossier-label">Dossier #005</div></div><div class="sticky-note">VICTIMES</div></div>
-        <div class="evidence" data-id="6"  data-dossier="Dossier #006" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="/images/photo-06.png"><div class="pin"></div><div class="photo-frame"><img src="/images/photo-06.png" alt="Indice 06" draggable="false"><div class="dossier-label">Dossier #006</div></div><div class="sticky-note">FILS DE PUTE</div></div>
-        <div class="evidence" data-id="7"  data-dossier="Dossier #007" data-note="TROU DU CUL" data-status="SUSPECT" data-img="/images/photo-07.png"><div class="pin"></div><div class="photo-frame"><img src="/images/photo-07.png" alt="Indice 07" draggable="false"><div class="dossier-label">Dossier #007</div></div><div class="sticky-note">TROU DU CUL</div></div>
-        <div class="evidence" data-id="8"  data-dossier="Dossier #008" data-note="VICTIMES" data-status="SUSPECT" data-img="/images/photo-08.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><img src="/images/photo-08.png" alt="Indice 08" draggable="false"><div class="dossier-label">Dossier #008</div></div><div class="sticky-note">VICTIMES</div></div>
-        <div class="evidence" data-id="9"  data-dossier="Dossier #009" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="/images/photo-09.png"><div class="pin"></div><div class="photo-frame"><img src="/images/photo-09.png" alt="Indice 09" draggable="false"><div class="dossier-label">Dossier #009</div></div><div class="sticky-note">FILS DE PUTE</div></div>
-        <div class="evidence" data-id="10" data-dossier="Dossier #010" data-note="TROU DU CUL" data-status="SUSPECT" data-img="/images/photo-10.png"><div class="pin"></div><div class="photo-frame"><img src="/images/photo-10.png" alt="Indice 10" draggable="false"><div class="dossier-label">Dossier #010</div></div><div class="sticky-note">TROU DU CUL</div></div>
-        <div class="evidence" data-id="11" data-dossier="Dossier #011" data-note="VICTIMES" data-status="SUSPECT" data-img="/images/photo-11.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><img src="/images/photo-11.png" alt="Indice 11" draggable="false"><div class="dossier-label">Dossier #011</div></div><div class="sticky-note">VICTIMES</div></div>
-        <div class="evidence" data-id="12" data-dossier="Dossier #012" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="/images/photo-13.png"><div class="pin"></div><div class="photo-frame"><img src="/images/photo-13.png" alt="Indice 13" draggable="false"><div class="dossier-label">Dossier #012</div></div><div class="sticky-note">FILS DE PUTE</div></div>
-        <div class="evidence" data-id="13" data-dossier="Dossier #013" data-note="TROU DU CUL" data-status="SUSPECT" data-img="/images/photo-14.png"><div class="pin"></div><div class="photo-frame"><img src="/images/photo-14.png" alt="Indice 14" draggable="false"><div class="dossier-label">Dossier #013</div></div><div class="sticky-note">TROU DU CUL</div></div>
-        <div class="evidence" data-id="14" data-dossier="Dossier #014" data-note="VICTIMES" data-status="SUSPECT" data-img="/images/photo-15.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><img src="/images/photo-15.png" alt="Indice 15" draggable="false"><div class="dossier-label">Dossier #014</div></div><div class="sticky-note">VICTIMES</div></div>
-
+        <div class="evidence" data-id="1"  data-dossier="Dossier #001" data-note="T'AS EU MAL TOI" data-status="SUSPECT" data-img="/images/photo-01.png"><div class="pin"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#001</span><img src="/images/photo-01.png" alt="Indice 01" draggable="false"></div><div class="dossier-label">Dossier #001</div></div><div class="sticky-note">T'AS EU MAL TOI</div></div>
+        <div class="evidence" data-id="2"  data-dossier="Dossier #002" data-note="VICTIMES" data-status="SUSPECT" data-img="/images/photo-02.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#002</span><img src="/images/photo-02.png" alt="Indice 02" draggable="false"></div><div class="dossier-label">Dossier #002</div></div><div class="sticky-note">VICTIMES</div></div>
+        <div class="evidence" data-id="3"  data-dossier="Dossier #003" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="/images/photo-03.png"><div class="pin"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#003</span><img src="/images/photo-03.png" alt="Indice 03" draggable="false"></div><div class="dossier-label">Dossier #003</div></div><div class="sticky-note">FILS DE PUTE</div></div>
+        <div class="evidence" data-id="4"  data-dossier="Dossier #004" data-note="TROU DU CUL" data-status="SUSPECT" data-img="/images/photo-04.png"><div class="pin"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#004</span><img src="/images/photo-04.png" alt="Indice 04" draggable="false"></div><div class="dossier-label">Dossier #004</div></div><div class="sticky-note">TROU DU CUL</div></div>
+        <div class="evidence" data-id="5"  data-dossier="Dossier #005" data-note="VICTIMES" data-status="SUSPECT" data-img="/images/photo-05.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#005</span><img src="/images/photo-05.png" alt="Indice 05" draggable="false"></div><div class="dossier-label">Dossier #005</div></div><div class="sticky-note">VICTIMES</div></div>
+        <div class="evidence" data-id="6"  data-dossier="Dossier #006" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="/images/photo-06.png"><div class="pin"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#006</span><img src="/images/photo-06.png" alt="Indice 06" draggable="false"></div><div class="dossier-label">Dossier #006</div></div><div class="sticky-note">FILS DE PUTE</div></div>
+        <div class="evidence" data-id="7"  data-dossier="Dossier #007" data-note="TROU DU CUL" data-status="SUSPECT" data-img="/images/photo-07.png"><div class="pin"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#007</span><img src="/images/photo-07.png" alt="Indice 07" draggable="false"></div><div class="dossier-label">Dossier #007</div></div><div class="sticky-note">TROU DU CUL</div></div>
+        <div class="evidence" data-id="8"  data-dossier="Dossier #008" data-note="VICTIMES" data-status="SUSPECT" data-img="/images/photo-08.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#008</span><img src="/images/photo-08.png" alt="Indice 08" draggable="false"></div><div class="dossier-label">Dossier #008</div></div><div class="sticky-note">VICTIMES</div></div>
+        <div class="evidence" data-id="9"  data-dossier="Dossier #009" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="/images/photo-09.png"><div class="pin"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#009</span><img src="/images/photo-09.png" alt="Indice 09" draggable="false"></div><div class="dossier-label">Dossier #009</div></div><div class="sticky-note">FILS DE PUTE</div></div>
+        <div class="evidence" data-id="10" data-dossier="Dossier #010" data-note="TROU DU CUL" data-status="SUSPECT" data-img="/images/photo-10.png"><div class="pin"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#010</span><img src="/images/photo-10.png" alt="Indice 10" draggable="false"></div><div class="dossier-label">Dossier #010</div></div><div class="sticky-note">TROU DU CUL</div></div>
+        <div class="evidence" data-id="11" data-dossier="Dossier #011" data-note="VICTIMES" data-status="SUSPECT" data-img="/images/photo-11.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#011</span><img src="/images/photo-11.png" alt="Indice 11" draggable="false"></div><div class="dossier-label">Dossier #011</div></div><div class="sticky-note">VICTIMES</div></div>
+        <div class="evidence" data-id="12" data-dossier="Dossier #012" data-note="FILS DE PUTE" data-status="SUSPECT" data-img="/images/photo-13.png"><div class="pin"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#012</span><img src="/images/photo-13.png" alt="Indice 13" draggable="false"></div><div class="dossier-label">Dossier #012</div></div><div class="sticky-note">FILS DE PUTE</div></div>
+        <div class="evidence" data-id="13" data-dossier="Dossier #013" data-note="TROU DU CUL" data-status="SUSPECT" data-img="/images/photo-14.png"><div class="pin"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#013</span><img src="/images/photo-14.png" alt="Indice 14" draggable="false"></div><div class="dossier-label">Dossier #013</div></div><div class="sticky-note">TROU DU CUL</div></div>
+        <div class="evidence" data-id="14" data-dossier="Dossier #014" data-note="VICTIMES" data-status="SUSPECT" data-img="/images/photo-15.png"><div class="pin"></div><div class="clip"></div><div class="photo-frame"><div class="photo-wrap"><span class="case-tag">#014</span><img src="/images/photo-15.png" alt="Indice 15" draggable="false"></div><div class="dossier-label">Dossier #014</div></div><div class="sticky-note">VICTIMES</div></div>
       </div>
     </div>
 
     <footer>
-      <p class="credits-label">LES VIOLEURS :</p>
+      <p class="credits-label">Les violeurs</p>
       <p class="credits-names">4CHAN <span>·</span> HAMZA <span>·</span> SOFIANE <span>·</span> SAPHIR <span>·</span> SINCE</p>
       <span class="credits-wallah">wAllah</span>
     </footer>
   </div>
 
-  <!-- Modal -->
   <div class="modal-overlay" id="modal">
     <div class="modal">
       <button class="modal-close" id="modalClose" aria-label="Fermer">✕</button>
       <div class="modal-photo">
         <img id="modalImg" src="" alt="">
-        <div class="stamp-overlay">PREUVE</div>
+        <div class="stamp-overlay">Preuve</div>
       </div>
       <div class="modal-info">
         <h2 id="modalTitle">Dossier</h2>
@@ -829,22 +887,9 @@
     const btnShuffle = document.getElementById('btnShuffle');
 
     const cards = [...board.querySelectorAll('.evidence, .center-poster')];
-    const defaultPositions = new Map();
 
-    cards.forEach(card => {
-      defaultPositions.set(card, {
-        top: card.style.top,
-        left: card.style.left,
-        right: card.style.right,
-        bottom: card.style.bottom,
-        transform: getComputedStyle(card).transform
-      });
-    });
-
-    /* ── Dynamic red strings ── */
     function updateStrings() {
       stringsSvg.innerHTML = '';
-      const boardRect = board.getBoundingClientRect();
       const center = board.querySelector('.center-poster');
       const cx = center.offsetLeft + center.offsetWidth / 2;
       const cy = center.offsetTop + center.offsetHeight / 2;
@@ -867,13 +912,11 @@
     window.addEventListener('load', updateStrings);
     window.addEventListener('resize', updateStrings);
 
-    /* ── Spotlight follows mouse ── */
     document.addEventListener('mousemove', e => {
       spotlight.style.left = e.clientX + 'px';
       spotlight.style.top = e.clientY + 'px';
     });
 
-    /* ── Highlight strings on hover ── */
     cards.forEach(card => {
       card.addEventListener('mouseenter', () => {
         if (card.classList.contains('center-poster')) {
@@ -885,7 +928,6 @@
           l.classList.toggle('highlight', i === idx);
         });
       });
-
       card.addEventListener('mouseleave', () => {
         stringsSvg.querySelectorAll('line').forEach(l => l.classList.remove('highlight'));
       });
@@ -919,7 +961,7 @@
     }
 
     cards.forEach(card => {
-      card.addEventListener('click', e => {
+      card.addEventListener('click', () => {
         if (dragMode) return;
         cards.forEach(c => c.classList.remove('active'));
         card.classList.add('active');
@@ -931,7 +973,6 @@
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-    /* ── Drag & drop ── */
     let dragMode = false;
     let dragging = null;
     let offsetX, offsetY;
@@ -940,7 +981,7 @@
       dragMode = !dragMode;
       btnDrag.classList.toggle('active', dragMode);
       board.classList.toggle('drag-mode', dragMode);
-      btnDrag.textContent = dragMode ? 'Mode déplacement actif' : 'Déplacer les photos';
+      btnDrag.textContent = dragMode ? 'Mode actif' : 'Déplacer';
     });
 
     cards.forEach(card => {
@@ -950,7 +991,6 @@
         dragging = card;
         card.classList.add('dragging');
         const rect = card.getBoundingClientRect();
-        const boardRect = board.getBoundingClientRect();
         offsetX = e.clientX - rect.left;
         offsetY = e.clientY - rect.top;
         card.style.right = 'auto';
@@ -978,7 +1018,6 @@
       }
     });
 
-    /* ── Reset positions ── */
     btnReset.addEventListener('click', () => {
       cards.forEach(card => {
         card.style.top = '';
@@ -991,17 +1030,14 @@
       setTimeout(updateStrings, 50);
     });
 
-    /* ── Shuffle ── */
     btnShuffle.addEventListener('click', () => {
       const bw = board.offsetWidth;
       const bh = board.offsetHeight;
       cards.forEach(card => {
-        const w = card.offsetWidth;
-        const h = card.offsetHeight;
         card.style.right = 'auto';
         card.style.bottom = 'auto';
-        card.style.left = Math.random() * (bw - w) + 'px';
-        card.style.top = Math.random() * (bh - h) + 'px';
+        card.style.left = Math.random() * (bw - card.offsetWidth) + 'px';
+        card.style.top = Math.random() * (bh - card.offsetHeight) + 'px';
         card.style.transform = `rotate(${Math.random() * 16 - 8}deg)`;
       });
       updateStrings();
