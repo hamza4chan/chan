@@ -7,142 +7,189 @@
   <meta name="description" content="4chan Hamza, Sofiane, Saphir, Since">
   <title>4chan Hamza, Sofiane, Saphir, Since</title>
   <link rel="canonical" href="https://grossepute.org/">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#1a0000">
   <meta property="og:url" content="https://grossepute.org/">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{width:100%;height:100%;background:#000;overflow:hidden}
-    body{display:flex;align-items:center;justify-content:center}
-    #stage{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-    canvas{display:block;filter:drop-shadow(0 0 3px rgba(196,30,58,.5));cursor:crosshair}
-    .vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.78) 100%)}
+    html,body{width:100%;height:100%;background:#000;overflow:hidden;color:#8b0018}
+    body{font-family:"Share Tech Mono",monospace}
+
+    .pulse{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,rgba(120,0,20,.12) 0%,transparent 55%);animation:breathe 4.5s ease-in-out infinite}
+    @keyframes breathe{0%,100%{opacity:.35}50%{opacity:.85}}
+
+    .spotlight{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle 180px at var(--mx,50%) var(--my,50%),rgba(180,10,30,.07),transparent 70%);transition:background .08s linear}
+
+    #grain{position:fixed;inset:0;width:100%;height:100%;opacity:.07;pointer-events:none;image-rendering:pixelated}
+
+    .stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:2}
+    .scale{transform-origin:center;transition:transform .15s ease-out;will-change:transform}
+    #art{
+      font-size:3.6px;line-height:1;color:#b01028;white-space:pre;user-select:none;
+      text-shadow:0 0 4px rgba(180,15,35,.85),0 0 12px rgba(120,0,20,.45);
+      animation:flicker 6s infinite;
+    }
+    @keyframes flicker{
+      0%,100%{opacity:1}92%{opacity:1}93%{opacity:.55}94%{opacity:1}96%{opacity:.7}97%{opacity:1}
+    }
+
+    .scanlines{position:fixed;inset:0;pointer-events:none;z-index:4;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.22) 2px,rgba(0,0,0,.22) 4px);opacity:.45}
+    .vignette{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.88) 100%)}
+
+    .flash{position:fixed;inset:0;background:rgba(120,0,15,.18);pointer-events:none;opacity:0;z-index:6;transition:opacity .05s}
+    .flash.on{opacity:1}
+
+    .whisper{position:fixed;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(200,20,40,.0);pointer-events:none;z-index:7;transition:opacity 2s ease,text-shadow 2s ease;white-space:nowrap}
+    .whisper.show{color:rgba(200,20,40,.55);text-shadow:0 0 8px rgba(200,20,40,.6)}
+
+    .hud{position:fixed;bottom:0;left:0;right:0;z-index:8;padding:12px 16px;font-size:11px;color:rgba(180,20,35,.65);letter-spacing:.08em;border-top:1px solid rgba(120,0,20,.25);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;justify-content:space-between;gap:1rem}
+    .hud .blink{animation:blink 1s step-end infinite;color:#cc1028}
+    @keyframes blink{50%{opacity:0}}
+    .hud .sig{color:rgba(120,0,20,.5);font-size:9px}
+
+    .glitch-line{position:fixed;top:0;left:0;right:0;height:2px;background:rgba(200,20,40,.5);box-shadow:0 0 12px rgba(200,20,40,.8);pointer-events:none;z-index:9;opacity:0}
+    .glitch-line.on{animation:glitchSlice .12s ease-out forwards}
+    @keyframes glitchSlice{0%{opacity:0;transform:translateY(0)}20%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
   </style>
 </head>
 <body>
-  <!-- build: v4b -->
-  <div id="stage"><canvas id="c"></canvas></div>
+  <!-- build: arg-v1 -->
+  <div class="pulse"></div>
+  <div class="spotlight" id="spot"></div>
+  <canvas id="grain"></canvas>
+  <div class="stage"><div class="scale" id="scale"><pre id="art"></pre></div></div>
+  <div class="scanlines"></div>
   <div class="vignette"></div>
+  <div class="flash" id="flash"></div>
+  <div class="glitch-line" id="gline"></div>
+  <div id="whispers"></div>
+  <div class="hud">
+    <div><span id="term"></span><span class="blink">_</span></div>
+    <div class="sig" id="sig">SIG: ███.███.███ // CONNEXION INSTABLE</div>
+  </div>
   <script id="art-data" type="application/json">"l:\u003e;\u003el!:;::=÷÷÷×-i:::::;\u003c=≈×I::::::::;l!i;:::;-∂∂≥±±±±÷÷÷÷±±±±±×+××\u003e!l!\u003e\u003c!-×÷×××÷÷×××=×÷÷÷≈×=i:,. .,:,,,,,,,,,,;:,,,:::.                \nJe;≠±≈±≠≈÷:I+\u003e++++l::::;×≤≈≈≈≈I::::::\u003c+××=l:::;=∫∂∑±×±±×=÷=×±±±±×+--+\u003e\u003e+-\u003e\u003e+++-==×÷÷××××××÷≈÷-I;:, ,::::,,,,,:::::,,::;:.. . ..\ni:I++\u003e\u003e\u003c;::!+--+!;:::::×±≈±±≈i:::::,\u003c×===\u003e:::;±∂∂∑±=××=-\u003c+=÷×-\u003e\u003c!!!!l lllll!l!!\u003e+\u003c\u003c--\u003e\u003c\u003e--÷≈×=I;:::;;;iillIII;::iIlIiIIIl+×\u003ci;I\u003e==\u003e-××-lI;::\ni::::,,:::::;Ii;:::::::,-≠≠÷I:::::::;\u003e×=-i:::;÷∫√≥≈×-+==\u003e\u003e+!l!llll!!\u003c \u003e\u003c!!l;lIIiIIIlIllii!+==+i:::;I\u003c\u003c!!!++liiIliIl\u003c\u003clI!=×-l;;I!\u003e×±÷÷×=÷=\u003e!l\nI::!-×\u003e=I:I\u003c+\u003el::::::::::::::::;\u003c\u003cI:::,::,:::;;≈∂∂∑±×==--\u003e!IlIIl\u003c\u003cI;;I l!!!\u003c!I;;lI;::,:iIlll\u003c+\u003cIi;;;I\u003e=××÷×+li\u003e==\u003eII+\u003e!\u003e--=+i;iIIiil+\u003c\u003e=-\u003e\u003cll\nI:-l\u003e-×-I\u003c,\u003e\u003c\u003c\u003el:\u003c=-=-i::::::+=×-+\u003c:::::::\u003c≈≠≈≈≠∫≤-×=\u003e\u003cliiI\u003c\u003cli;iI!li iiIl!\u003c\u003e\u003c\u003c\u003c\u003c!llI;lli;i;.,illllIl!\u003e=÷\u003e!\u003e=××+!I\u003c++×÷×+-×-!III:;il\u003e+-+!Ii\n\u003c:i;\u003e\u003c\u003e+;iI\u003cl\u003e!;iI\u003e+\u003c\u003ei:::::;=÷\u003e×++;:::::I≈≈÷÷±±≥±\u003c-\u003cIiil!li;:;il!iiI Il!\u003c\u003e+++---++\u003e\u003c\u003c\u003e\u003el;::iili;Il!\u003e\u003cl!+\u003e!\u003c=××\u003c!\u003e=++±≤±≤∑∑∑≈+lli::i!-=+\u003cli\n!:,:!l+I,,I!\u003ci;::i\u003e\u003c++i::::::!\u003e+=-I::::::;÷±÷±÷≈∑±!\u003eiIIIi;i;;;iI\u003cliiIl \u003c\u003e++----=-----+++-+\u003e\u003c!i;;III;;IIlIl-+!l!\u003c!ll\u003e=\u003elI-×=÷÷±÷-!ii;;iI±≠×--±\n::::::,::::,,::::,:ii,,::::::::::::::::::::i!l≈≤≤≤≈liii;;:iii;\u003elII!\u003c\u003e ++-+----=-==----+++\u003e\u003e\u003c\u003e\u003cI:::i::I!\u003e===-+lII\u003e×÷÷+\u003c+=÷±=\u003e\u003e\u003e+\u003cIlli;i±∫√≤÷=\ni::::::::::::::::::::::::::::::::::::::::;ii;I∫∂∫∫-i;Iii;;i;;lI;I\u003c+++ +++----========------+\u003c!li::i;il+-====××=-×±≈≈×÷≈÷÷==\u003cl\u003c\u003c\u003c!l!lIi=≤∑°∇≥\ni:;l\u003e\u003c!;::::::::::::::::::::::::;I\u003c++i::;\u003e+\u003c\u003e-I+!-+ii!;;;;;:;II:I\u003e+--- ------==========----==-\u003e!i;;ili;I-====×××÷×+-÷≠∑∑√√√≠\u003eii!\u003e\u003c!Il!I×≥∫∫≤\u003e\nil\u003e+\u003e\u003e+\u003c:::::::::::::::::::::::;-i\u003cl\u003c\u003c;:\u003c÷-+\u003e+\u003c\u003cl\u003elii;;;;:,:;:i\u003c+-+\u003c! \u003c\u003e---============------+\u003cl;;;I!I;;\u003c--=××÷÷÷=\u003e÷≠≤≥≤≠≠±\u003cii!\u003c\u003clIIli×√∏∂≥\u003c\ni×±×=++÷i::::::::::::::::::::::;×+--+=;::×=--=!\u003c+lii;;;;,,:;,;\u003e+-==-- =+!Il\u003c+=×÷×=======---++\u003e\u003e!i:;;iIIiIIll!!!!!-±±±≈≈≈±÷±-\u003e+\u003c!ll!lii÷≤≥√≥÷\n::×--×±l::::::::::::::::::::::::,\u003c++l::::::i;;iIIIii;:,;i:,,,,I-=--\u003e\u003c!! !\u003c\u003c\u003c\u003cll!\u003e=××××====---+\u003e\u003e\u003e\u003cI;:i;IIIii!\u003c×÷±÷-=±≈±÷÷×÷≈≈≠≥√∑≠×-\u003c!ll÷≤∫∇∫≤\n:::,::::::::::::::::::::::::::::::::::::::::;iII;I::;iiiI:,;!=×=+\u003eI:,, ,;iIl!\u003c\u003c\u003e--======----+\u003e\u003e\u003e\u003cI;:;i;lIiill+=××\u003e\u003cl\u003e!××=≈≠≤≤≠≠≤≤×∑√∑≠×÷≥∏♦◦√\ni::::::::::::::::::Ili::::::::::::::;iiIlIIIii;iiii;i:,:,i\u003c-=×==-+\u003el; ,:\u003ei!!\u003c\u003c+--+-++\u003e\u003e+---+\u003e\u003c\u003cli;::;;;!Iiill=×=\u003e-====±±÷≠≤××≠≠≠∫√∑∫∂∫≈≠°♦♦√\nje:\u003cl!\u003ell:\u003c≤≤≤≠!::-≥×÷≠≈;::::::::;!==-i;i××llI:;iIi:;,,..;!--×××==-+\u003c\u003c!\u003c\u003c!l-++-×=+\u003e\u003c!liii!+-+\u003c!l;:::;;;I!i;I!=÷×\u003e-×=×≈≈≈≠≈±\u003clll\u003e=±≠≠≤≥≈≠°♦♦∫\nii!\u003c!!\u003cI\u003c≠≠≈≠≈±;I≤÷=÷×≠\u003e:::::::,li!\u003cIi:\u003c×-\u003e!IlI;:;;:,,,,;++-======-== =====--===+!IiiiiIIi;I\u003e!i::::;;:i+liiI!!!!\u003c+÷±≈≠≠≤≤≠+i;iiII!\u003c\u003c\u003c=≤•♦♦∂\n;,,;llI,!≈≈≈±≈±::±±±÷×±i:::::::,;I+\u003e\u003ei:;\u003ci;;;iIi;::;;;::l\u003e+--======== =======-==\u003c!!!Ii;iiIl!!iI,,::;;i;;!\u003ciiliiI\u003e≈≤±≈≠≠≤≤≠±\u003cl!IiiII\u003c\u003eI×≤∇∇∇±\n;:, ;;.,,\u003c÷±±+::::\u003c××\u003e::::::::::,:l\u003c;;IIi;:iI;:::I::Ii;l\u003e++-----====××= =======-\u003c\u003c+\u003ei::\u003e::iIli:.:::::i:;i!II!+-=±≥≤±±±≠±×--!II!!l!\u003c!ll≤°∏∂∑≈\n;::::;::::,,::::::::,::::::::::::::;IIii::;;::::I,.,:Il!++++++--===== =---=====+\u003c\u003e+\u003elllli,:II;.,,:,,,;:::lIi\u003e-==÷±±≈≠×\u003e-×--I:::;Ii;iiI√∂∫∫∂÷\n;:\u003e±-=±+:::::::::::::::l!\u003c;::::::i;i\u003e\u003e!::;;::,:i..,,,!l\u003e++++++++----++ ++---=××-\u003e\u003e+-++\u003e!Il!lIi,.,...,::,::lii\u003c!\u003c\u003c+---=---=--+\u003e\u003e\u003c\u003c\u003e\u003c\u003c\u003e\u003e+÷≠≤≤≠=\n;;±-×=-=l:::::::::::,l\u003e++-+i::,:::;÷\u003e\u003cl;!;;::I;;,,:,,\u003c!\u003e++++\u003e+\u003e+++-=--\u003elii!!!!\u003c\u003e--===---+\u003cl; ....,,,,:!;II≈≠∑∑≥≥≥≥≥∑≥≥≥∑≥≥∑∑≥≥≥≥∑∑≥≥≥≥≤≤≥≥\n;:÷+---+:,:::::::::::,:l!!l!;::::;i;+-\u003e!!!IIIi:::I:,,\u003cI\u003c\u003e++++\u003e\u003e\u003e\u003e\u003e\u003e\u003e-------+!i,iI\u003c----==--+\u003cI, ,..,,.,:ii:;;:;IIIii;;;;;;;ii:,,::,,::,,,,,,,,\n;:,I\u003e!I::::::::::::,,,;!\u003c!i,::::::;IIII;i::;::,,:I;,+,I\u003c\u003e++\u003e++\u003e\u003ciill!!\u003c\u003e+\u003e++\u003e\u003c\u003c\u003e+-++++++\u003e\u003cl: .,..,,.,::::;i;,...... ...,,. .\n;:::::::::::::::::::,,,,,,,::::::::;;;;;ii;i:;:,,;l;i.,l\u003e+\u003e\u003e\u003e+--+\u003c!!!ll!lll!\u003e\u003e++++\u003e\u003e\u003e\u003e\u003c!l, .:.,,.,,,,,;ii;:. ..... ..,. ,\n:,::,:::::::::::::::::::::,::::::::::;iiii;:;l::,,:;;;,:i\u003c\u003e+\u003e+---++\u003e\u003c\u003c-+\u003eliiii!\u003e\u003e\u003e\u003e\u003e\u003c!!II,., ,::::,,,,:;:;i:i,.....,,.,,,,,,,:,,,,,..,,..,.,\n:::::::::::::,:::::::,:,,:::,::::::;II:;;;l;;:,:,:,:,::;i\u003c++++++---+\u003c!lllll!I:;\u003c\u003c\u003e!!llIi;:,. :;,;i:,::i;i+i=!±≈±≈÷÷≤I-!Il!!lll!!l!!lIIlliIIi\n:::::;IllilliIIlll!lll!\u003c\u003c\u003c!!\u003c\u003cIiI!lI!i:;I;;,,::::,,,;,:iiI\u003c++++---==-\u003e\u003e\u003cllIl!\u003e\u003e\u003e!llIIiiii:; ,i:;;:,:;;l-lIl\u003e=××--\u003e=l=÷!\u003e\u003el!lll!l!!!!llIill!\n:,:::!\u003e\u003e=\u003e\u003e+Il!!!!:;;IiIl\u003cll!lii:;;:iIiii;::,,:;:::. .illiI\u003c+++--=====-+\u003e\u003c\u003c\u003c\u003c\u003clIlIIi; .\u003e, ,::;,:;;\u003c!\u003cl\u003c-=×=++!\u003c+;≈+!!!liiIIl!!!lllliI!l\n::,:,l\u003c\u003c\u003cI!\u003elll\u003e+!lii;:,,Il\u003c\u003c\u003cIi;:;ll!!i:,,,,:;:::,. ,llllii!++++++---+\u003e\u003c!!lIIIIIii: -!.::::,:;;;i!\u003c=×-××-\u003e+l=I\u003e≈!!!lll!\u003c\u003c\u003c\u003e\u003e\u003e\u003c\u003c!l!li\n:,:,,!III:!\u003cll!ll!iI\u003ci:;:\u003c!!\u003c\u003cl\u003el!IIiIIi;;::;:,,.. ;l!\u003c!li;il!\u003c\u003c\u003c\u003c\u003c\u003c\u003c!!lIIIIii;:, !\u003c.;::;:,:;;!+\u003e====-=\u003c\u003e!\u003c\u003e:÷-\u003c\u003e\u003e++++--=+++\u003e\u003c++\u003c\u003e\n::::,liil!llI!-\u003clIIii!II;!!!!\u003c\u003c!!lIiIIIlIi;;i,:::. i!!\u003c\u003c!lIIi;;iIll!!lIiii;::, ;; Ii:,:;,:;;I!\u003e=×××-=--=l×!l≠\u003e++\u003e--=×==---=+--××\n::,,,ll\u003e\u003e-×\u003elI+lliI!\u003c\u003c\u003cIill+l\u003ciili;II:ii;;::,:,.. .I!\u003c\u003c\u003c!llIii;::::;::::::::, ,! ,×\u003cI,,:::.,:Iil\u003c+====-=+=\u003c-=i×±\u003cl!!!!\u003c\u003c\u003e==-=---+\u003c\n::::,Il!l=-=\u003cI::I;;i!!!Iii:!ii;liiii;iii:::,..... .,I!\u003c\u003c\u003c\u003c!lIIi;;::::::::::::, ;I, ;Il,:,,:::,,:i\u003e\u003c\u003c\u003e-====×+-=l×\u003eI≠+\u003c\u003c--\u003c!!!\u003c\u003e\u003e\u003e\u003elIii\n::,,,l!lil\u003e+I:::IIi;;;i;i!:;:::;;i;;;;;;::,.,:,. .,I!\u003c\u003c\u003c\u003c\u003c!!lIIi;;:;;;;;iii;, .lI:IIl\u003ci,;,,,:::,,:I+\u003c\u003c+==××===+×l+=:+÷i;i!\u003e+\u003eIiiIIIl\u003e--\n:::,,i=+;;I\u003e×÷!\u003c!lIl!\u003c=\u003cll!lllli;lliIiiIi,::;;:.,...,Il!\u003c\u003c\u003c\u003c\u003c\u003c\u003c\u003c!!llIIiiIIII;, .,:;,,;i::,,::,::;I!+\u003e=±÷±≈÷×≠-÷-\u003c±!,×l,ilIiiiiI\u003e≈≈÷××=\n:,,,,il!..:il!i\u003cl:;i;;;;;i-+\u003e\u003cIi;I;:ill;:::;:,;l,,:,,,iIl!\u003c\u003c\u003e\u003e\u003e\u003c!\u003c!!!llll!lllI;,. ....,,,:i::::;:,:::;;l\u003e!=×±≈≈≈≈≠≠≠≠≠≠≠≤≤≠≠≠≠≠≠≠≈≠≠≠≠≠≠≠\n:,,,,iII:,:!lI;lI\u003e\u003c;,:,,,i×-\u003c!Ii;::;li;;;;;;:IiI\u003c::::iIll!\u003c\u003e\u003e\u003c\u003c\u003c!!!ll l!!!!lli:,,:::::,,;,.,,,,,,:;;iiill+\u003e+\u003e\u003e\u003e\u003e\u003e\u003c\u003c\u003e\u003e\u003e\u003e\u003e\u003e\u003e\u003e\u003e\u003e\u003e\u003c\u003c\u003e\u003e\u003e\u003c\u003c\u003e\u003c\u003c\u003c\u003c\n:,,,,i;I;,:;,;;lI:i++I-;,:\u003cllIi;;;i;;;:Ii:::i!\u003cI;;,i;IlIl!!\u003c\u003c\u003c\u003c!!!!ll!!!!llIi:...,,,,:;.... ..,,,,::;:iiiiI::;:;;;:;::::::;I;i;:;i:;l;....\n:,,,,;:...,,,:;lI:;;;iIIIii;:,,,;;:;;;;,,.:;;;;,,,:;Il!\u003c!l!\u003c\u003c\u003c!!!llll!ll!llIi:. .:::::...,:,,....,:iiiillIIii;;;iiIIIlIIIl!+===\u003e\u003c+-\u003e-=-÷≠≠≥\n:,,,,:;:,,. ...,,:, li!:li;!!,lIi:;i;;,:,:iiIi;i:,i;iI!\u003c\u003e\u003c!!\u003c\u003c!!lll!!!!!!!!lIi,.;::,:,....:,,..,,:;;::;;;Mall!+--+-==×××--==÷÷÷÷≈\u003e\u003c≈÷÷--=\u003e\u003c\n,,,,,i i\u003c;l,,i.;;:,..,,,,;.:.; .;:ii;;,:::i:;Il;,:;Ilil\u003c\u003e\u003e\u003c!\u003e\u003e\u003c!!!!\u003c\u003c\u003c\u003c\u003c\u003c\u003c\u003c!lIi;, .,......,.,,,:;:;;iiii;;iIIIiiiiiiIl;,,,,,:;l\u003c!;;±±≠\u003eIi\n:,,,,; \u003ciliI:Il;l!Iii::......,;iiII;i;;;;:::,:iIl\u003ci!\u003e\u003e+\u003e\u003c\u003c+\u003c!\u003c\u003e\u003e\u003e\u003e+\u003e++\u003e\u003c!llii:,. ....,,,,...,::::;;;ii;ii;ili:+≈≈≈÷≤≤≤÷≠≠≤±=\u003e\u003c\u003c=±≠≈l:I;:;\n:,,,,, .,:;,..;\u003e\u003e+I..,,:illiiIiii;;;:,,.,,;!!\u003cIl\u003c\u003e+--+\u003c\u003e+\u003c\u003e+---++\u003e\u003e\u003c!!lli;;,.,,:::,.....,,::;:,:;;:;;;i;iIl!\u003e\u003e\u003c-=-+≠≥≤=Iii:!--+IiII;i\n:,,,,,... ,l\u003e+++\u003e\u003c\u003e-+++:,::ilIIiiiiillI;:;;;;:,::;;l!\u003c\u003e\u003e\u003e+--\u003e-\u003c\u003e--++++\u003c\u003e\u003e\u003c\u003c!lI;:::::,::,:;:,...,,:::;::::;;;;iIIlll\u003e+\u003e\u003c=÷-+l\u003c=;l=-!iii;:l\nl\u003c\u003e×±×÷×+-÷÷=-\u003c!!Iiiii;;ilIIIIiiiiiii;;;:::II!i;::;;I\u003c\u003e\u003c\u003e\u003c=≈≠×÷≠=÷÷÷ =++\u003e++\u003e\u003e\u003e!I;::::,::,,,,...,,,,:,,:,,,,:;::;;iiiII\u003c\u003e!\u003e=×-\u003e!!!:l\u003e\u003cli!\u003ei;l\nll!!!!!!!l!!!!!\u003c\u003c\u003c-×=-+!lIIIiiiiiiiii;;;;;l\u003e\u003e\u003cl\u003c-=××\u003c;;;i;;I\u003c×÷=±≥≥≈≈≈= \u003e+--\u003e!i;;;i;i;,:,,,:;::,,::;:,::.,:,:;:::;;;iiiiIl\u003c\u003c+-×\u003e!++Il!lIIlI;;I\nIIIIIIIIIIIIIIIIlllIIIiiiiiiiii;;:;;+÷÷±±±≈≈≈≈≠≠≠≈\u003eiI;;;;;;;;;ii;; ;;;;;;;;;i\u003c+-+I,,.:,::::,;;:,::,,,,,:;:::;;;;;iiiiI\u003c\u003c!!\u003e\u003c+\u003eiI!I;iIi;;I\nIIIIIIIiiiIIIiiIllIiiii;;;;;;;;;;:;;;-±±≈±≈≠≈≈≈≈≈≈≈≈≈≈≠×\u003elii;;;;;;;; ;;;iil-±≈±=-=+!;:,,:iI;;;::;::::,,,,::::;;;;;;;;;iil!ll\u003e\u003e\u003e+I\u003e×+iiii;;I\nlIIIIIIiIIIiIiiiilIIii;;;;;;;;;;;;;;;::i÷≈≈±±≈≈≈≈≈≈≈≈≈≈≈≈≈±±±≈≈≈≈≈≈≈≈ ≈≈≈±±±±÷÷÷÷÷×=-I:,:;;;:;;;!li::,,,,:::::;;:;;;;;;iiI--\u003e\u003e\u003e-+l=≠÷\u003ciii;il\nllIIIiiiiiiiilIiiii;;;;::;;;;::;;;;i-≠≈≈±±±≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈÷≈±≈±±±±±±± ±±±±±±±±=±±÷÷÷\u003ei;;:il,:;i===\u003c:::,,::::::::;;;;;;ii\u003e±-\u003c\u003e--l=≠≈+IIi;il\nlllIIIIiiiiIii;;;;;;;::::;;:::;;;;i≈±±±≈±÷±≈≈≈≈±±≈±±±±±≈±÷±±±±±±±±± ±±±±±±±±÷±±±±÷÷×\u003c!Il;;Ii\u003c+÷×÷!::::::::::::::;;;;;iiI÷×+-×=\u003e×≈≈+\u003e--\u003e\u003c+\nllllIIIIIiiIii;;;;:::::::::::::::;;\u003e≈±±±±÷÷±≈≈±±±±±±±±±±±±÷±±±±±±±± ±±±±±±±÷÷÷÷±±÷÷××--lI!I+×××÷±±I:::::::::::::;;;;;ii\u003c---=×÷±×+=±≤≥≥≤≠\nIIlIIIIIIIiiii;;;;:::::::::,::::;;I≈±±±±±±±±±±±±±±±±±±±±±×±÷÷±±±± ±±÷±±±±×±±÷÷÷!I;!\u003c;;I!+×÷±×±×÷÷i:::::::::::;;;;;;iil-==\u003e++-÷-+\u003e=≤≤≥≤\nlIIIIIIIII;;;;;::::::::::::::::;-±÷÷±±±±÷±±±±×!iiii÷iii;;;l-±±±=li ;;i\u003e±=;i;;;;ii±\u003ci;:::l±±÷±±÷÷±×÷-:::,,::::::::::;;;iI=÷÷+\u003e\u003e=-!ll!×≠≠≤\nIIIIIIIIIIii;;;;;:::::::::::,::::;×±×÷±÷÷±÷±÷±\u003c;;;;iii÷Ii;l\u003el;;!±I;;; ;;;i;÷÷×-;;ii=±±±l;;i±±±±±±±×±÷-×I::,,::::::::::;;;;;i+-++\u003eiiIiIII\u003e±±≈\nllIIIIIIIiii;;;;:::::::::::::,:::;×=×÷÷÷÷±÷÷÷±!;;i≈±±±±li;i;;;;I÷;;;i ==;ii\u003e=I;;;iIiiI±±i;;±±±±±±÷÷±=+=:::,::,:::::::::;;;;;l×=++!\u003e\u003elIII!\u003e\u003e-\nllllIIIIII;;;::::::::::,::,:,::;===÷÷÷×÷÷±÷÷÷I;;;;;;-\u003eiii=;;;;\u003e÷i;; iii;ii-;i;;i;;iI×≈×±±±÷×\u003eI;-÷÷÷÷=-i:,:,::::,:::::::;;i=××=×=÷-III;,,,\nllllllIIIIii;;;;::::::::::::,:,,:;+=×÷×××÷÷---÷÷≈=\u003e\u003c\u003c!-=\u003c\u003e\u003c÷±=\u003e\u003c\u003e±÷×× ××==×=×=+\u003e!Ii;=!i;i×;;;;;;;l±÷÷÷÷--,,,,::,:::::::::;;;;\u003c÷÷≈±-×+IIi,,,,\nillllllIIIIi;;;::::::,::::::::,,,,,:+-××==×÷-ii;=÷÷÷×÷\u003ci;;;I=±\u003ci;I÷±iil !±l;;;×\u003e;;;;;;!×l;;×i;;;;;;i=×÷÷×=!i,,:,,:::::::::::;;i÷±±±±±-\u003cl::!-×\n:lllIIIIIII;;;;:::::::,,::,,:,,,,:\u003e+=---××=iii=÷×÷÷I;;;I;;;!-;;;÷÷I;; i÷\u003ciii==;;i;;i;××=÷×=!;:::;;I÷×=-=!;,,,:::,:::::::::;;;!--+---+-+++-=\n,IllIIIIIII;;:::::::::::,,,:,,:,,:\u003e-+\u003e==×××iiiI+=××i;;\u003c±I;;i×;;;l+;;; ;=+;ii\u003c×;;;;;;;\u003e×+ii;i;i;;i\u003c××=--+\u003ei,,,::,:::,::::::;;;I+----\u003el;;;i--\n.:IIIIIIIII;;;::::::::::::,,,:,,,,I\u003e-==-=×××iii;;;!×i;;;;;i-×-i;;;;;i ××=iI;l÷IiiiiII\u003c÷-\u003cl=±+::::;:,+=-++\u003ei.,,:,::,,::::::::;;;:,;;II;:l+×==\n..IllIIIIIi;;::::::,,,::::::,,,::,i++\u003e+-===-++===-=÷÷÷+\u003c\u003e××××++\u003e-=×\u003e\u003c !=×\u003c!il××;:::::i÷!;;I±;::IlI\u003c==-+++\u003e;,,,,,,,::::::::::;;;iIIIIIIIIIIIIi\n..;IIlIIIii;;::::::::,,,::,,:,,:,,;\u003c\u003c+----=I::=×××××l:::::;+×I::\u003c=×i: :+×\u003c=I;=×i::IlII-×\u003eI×÷-i:::;::+--++\u003el,:,,,,,:,:::::::::;;illllllIlllIl\n..:IIIIIIii;;:::::::::,,,,,::::,,,:l\u003c\u003e++--=\u003c,:-××××\u003e::l÷×;::-l::I=×I: :!--!\u003e;\u003e=l::;!\u003c+-××+Ii;;::::::+=-++\u003e\u003c:,,,,,::::::::::::::;iII;:;::::::\n ..iIIIiiii;;;::::::,:,::,,,,,:,,,:\u003c\u003c\u003e++-==+,,:\u003c\u003e\u003c+-:::\u003cl::;==:::;:::: +=-;\u003e:!=+::::::i××+;iiI!\u003c+-==+\u003e-+\u003e\u003e\u003c;,,,,,::,,,,,:::::;;;i\u003c\u003c\u003c;::,,...\n ..;iIiiii;::::::,::,,,::,:,,,,:,,I\u003c\u003e+--===\u003c:,:::!==l;:;;l===×\u003eI;;i\u003c= ===l-!\u003c==---+\u003e\u003c!\u003e=!ii\u003c=\u003ciii;;;I-+\u003e\u003c!i,,,,,,:,,,,::::::::;;IIl!\u003c\u003e\u003e\u003e\u003e\u003e\u003e\n  .:iiiiiii;:::::,,,:,,,,:::,,:,,,,i\u003c\u003e+-----\u003e\u003e-=××====+\u003c!\u003c+===!II+-=ii i\u003c--iii--\u003ciiiiIIl-\u003e\u003cil-IiiIlIi!+\u003e\u003c\u003c!;,,,,,,,,,,,,::::::::;.;l!!\u003c\u003c\u003c\u003c\u003c\n .,:iiiiiii;:::::::,,:,,,,,,,,,,,,,I\u003c\u003e\u003e++--\u003e;;\u003e=====\u003cIiIiiIi\u003e-!ii!--li il-=Iii!-+iiiIiii+-\u003e!--+Ii;;i:,I\u003c\u003c!l;,,,,,,,,,,,,,,:::::::;,:l\u003c!!!!\u003c\u003c\n  .;iiiiiii;:::::::,,,,,,,,,,,,,:,.;\u003c\u003c\u003e+++-\u003e;;\u003e-----Iii---iii-!iiI--!i iI--Iii;-+ii;\u003c\u003e\u003e!\u003e++I;;::::::,,l!llI:.,,,,,,,,,,,,,:::::::::,i!!!!!!!\n  .;iiiiii;;:::::::,,,,,,,,,,,,,,,,;!\u003c\u003c\u003e\u003e++\u003e;;;!\u003e\u003c\u003c-iiiI!Iiii-+I;;;;i; ;\u003c++I;;;++i;;;::;l\u003e\u003eI;IIl!\u003c!!I;ilIi:..,,,,,,,,,,,,,,,:::::;.,:iiIIII\n  .;iiiiii;;:::::,,,,,,,,,,,,,,,,,;!!\u003c\u003c\u003e\u003e\u003e+!;;:::i++!ii:;il+\u003e\u003e+\u003eIiiI!\u003e\u003e\u003e\u003e!!!!\u003e\u003e\u003cllIIi;I\u003c;::I!;:::::;ii;:,:;::,,,,,,,,,,,,,,:::::, :iiii\n ..;iiiiiii;:::::,,,,,,,,,,,,,,,,,,Il!!\u003c\u003c\u003e\u003c\u003c\u003c\u003c\u003e\u003e\u003e\u003e\u003e\u003e\u003e+\u003c!!!\u003e\u003e\u003e\u003cIii\u003c\u003c\u003c;;;l\u003cl;:;!\u003cI:::iIII!l:;lI,,,,..,;:iIIIIIIi,.,,,,,,,,,,,,:,:::,...illIl\n...;iiiiii;;::::,,,,,,,,,,,,,,,,,,,,je vais !!\u003c!:;I\u003c\u003c\u003c\u003c\u003c\u003ei;;;;:;;!\u003c;::l!! :::i!I:::Ili:,,::;iII;:,,.....,,;iiIlIiIIIIi;,,,,,,,,,,,::::::...,,,,,\n"  </script>
   <script>
 (() => {
   const ART = JSON.parse(document.getElementById("art-data").textContent);
-  const canvas = document.getElementById("c");
-  const ctx = canvas.getContext("2d", { alpha: false });
+  const art = document.getElementById("art");
+  const scaleEl = document.getElementById("scale");
+  const spot = document.getElementById("spot");
+  const flash = document.getElementById("flash");
+  const gline = document.getElementById("gline");
+  const term = document.getElementById("term");
+  const sig = document.getElementById("sig");
+  const whispersEl = document.getElementById("whispers");
 
-  const CELL_W = 4.05, CELL_H = 5, RADIUS = 85, PUSH = 9;
-  const LERP_IN = 0.2, LERP_OUT = 0.12, BUCKET = 32;
+  art.textContent = ART;
 
-  const chars = [];
-  const buckets = new Map();
-  const lines = ART.split("\n");
-  let maxCol = 0;
+  const MSGS = [
+    "signal detecte...",
+    "tu ne devrais pas etre la",
+    "il regarde par l'ecran",
+    "erreur: sujet observe",
+    "fichier corrompu [████]",
+    "ne clique pas",
+    "ils savent",
+    "connexion non securisee",
+    "tu es deja dedans",
+    "ecoute...",
+  ];
+  const TERMS = [
+    "> lecture en cours...",
+    "> acces refuse ███",
+    "> trace active...",
+    "> il sait que tu es la",
+    "> buffer overflow",
+    "> signal: PERDU",
+    "> ne ferme pas",
+    "> analyse comportementale...",
+  ];
+  const WHISPERS = [
+    "regarde pas derriere",
+    "trop tard",
+    "pourquoi tu es la",
+    "il attend",
+    "tu entends",
+    "cesse",
+    "mal",
+    "fuis",
+  ];
 
-  for (let row = 0; row < lines.length; row++) {
-    const line = lines[row];
-    if (line.length > maxCol) maxCol = line.length;
-    for (let col = 0; col < line.length; col++) {
-      const ch = line[col];
-      if (ch === " ") continue;
-      const bx = col * CELL_W + 2, by = row * CELL_H + 1;
-      const c = { bx, by, ch, ox: 0, oy: 0 };
-      chars.push(c);
-      const key = ((bx / BUCKET) | 0) + "," + ((by / BUCKET) | 0);
-      if (!buckets.has(key)) buckets.set(key, []);
-      buckets.get(key).push(c);
-    }
-  }
-
-  const W = Math.ceil(maxCol * CELL_W) + 4;
-  const H = Math.ceil(lines.length * CELL_H) + 4;
-  const dpr = Math.min(devicePixelRatio || 1, 2);
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.font = "4px Courier New, monospace";
-  ctx.textBaseline = "top";
-
-  let scale = 1, mouseOn = false, mx = -9999, my = -9999, anim = false, raf = 0;
+  let baseScale = 1;
 
   function fit() {
-    scale = Math.min(innerWidth * 0.96 / W, innerHeight * 0.96 / H, 3);
-    canvas.style.width = (W * scale) + "px";
-    canvas.style.height = (H * scale) + "px";
+    baseScale = Math.max(Math.min(innerWidth * .94 / art.scrollWidth, innerHeight * .82 / art.scrollHeight, 4), .8);
+    scaleEl.style.transform = "scale(" + baseScale + ")";
   }
 
-  function toCanvas(e) {
-    const r = canvas.getBoundingClientRect();
-    return { x: (e.clientX - r.left) / scale, y: (e.clientY - r.top) / scale };
+  document.addEventListener("mousemove", e => {
+    spot.style.setProperty("--mx", (e.clientX / innerWidth * 100) + "%");
+    spot.style.setProperty("--my", (e.clientY / innerHeight * 100) + "%");
+    const cx = innerWidth / 2, cy = innerHeight / 2;
+    const dx = (e.clientX - cx) / cx, dy = (e.clientY - cy) / cy;
+    scaleEl.style.transform = "scale(" + baseScale + ") perspective(800px) rotateX(" + (dy * -2.5) + "deg) rotateY(" + (dx * 2.5) + "deg)";
+  }, { passive: true });
+
+  // grain
+  const gc = document.getElementById("grain");
+  const gx = gc.getContext("2d");
+  function resizeGrain() {
+    gc.width = Math.ceil(innerWidth / 4);
+    gc.height = Math.ceil(innerHeight / 4);
   }
-
-  function nearChars() {
-    const list = [];
-    const bx0 = ((mx - RADIUS) / BUCKET) | 0, bx1 = ((mx + RADIUS) / BUCKET) | 0;
-    const by0 = ((my - RADIUS) / BUCKET) | 0, by1 = ((my + RADIUS) / BUCKET) | 0;
-    for (let gy = by0; gy <= by1; gy++)
-      for (let gx = bx0; gx <= bx1; gx++) {
-        const b = buckets.get(gx + "," + gy);
-        if (b) list.push(...b);
-      }
-    return list;
-  }
-
-  function draw() {
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "#c41e3a";
-
-    const r2 = RADIUS * RADIUS;
-    const active = mouseOn ? nearChars() : [];
-    const activeSet = new Set(active);
-
-    for (let i = 0; i < chars.length; i++) {
-      const c = chars[i];
-      let tx = 0, ty = 0;
-
-      if (mouseOn && activeSet.has(c)) {
-        const dx = c.bx - mx, dy = c.by - my;
-        const d2 = dx * dx + dy * dy;
-        if (d2 < r2 && d2 > 0.01) {
-          const d = Math.sqrt(d2);
-          const f = (1 - d / RADIUS) * PUSH;
-          tx = (dx / d) * f;
-          ty = (dy / d) * f;
-        }
-      }
-
-      const k = mouseOn ? LERP_IN : LERP_OUT;
-      c.ox += (tx - c.ox) * k;
-      c.oy += (ty - c.oy) * k;
-      ctx.fillText(c.ch, c.bx + c.ox, c.by + c.oy);
+  function drawGrain() {
+    const w = gc.width, h = gc.height;
+    const img = gx.createImageData(w, h);
+    const d = img.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const v = Math.random() * 80 | 0;
+      d[i] = 120; d[i+1] = v >> 2; d[i+2] = v >> 3; d[i+3] = 30 + Math.random() * 40;
     }
+    gx.putImageData(img, 0, 0);
+    requestAnimationFrame(drawGrain);
   }
 
-  function moving() {
-    if (mouseOn) return true;
-    for (let i = 0; i < chars.length; i++) {
-      const c = chars[i];
-      if (c.ox * c.ox + c.oy * c.oy > 0.5) return true;
+  function whisper() {
+    const el = document.createElement("div");
+    el.className = "whisper";
+    el.textContent = WHISPERS[Math.random() * WHISPERS.length | 0];
+    el.style.left = (8 + Math.random() * 75) + "%";
+    el.style.top = (10 + Math.random() * 70) + "%";
+    whispersEl.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("show"));
+    setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 2000); }, 1800 + Math.random() * 2000);
+    setTimeout(whisper, 4000 + Math.random() * 7000);
+  }
+
+  function glitch() {
+    if (Math.random() < .35) {
+      gline.style.top = (Math.random() * 100) + "%";
+      gline.classList.add("on");
+      setTimeout(() => gline.classList.remove("on"), 120);
     }
-    return false;
+    if (Math.random() < .12) {
+      flash.classList.add("on");
+      setTimeout(() => flash.classList.remove("on"), 50 + Math.random() * 80);
+    }
+    if (Math.random() < .08) {
+      art.style.transform = "translate(" + ((Math.random()-.5)*3) + "px," + ((Math.random()-.5)*2) + "px)";
+      setTimeout(() => art.style.transform = "", 60);
+    }
+    setTimeout(glitch, 800 + Math.random() * 2500);
   }
 
-  function loop() {
-    raf = 0;
-    draw();
-    if (moving()) raf = requestAnimationFrame(loop);
-    else anim = false;
-  }
+  let ti = 0;
+  setInterval(() => {
+    term.textContent = TERMS[ti++ % TERMS.length];
+    sig.textContent = "SIG: " + Math.random().toString(16).slice(2,6).toUpperCase() + "." + (Math.random()*999|0) + " // " + MSGS[Math.random()*MSGS.length|0].toUpperCase();
+  }, 3200);
 
-  function kick() {
-    if (!anim) { anim = true; raf = requestAnimationFrame(loop); }
-  }
-
-  canvas.addEventListener("mouseenter", e => { mouseOn = true; const p = toCanvas(e); mx = p.x; my = p.y; kick(); });
-  canvas.addEventListener("mousemove", e => { if (!mouseOn) return; const p = toCanvas(e); mx = p.x; my = p.y; kick(); }, { passive: true });
-  canvas.addEventListener("mouseleave", () => { mouseOn = false; kick(); });
-
-  fit(); draw();
-  addEventListener("resize", () => { fit(); kick(); });
+  fit();
+  resizeGrain();
+  drawGrain();
+  whisper();
+  glitch();
+  addEventListener("resize", () => { fit(); resizeGrain(); });
 })();
   </script>
 </body>
