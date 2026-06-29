@@ -7,190 +7,117 @@
   <meta name="description" content="4chan Hamza, Sofiane, Saphir, Since">
   <title>4chan Hamza, Sofiane, Saphir, Since</title>
   <link rel="canonical" href="https://grossepute.org/">
-  <meta name="theme-color" content="#1a0000">
+  <meta name="theme-color" content="#000000">
   <meta property="og:url" content="https://grossepute.org/">
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@400&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{width:100%;height:100%;background:#000;overflow:hidden;color:#8b0018}
-    body{font-family:"Share Tech Mono",monospace}
-
-    .pulse{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,rgba(120,0,20,.12) 0%,transparent 55%);animation:breathe 4.5s ease-in-out infinite}
-    @keyframes breathe{0%,100%{opacity:.35}50%{opacity:.85}}
-
-    .spotlight{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle 180px at var(--mx,50%) var(--my,50%),rgba(180,10,30,.07),transparent 70%);transition:background .08s linear}
-
-    #grain{position:fixed;inset:0;width:100%;height:100%;opacity:.07;pointer-events:none;image-rendering:pixelated}
-
-    .stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:2}
-    .scale{transform-origin:center;transition:transform .15s ease-out;will-change:transform}
+    html,body{width:100%;height:100%;background:#000;overflow:hidden}
+    body{display:flex;align-items:center;justify-content:center}
+    .wrap{transform-origin:center center}
     #art{
-      font-size:3.6px;line-height:1;color:#b01028;white-space:pre;user-select:none;
-      text-shadow:0 0 4px rgba(180,15,35,.85),0 0 12px rgba(120,0,20,.45);
-      animation:flicker 6s infinite;
+      font-family:"Noto Sans Mono","Courier New",monospace;
+      font-size:5px;line-height:1.05;color:#cc1028;white-space:pre;
+      text-shadow:0 0 6px rgba(200,16,40,.7),0 0 14px rgba(120,0,20,.4);
+      user-select:none;display:block;
     }
-    @keyframes flicker{
-      0%,100%{opacity:1}92%{opacity:1}93%{opacity:.55}94%{opacity:1}96%{opacity:.7}97%{opacity:1}
-    }
-
-    .scanlines{position:fixed;inset:0;pointer-events:none;z-index:4;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.22) 2px,rgba(0,0,0,.22) 4px);opacity:.45}
-    .vignette{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.88) 100%)}
-
-    .flash{position:fixed;inset:0;background:rgba(120,0,15,.18);pointer-events:none;opacity:0;z-index:6;transition:opacity .05s}
-    .flash.on{opacity:1}
-
-    .whisper{position:fixed;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(200,20,40,.0);pointer-events:none;z-index:7;transition:opacity 2s ease,text-shadow 2s ease;white-space:nowrap}
-    .whisper.show{color:rgba(200,20,40,.55);text-shadow:0 0 8px rgba(200,20,40,.6)}
-
-    .hud{position:fixed;bottom:0;left:0;right:0;z-index:8;padding:12px 16px;font-size:11px;color:rgba(180,20,35,.65);letter-spacing:.08em;border-top:1px solid rgba(120,0,20,.25);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;justify-content:space-between;gap:1rem}
-    .hud .blink{animation:blink 1s step-end infinite;color:#cc1028}
-    @keyframes blink{50%{opacity:0}}
-    .hud .sig{color:rgba(120,0,20,.5);font-size:9px}
-
-    .glitch-line{position:fixed;top:0;left:0;right:0;height:2px;background:rgba(200,20,40,.5);box-shadow:0 0 12px rgba(200,20,40,.8);pointer-events:none;z-index:9;opacity:0}
-    .glitch-line.on{animation:glitchSlice .12s ease-out forwards}
-    @keyframes glitchSlice{0%{opacity:0;transform:translateY(0)}20%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+    .vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 38%,rgba(0,0,0,.82) 100%)}
+    .scanlines{position:fixed;inset:0;pointer-events:none;opacity:.3;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 4px)}
   </style>
 </head>
 <body>
-  <!-- build: arg-v1 -->
-  <div class="pulse"></div>
-  <div class="spotlight" id="spot"></div>
-  <canvas id="grain"></canvas>
-  <div class="stage"><div class="scale" id="scale"><pre id="art"></pre></div></div>
+  <!-- build: v5 -->
+  <div class="wrap" id="wrap"><pre id="art">l:&gt;;&gt;l!:;::=÷÷÷×-i:::::;&lt;=≈×I::::::::;l!i;:::;-∂∂≥±±±±÷÷÷÷±±±±±×+××&gt;!l!&gt;&lt;!-×÷×××÷÷×××=×÷÷÷≈×=i:,. .,:,,,,,,,,,,;:,,,:::.                
+Je;≠±≈±≠≈÷:I+&gt;++++l::::;×≤≈≈≈≈I::::::&lt;+××=l:::;=∫∂∑±×±±×=÷=×±±±±×+--+&gt;&gt;+-&gt;&gt;+++-==×÷÷××××××÷≈÷-I;:, ,::::,,,,,:::::,,::;:.. . ..
+i:I++&gt;&gt;&lt;;::!+--+!;:::::×±≈±±≈i:::::,&lt;×===&gt;:::;±∂∂∑±=××=-&lt;+=÷×-&gt;&lt;!!!!l lllll!l!!&gt;+&lt;&lt;--&gt;&lt;&gt;--÷≈×=I;:::;;;iillIII;::iIlIiIIIl+×&lt;i;I&gt;==&gt;-××-lI;::
+i::::,,:::::;Ii;:::::::,-≠≠÷I:::::::;&gt;×=-i:::;÷∫√≥≈×-+==&gt;&gt;+!l!llll!!&lt; &gt;&lt;!!l;lIIiIIIlIllii!+==+i:::;I&lt;&lt;!!!++liiIliIl&lt;&lt;lI!=×-l;;I!&gt;×±÷÷×=÷=&gt;!l
+I::!-×&gt;=I:I&lt;+&gt;l::::::::::::::::;&lt;&lt;I:::,::,:::;;≈∂∂∑±×==--&gt;!IlIIl&lt;&lt;I;;I l!!!&lt;!I;;lI;::,:iIlll&lt;+&lt;Ii;;;I&gt;=××÷×+li&gt;==&gt;II+&gt;!&gt;--=+i;iIIiil+&lt;&gt;=-&gt;&lt;ll
+I:-l&gt;-×-I&lt;,&gt;&lt;&lt;&gt;l:&lt;=-=-i::::::+=×-+&lt;:::::::&lt;≈≠≈≈≠∫≤-×=&gt;&lt;liiI&lt;&lt;li;iI!li iiIl!&lt;&gt;&lt;&lt;&lt;&lt;!llI;lli;i;.,illllIl!&gt;=÷&gt;!&gt;=××+!I&lt;++×÷×+-×-!III:;il&gt;+-+!Ii
+&lt;:i;&gt;&lt;&gt;+;iI&lt;l&gt;!;iI&gt;+&lt;&gt;i:::::;=÷&gt;×++;:::::I≈≈÷÷±±≥±&lt;-&lt;Iiil!li;:;il!iiI Il!&lt;&gt;+++---++&gt;&lt;&lt;&gt;&gt;l;::iili;Il!&gt;&lt;l!+&gt;!&lt;=××&lt;!&gt;=++±≤±≤∑∑∑≈+lli::i!-=+&lt;li
+!:,:!l+I,,I!&lt;i;::i&gt;&lt;++i::::::!&gt;+=-I::::::;÷±÷±÷≈∑±!&gt;iIIIi;i;;;iI&lt;liiIl &lt;&gt;++----=-----+++-+&gt;&lt;!i;;III;;IIlIl-+!l!&lt;!ll&gt;=&gt;lI-×=÷÷±÷-!ii;;iI±≠×--±
+::::::,::::,,::::,:ii,,::::::::::::::::::::i!l≈≤≤≤≈liii;;:iii;&gt;lII!&lt;&gt; ++-+----=-==----+++&gt;&gt;&lt;&gt;&lt;I:::i::I!&gt;===-+lII&gt;×÷÷+&lt;+=÷±=&gt;&gt;&gt;+&lt;Illi;i±∫√≤÷=
+i::::::::::::::::::::::::::::::::::::::::;ii;I∫∂∫∫-i;Iii;;i;;lI;I&lt;+++ +++----========------+&lt;!li::i;il+-====××=-×±≈≈×÷≈÷÷==&lt;l&lt;&lt;&lt;!l!lIi=≤∑°∇≥
+i:;l&gt;&lt;!;::::::::::::::::::::::::;I&lt;++i::;&gt;+&lt;&gt;-I+!-+ii!;;;;;:;II:I&gt;+--- ------==========----==-&gt;!i;;ili;I-====×××÷×+-÷≠∑∑√√√≠&gt;ii!&gt;&lt;!Il!I×≥∫∫≤&gt;
+il&gt;+&gt;&gt;+&lt;:::::::::::::::::::::::;-i&lt;l&lt;&lt;;:&lt;÷-+&gt;+&lt;&lt;l&gt;lii;;;;:,:;:i&lt;+-+&lt;! &lt;&gt;---============------+&lt;l;;;I!I;;&lt;--=××÷÷÷=&gt;÷≠≤≥≤≠≠±&lt;ii!&lt;&lt;lIIli×√∏∂≥&lt;
+i×±×=++÷i::::::::::::::::::::::;×+--+=;::×=--=!&lt;+lii;;;;,,:;,;&gt;+-==-- =+!Il&lt;+=×÷×=======---++&gt;&gt;!i:;;iIIiIIll!!!!!-±±±≈≈≈±÷±-&gt;+&lt;!ll!lii÷≤≥√≥÷
+::×--×±l::::::::::::::::::::::::,&lt;++l::::::i;;iIIIii;:,;i:,,,,I-=--&gt;&lt;!! !&lt;&lt;&lt;&lt;ll!&gt;=××××====---+&gt;&gt;&gt;&lt;I;:i;IIIii!&lt;×÷±÷-=±≈±÷÷×÷≈≈≠≥√∑≠×-&lt;!ll÷≤∫∇∫≤
+:::,::::::::::::::::::::::::::::::::::::::::;iII;I::;iiiI:,;!=×=+&gt;I:,, ,;iIl!&lt;&lt;&gt;--======----+&gt;&gt;&gt;&lt;I;:;i;lIiill+=××&gt;&lt;l&gt;!××=≈≠≤≤≠≠≤≤×∑√∑≠×÷≥∏♦◦√
+i::::::::::::::::::Ili::::::::::::::;iiIlIIIii;iiii;i:,:,i&lt;-=×==-+&gt;l; ,:&gt;i!!&lt;&lt;+--+-++&gt;&gt;+---+&gt;&lt;&lt;li;::;;;!Iiill=×=&gt;-====±±÷≠≤××≠≠≠∫√∑∫∂∫≈≠°♦♦√
+je:&lt;l!&gt;ll:&lt;≤≤≤≠!::-≥×÷≠≈;::::::::;!==-i;i××llI:;iIi:;,,..;!--×××==-+&lt;&lt;!&lt;&lt;!l-++-×=+&gt;&lt;!liii!+-+&lt;!l;:::;;;I!i;I!=÷×&gt;-×=×≈≈≈≠≈±&lt;lll&gt;=±≠≠≤≥≈≠°♦♦∫
+ii!&lt;!!&lt;I&lt;≠≠≈≠≈±;I≤÷=÷×≠&gt;:::::::,li!&lt;Ii:&lt;×-&gt;!IlI;:;;:,,,,;++-======-== =====--===+!IiiiiIIi;I&gt;!i::::;;:i+liiI!!!!&lt;+÷±≈≠≠≤≤≠+i;iiII!&lt;&lt;&lt;=≤•♦♦∂
+;,,;llI,!≈≈≈±≈±::±±±÷×±i:::::::,;I+&gt;&gt;i:;&lt;i;;;iIi;::;;;::l&gt;+--======== =======-==&lt;!!!Ii;iiIl!!iI,,::;;i;;!&lt;iiliiI&gt;≈≤±≈≠≠≤≤≠±&lt;l!IiiII&lt;&gt;I×≤∇∇∇±
+;:, ;;.,,&lt;÷±±+::::&lt;××&gt;::::::::::,:l&lt;;;IIi;:iI;:::I::Ii;l&gt;++-----====××= =======-&lt;&lt;+&gt;i::&gt;::iIli:.:::::i:;i!II!+-=±≥≤±±±≠±×--!II!!l!&lt;!ll≤°∏∂∑≈
+;::::;::::,,::::::::,::::::::::::::;IIii::;;::::I,.,:Il!++++++--===== =---=====+&lt;&gt;+&gt;lllli,:II;.,,:,,,;:::lIi&gt;-==÷±±≈≠×&gt;-×--I:::;Ii;iiI√∂∫∫∂÷
+;:&gt;±-=±+:::::::::::::::l!&lt;;::::::i;i&gt;&gt;!::;;::,:i..,,,!l&gt;++++++++----++ ++---=××-&gt;&gt;+-++&gt;!Il!lIi,.,...,::,::lii&lt;!&lt;&lt;+---=---=--+&gt;&gt;&lt;&lt;&gt;&lt;&lt;&gt;&gt;+÷≠≤≤≠=
+;;±-×=-=l:::::::::::,l&gt;++-+i::,:::;÷&gt;&lt;l;!;;::I;;,,:,,&lt;!&gt;++++&gt;+&gt;+++-=--&gt;lii!!!!&lt;&gt;--===---+&lt;l; ....,,,,:!;II≈≠∑∑≥≥≥≥≥∑≥≥≥∑≥≥∑∑≥≥≥≥∑∑≥≥≥≥≤≤≥≥
+;:÷+---+:,:::::::::::,:l!!l!;::::;i;+-&gt;!!!IIIi:::I:,,&lt;I&lt;&gt;++++&gt;&gt;&gt;&gt;&gt;&gt;&gt;-------+!i,iI&lt;----==--+&lt;I, ,..,,.,:ii:;;:;IIIii;;;;;;;ii:,,::,,::,,,,,,,,
+;:,I&gt;!I::::::::::::,,,;!&lt;!i,::::::;IIII;i::;::,,:I;,+,I&lt;&gt;++&gt;++&gt;&lt;iill!!&lt;&gt;+&gt;++&gt;&lt;&lt;&gt;+-++++++&gt;&lt;l: .,..,,.,::::;i;,...... ...,,. .
+;:::::::::::::::::::,,,,,,,::::::::;;;;;ii;i:;:,,;l;i.,l&gt;+&gt;&gt;&gt;+--+&lt;!!!ll!lll!&gt;&gt;++++&gt;&gt;&gt;&gt;&lt;!l, .:.,,.,,,,,;ii;:. ..... ..,. ,
+:,::,:::::::::::::::::::::,::::::::::;iiii;:;l::,,:;;;,:i&lt;&gt;+&gt;+---++&gt;&lt;&lt;-+&gt;liiii!&gt;&gt;&gt;&gt;&gt;&lt;!!II,., ,::::,,,,:;:;i:i,.....,,.,,,,,,,:,,,,,..,,..,.,
+:::::::::::::,:::::::,:,,:::,::::::;II:;;;l;;:,:,:,:,::;i&lt;++++++---+&lt;!lllll!I:;&lt;&lt;&gt;!!llIi;:,. :;,;i:,::i;i+i=!±≈±≈÷÷≤I-!Il!!lll!!l!!lIIlliIIi
+:::::;IllilliIIlll!lll!&lt;&lt;&lt;!!&lt;&lt;IiI!lI!i:;I;;,,::::,,,;,:iiI&lt;++++---==-&gt;&gt;&lt;llIl!&gt;&gt;&gt;!llIIiiii:; ,i:;;:,:;;l-lIl&gt;=××--&gt;=l=÷!&gt;&gt;l!lll!l!!!!llIill!
+:,:::!&gt;&gt;=&gt;&gt;+Il!!!!:;;IiIl&lt;ll!lii:;;:iIiii;::,,:;:::. .illiI&lt;+++--=====-+&gt;&lt;&lt;&lt;&lt;&lt;lIlIIi; .&gt;, ,::;,:;;&lt;!&lt;l&lt;-=×=++!&lt;+;≈+!!!liiIIl!!!lllliI!l
+::,:,l&lt;&lt;&lt;I!&gt;lll&gt;+!lii;:,,Il&lt;&lt;&lt;Ii;:;ll!!i:,,,,:;:::,. ,llllii!++++++---+&gt;&lt;!!lIIIIIii: -!.::::,:;;;i!&lt;=×-××-&gt;+l=I&gt;≈!!!lll!&lt;&lt;&lt;&gt;&gt;&gt;&lt;&lt;!l!li
+:,:,,!III:!&lt;ll!ll!iI&lt;i:;:&lt;!!&lt;&lt;l&gt;l!IIiIIi;;::;:,,.. ;l!&lt;!li;il!&lt;&lt;&lt;&lt;&lt;&lt;&lt;!!lIIIIii;:, !&lt;.;::;:,:;;!+&gt;====-=&lt;&gt;!&lt;&gt;:÷-&lt;&gt;&gt;++++--=+++&gt;&lt;++&lt;&gt;
+::::,liil!llI!-&lt;lIIii!II;!!!!&lt;&lt;!!lIiIIIlIi;;i,:::. i!!&lt;&lt;!lIIi;;iIll!!lIiii;::, ;; Ii:,:;,:;;I!&gt;=×××-=--=l×!l≠&gt;++&gt;--=×==---=+--××
+::,,,ll&gt;&gt;-×&gt;lI+lliI!&lt;&lt;&lt;Iill+l&lt;iili;II:ii;;::,:,.. .I!&lt;&lt;&lt;!llIii;::::;::::::::, ,! ,×&lt;I,,:::.,:Iil&lt;+====-=+=&lt;-=i×±&lt;l!!!!&lt;&lt;&gt;==-=---+&lt;
+::::,Il!l=-=&lt;I::I;;i!!!Iii:!ii;liiii;iii:::,..... .,I!&lt;&lt;&lt;&lt;!lIIi;;::::::::::::, ;I, ;Il,:,,:::,,:i&gt;&lt;&lt;&gt;-====×+-=l×&gt;I≠+&lt;&lt;--&lt;!!!&lt;&gt;&gt;&gt;&gt;lIii
+::,,,l!lil&gt;+I:::IIi;;;i;i!:;:::;;i;;;;;;::,.,:,. .,I!&lt;&lt;&lt;&lt;&lt;!!lIIi;;:;;;;;iii;, .lI:IIl&lt;i,;,,,:::,,:I+&lt;&lt;+==××===+×l+=:+÷i;i!&gt;+&gt;IiiIIIl&gt;--
+:::,,i=+;;I&gt;×÷!&lt;!lIl!&lt;=&lt;ll!lllli;lliIiiIi,::;;:.,...,Il!&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;!!llIIiiIIII;, .,:;,,;i::,,::,::;I!+&gt;=±÷±≈÷×≠-÷-&lt;±!,×l,ilIiiiiI&gt;≈≈÷××=
+:,,,,il!..:il!i&lt;l:;i;;;;;i-+&gt;&lt;Ii;I;:ill;:::;:,;l,,:,,,iIl!&lt;&lt;&gt;&gt;&gt;&lt;!&lt;!!!llll!lllI;,. ....,,,:i::::;:,:::;;l&gt;!=×±≈≈≈≈≠≠≠≠≠≠≠≤≤≠≠≠≠≠≠≠≈≠≠≠≠≠≠≠
+:,,,,iII:,:!lI;lI&gt;&lt;;,:,,,i×-&lt;!Ii;::;li;;;;;;:IiI&lt;::::iIll!&lt;&gt;&gt;&lt;&lt;&lt;!!!ll l!!!!lli:,,:::::,,;,.,,,,,,:;;iiill+&gt;+&gt;&gt;&gt;&gt;&gt;&lt;&lt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&lt;&lt;&gt;&gt;&gt;&lt;&lt;&gt;&lt;&lt;&lt;&lt;
+:,,,,i;I;,:;,;;lI:i++I-;,:&lt;llIi;;;i;;;:Ii:::i!&lt;I;;,i;IlIl!!&lt;&lt;&lt;&lt;!!!!ll!!!!llIi:...,,,,:;.... ..,,,,::;:iiiiI::;:;;;:;::::::;I;i;:;i:;l;....
+:,,,,;:...,,,:;lI:;;;iIIIii;:,,,;;:;;;;,,.:;;;;,,,:;Il!&lt;!l!&lt;&lt;&lt;!!!llll!ll!llIi:. .:::::...,:,,....,:iiiillIIii;;;iiIIIlIIIl!+===&gt;&lt;+-&gt;-=-÷≠≠≥
+:,,,,:;:,,. ...,,:, li!:li;!!,lIi:;i;;,:,:iiIi;i:,i;iI!&lt;&gt;&lt;!!&lt;&lt;!!lll!!!!!!!!lIi,.;::,:,....:,,..,,:;;::;;;Mall!+--+-==×××--==÷÷÷÷≈&gt;&lt;≈÷÷--=&gt;&lt;
+,,,,,i i&lt;;l,,i.;;:,..,,,,;.:.; .;:ii;;,:::i:;Il;,:;Ilil&lt;&gt;&gt;&lt;!&gt;&gt;&lt;!!!!&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;!lIi;, .,......,.,,,:;:;;iiii;;iIIIiiiiiiIl;,,,,,:;l&lt;!;;±±≠&gt;Ii
+:,,,,; &lt;iliI:Il;l!Iii::......,;iiII;i;;;;:::,:iIl&lt;i!&gt;&gt;+&gt;&lt;&lt;+&lt;!&lt;&gt;&gt;&gt;&gt;+&gt;++&gt;&lt;!llii:,. ....,,,,...,::::;;;ii;ii;ili:+≈≈≈÷≤≤≤÷≠≠≤±=&gt;&lt;&lt;=±≠≈l:I;:;
+:,,,,, .,:;,..;&gt;&gt;+I..,,:illiiIiii;;;:,,.,,;!!&lt;Il&lt;&gt;+--+&lt;&gt;+&lt;&gt;+---++&gt;&gt;&lt;!!lli;;,.,,:::,.....,,::;:,:;;:;;;i;iIl!&gt;&gt;&lt;-=-+≠≥≤=Iii:!--+IiII;i
+:,,,,,... ,l&gt;+++&gt;&lt;&gt;-+++:,::ilIIiiiiillI;:;;;;:,::;;l!&lt;&gt;&gt;&gt;+--&gt;-&lt;&gt;--++++&lt;&gt;&gt;&lt;&lt;!lI;:::::,::,:;:,...,,:::;::::;;;;iIIlll&gt;+&gt;&lt;=÷-+l&lt;=;l=-!iii;:l
+l&lt;&gt;×±×÷×+-÷÷=-&lt;!!Iiiii;;ilIIIIiiiiiii;;;:::II!i;::;;I&lt;&gt;&lt;&gt;&lt;=≈≠×÷≠=÷÷÷ =++&gt;++&gt;&gt;&gt;!I;::::,::,,,,...,,,,:,,:,,,,:;::;;iiiII&lt;&gt;!&gt;=×-&gt;!!!:l&gt;&lt;li!&gt;i;l
+ll!!!!!!!l!!!!!&lt;&lt;&lt;-×=-+!lIIIiiiiiiiii;;;;;l&gt;&gt;&lt;l&lt;-=××&lt;;;;i;;I&lt;×÷=±≥≥≈≈≈= &gt;+--&gt;!i;;;i;i;,:,,,:;::,,::;:,::.,:,:;:::;;;iiiiIl&lt;&lt;+-×&gt;!++Il!lIIlI;;I
+IIIIIIIIIIIIIIIIlllIIIiiiiiiiii;;:;;+÷÷±±±≈≈≈≈≠≠≠≈&gt;iI;;;;;;;;;ii;; ;;;;;;;;;i&lt;+-+I,,.:,::::,;;:,::,,,,,:;:::;;;;;iiiiI&lt;&lt;!!&gt;&lt;+&gt;iI!I;iIi;;I
+IIIIIIIiiiIIIiiIllIiiii;;;;;;;;;;:;;;-±±≈±≈≠≈≈≈≈≈≈≈≈≈≈≠×&gt;lii;;;;;;;; ;;;iil-±≈±=-=+!;:,,:iI;;;::;::::,,,,::::;;;;;;;;;iil!ll&gt;&gt;&gt;+I&gt;×+iiii;;I
+lIIIIIIiIIIiIiiiilIIii;;;;;;;;;;;;;;;::i÷≈≈±±≈≈≈≈≈≈≈≈≈≈≈≈≈±±±≈≈≈≈≈≈≈≈ ≈≈≈±±±±÷÷÷÷÷×=-I:,:;;;:;;;!li::,,,,:::::;;:;;;;;;iiI--&gt;&gt;&gt;-+l=≠÷&lt;iii;il
+llIIIiiiiiiiilIiiii;;;;::;;;;::;;;;i-≠≈≈±±±≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈÷≈±≈±±±±±±± ±±±±±±±±=±±÷÷÷&gt;i;;:il,:;i===&lt;:::,,::::::::;;;;;;ii&gt;±-&lt;&gt;--l=≠≈+IIi;il
+lllIIIIiiiiIii;;;;;;;::::;;:::;;;;i≈±±±≈±÷±≈≈≈≈±±≈±±±±±≈±÷±±±±±±±±± ±±±±±±±±÷±±±±÷÷×&lt;!Il;;Ii&lt;+÷×÷!::::::::::::::;;;;;iiI÷×+-×=&gt;×≈≈+&gt;--&gt;&lt;+
+llllIIIIIiiIii;;;;:::::::::::::::;;&gt;≈±±±±÷÷±≈≈±±±±±±±±±±±±÷±±±±±±±± ±±±±±±±÷÷÷÷±±÷÷××--lI!I+×××÷±±I:::::::::::::;;;;;ii&lt;---=×÷±×+=±≤≥≥≤≠
+IIlIIIIIIIiiii;;;;:::::::::,::::;;I≈±±±±±±±±±±±±±±±±±±±±±×±÷÷±±±± ±±÷±±±±×±±÷÷÷!I;!&lt;;;I!+×÷±×±×÷÷i:::::::::::;;;;;;iil-==&gt;++-÷-+&gt;=≤≤≥≤
+lIIIIIIIII;;;;;::::::::::::::::;-±÷÷±±±±÷±±±±×!iiii÷iii;;;l-±±±=li ;;i&gt;±=;i;;;;ii±&lt;i;:::l±±÷±±÷÷±×÷-:::,,::::::::::;;;iI=÷÷+&gt;&gt;=-!ll!×≠≠≤
+IIIIIIIIIIii;;;;;:::::::::::,::::;×±×÷±÷÷±÷±÷±&lt;;;;;iii÷Ii;l&gt;l;;!±I;;; ;;;i;÷÷×-;;ii=±±±l;;i±±±±±±±×±÷-×I::,,::::::::::;;;;;i+-++&gt;iiIiIII&gt;±±≈
+llIIIIIIIiii;;;;:::::::::::::,:::;×=×÷÷÷÷±÷÷÷±!;;i≈±±±±li;i;;;;I÷;;;i ==;ii&gt;=I;;;iIiiI±±i;;±±±±±±÷÷±=+=:::,::,:::::::::;;;;;l×=++!&gt;&gt;lIII!&gt;&gt;-
+llllIIIIII;;;::::::::::,::,:,::;===÷÷÷×÷÷±÷÷÷I;;;;;;-&gt;iii=;;;;&gt;÷i;; iii;ii-;i;;i;;iI×≈×±±±÷×&gt;I;-÷÷÷÷=-i:,:,::::,:::::::;;i=××=×=÷-III;,,,
+llllllIIIIii;;;;::::::::::::,:,,:;+=×÷×××÷÷---÷÷≈=&gt;&lt;&lt;!-=&lt;&gt;&lt;÷±=&gt;&lt;&gt;±÷×× ××==×=×=+&gt;!Ii;=!i;i×;;;;;;;l±÷÷÷÷--,,,,::,:::::::::;;;;&lt;÷÷≈±-×+IIi,,,,
+illllllIIIIi;;;::::::,::::::::,,,,,:+-××==×÷-ii;=÷÷÷×÷&lt;i;;;I=±&lt;i;I÷±iil !±l;;;×&gt;;;;;;;!×l;;×i;;;;;;i=×÷÷×=!i,,:,,:::::::::::;;i÷±±±±±-&lt;l::!-×
+:lllIIIIIII;;;;:::::::,,::,,:,,,,:&gt;+=---××=iii=÷×÷÷I;;;I;;;!-;;;÷÷I;; i÷&lt;iii==;;i;;i;××=÷×=!;:::;;I÷×=-=!;,,,:::,:::::::::;;;!--+---+-+++-=
+,IllIIIIIII;;:::::::::::,,,:,,:,,:&gt;-+&gt;==×××iiiI+=××i;;&lt;±I;;i×;;;l+;;; ;=+;ii&lt;×;;;;;;;&gt;×+ii;i;i;;i&lt;××=--+&gt;i,,,::,:::,::::::;;;I+----&gt;l;;;i--
+.:IIIIIIIII;;;::::::::::::,,,:,,,,I&gt;-==-=×××iii;;;!×i;;;;;i-×-i;;;;;i ××=iI;l÷IiiiiII&lt;÷-&lt;l=±+::::;:,+=-++&gt;i.,,:,::,,::::::::;;;:,;;II;:l+×==
+..IllIIIIIi;;::::::,,,::::::,,,::,i++&gt;+-===-++===-=÷÷÷+&lt;&gt;××××++&gt;-=×&gt;&lt; !=×&lt;!il××;:::::i÷!;;I±;::IlI&lt;==-+++&gt;;,,,,,,,::::::::::;;;iIIIIIIIIIIIIi
+..;IIlIIIii;;::::::::,,,::,,:,,:,,;&lt;&lt;+----=I::=×××××l:::::;+×I::&lt;=×i: :+×&lt;=I;=×i::IlII-×&gt;I×÷-i:::;::+--++&gt;l,:,,,,,:,:::::::::;;illllllIlllIl
+..:IIIIIIii;;:::::::::,,,,,::::,,,:l&lt;&gt;++--=&lt;,:-××××&gt;::l÷×;::-l::I=×I: :!--!&gt;;&gt;=l::;!&lt;+-××+Ii;;::::::+=-++&gt;&lt;:,,,,,::::::::::::::;iII;:;::::::
+ ..iIIIiiii;;;::::::,:,::,,,,,:,,,:&lt;&lt;&gt;++-==+,,:&lt;&gt;&lt;+-:::&lt;l::;==:::;:::: +=-;&gt;:!=+::::::i××+;iiI!&lt;+-==+&gt;-+&gt;&gt;&lt;;,,,,,::,,,,,:::::;;;i&lt;&lt;&lt;;::,,...
+ ..;iIiiii;::::::,::,,,::,:,,,,:,,I&lt;&gt;+--===&lt;:,:::!==l;:;;l===×&gt;I;;i&lt;= ===l-!&lt;==---+&gt;&lt;!&gt;=!ii&lt;=&lt;iii;;;I-+&gt;&lt;!i,,,,,,:,,,,::::::::;;IIl!&lt;&gt;&gt;&gt;&gt;&gt;&gt;
+  .:iiiiiii;:::::,,,:,,,,:::,,:,,,,i&lt;&gt;+-----&gt;&gt;-=××====+&lt;!&lt;+===!II+-=ii i&lt;--iii--&lt;iiiiIIl-&gt;&lt;il-IiiIlIi!+&gt;&lt;&lt;!;,,,,,,,,,,,,::::::::;.;l!!&lt;&lt;&lt;&lt;&lt;
+ .,:iiiiiii;:::::::,,:,,,,,,,,,,,,,I&lt;&gt;&gt;++--&gt;;;&gt;=====&lt;IiIiiIi&gt;-!ii!--li il-=Iii!-+iiiIiii+-&gt;!--+Ii;;i:,I&lt;&lt;!l;,,,,,,,,,,,,,,:::::::;,:l&lt;!!!!&lt;&lt;
+  .;iiiiiii;:::::::,,,,,,,,,,,,,:,.;&lt;&lt;&gt;+++-&gt;;;&gt;-----Iii---iii-!iiI--!i iI--Iii;-+ii;&lt;&gt;&gt;!&gt;++I;;::::::,,l!llI:.,,,,,,,,,,,,,:::::::::,i!!!!!!!
+  .;iiiiii;;:::::::,,,,,,,,,,,,,,,,;!&lt;&lt;&gt;&gt;++&gt;;;;!&gt;&lt;&lt;-iiiI!Iiii-+I;;;;i; ;&lt;++I;;;++i;;;::;l&gt;&gt;I;IIl!&lt;!!I;ilIi:..,,,,,,,,,,,,,,,:::::;.,:iiIIII
+  .;iiiiii;;:::::,,,,,,,,,,,,,,,,,;!!&lt;&lt;&gt;&gt;&gt;+!;;:::i++!ii:;il+&gt;&gt;+&gt;IiiI!&gt;&gt;&gt;&gt;!!!!&gt;&gt;&lt;llIIi;I&lt;;::I!;:::::;ii;:,:;::,,,,,,,,,,,,,,:::::, :iiii
+ ..;iiiiiii;:::::,,,,,,,,,,,,,,,,,,Il!!&lt;&lt;&gt;&lt;&lt;&lt;&lt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;+&lt;!!!&gt;&gt;&gt;&lt;Iii&lt;&lt;&lt;;;;l&lt;l;:;!&lt;I:::iIII!l:;lI,,,,..,;:iIIIIIIi,.,,,,,,,,,,,,:,:::,...illIl
+...;iiiiii;;::::,,,,,,,,,,,,,,,,,,,,je vais !!&lt;!:;I&lt;&lt;&lt;&lt;&lt;&gt;i;;;;:;;!&lt;;::l!! :::i!I:::Ili:,,::;iII;:,,.....,,;iiIlIiIIIIi;,,,,,,,,,,,::::::...,,,,,
+</pre></div>
   <div class="scanlines"></div>
   <div class="vignette"></div>
-  <div class="flash" id="flash"></div>
-  <div class="glitch-line" id="gline"></div>
-  <div id="whispers"></div>
-  <div class="hud">
-    <div><span id="term"></span><span class="blink">_</span></div>
-    <div class="sig" id="sig">SIG: ███.███.███ // CONNEXION INSTABLE</div>
-  </div>
-  <script id="art-data" type="application/json">"l:\u003e;\u003el!:;::=÷÷÷×-i:::::;\u003c=≈×I::::::::;l!i;:::;-∂∂≥±±±±÷÷÷÷±±±±±×+××\u003e!l!\u003e\u003c!-×÷×××÷÷×××=×÷÷÷≈×=i:,. .,:,,,,,,,,,,;:,,,:::.                \nJe;≠±≈±≠≈÷:I+\u003e++++l::::;×≤≈≈≈≈I::::::\u003c+××=l:::;=∫∂∑±×±±×=÷=×±±±±×+--+\u003e\u003e+-\u003e\u003e+++-==×÷÷××××××÷≈÷-I;:, ,::::,,,,,:::::,,::;:.. . ..\ni:I++\u003e\u003e\u003c;::!+--+!;:::::×±≈±±≈i:::::,\u003c×===\u003e:::;±∂∂∑±=××=-\u003c+=÷×-\u003e\u003c!!!!l lllll!l!!\u003e+\u003c\u003c--\u003e\u003c\u003e--÷≈×=I;:::;;;iillIII;::iIlIiIIIl+×\u003ci;I\u003e==\u003e-××-lI;::\ni::::,,:::::;Ii;:::::::,-≠≠÷I:::::::;\u003e×=-i:::;÷∫√≥≈×-+==\u003e\u003e+!l!llll!!\u003c \u003e\u003c!!l;lIIiIIIlIllii!+==+i:::;I\u003c\u003c!!!++liiIliIl\u003c\u003clI!=×-l;;I!\u003e×±÷÷×=÷=\u003e!l\nI::!-×\u003e=I:I\u003c+\u003el::::::::::::::::;\u003c\u003cI:::,::,:::;;≈∂∂∑±×==--\u003e!IlIIl\u003c\u003cI;;I l!!!\u003c!I;;lI;::,:iIlll\u003c+\u003cIi;;;I\u003e=××÷×+li\u003e==\u003eII+\u003e!\u003e--=+i;iIIiil+\u003c\u003e=-\u003e\u003cll\nI:-l\u003e-×-I\u003c,\u003e\u003c\u003c\u003el:\u003c=-=-i::::::+=×-+\u003c:::::::\u003c≈≠≈≈≠∫≤-×=\u003e\u003cliiI\u003c\u003cli;iI!li iiIl!\u003c\u003e\u003c\u003c\u003c\u003c!llI;lli;i;.,illllIl!\u003e=÷\u003e!\u003e=××+!I\u003c++×÷×+-×-!III:;il\u003e+-+!Ii\n\u003c:i;\u003e\u003c\u003e+;iI\u003cl\u003e!;iI\u003e+\u003c\u003ei:::::;=÷\u003e×++;:::::I≈≈÷÷±±≥±\u003c-\u003cIiil!li;:;il!iiI Il!\u003c\u003e+++---++\u003e\u003c\u003c\u003e\u003el;::iili;Il!\u003e\u003cl!+\u003e!\u003c=××\u003c!\u003e=++±≤±≤∑∑∑≈+lli::i!-=+\u003cli\n!:,:!l+I,,I!\u003ci;::i\u003e\u003c++i::::::!\u003e+=-I::::::;÷±÷±÷≈∑±!\u003eiIIIi;i;;;iI\u003cliiIl \u003c\u003e++----=-----+++-+\u003e\u003c!i;;III;;IIlIl-+!l!\u003c!ll\u003e=\u003elI-×=÷÷±÷-!ii;;iI±≠×--±\n::::::,::::,,::::,:ii,,::::::::::::::::::::i!l≈≤≤≤≈liii;;:iii;\u003elII!\u003c\u003e ++-+----=-==----+++\u003e\u003e\u003c\u003e\u003cI:::i::I!\u003e===-+lII\u003e×÷÷+\u003c+=÷±=\u003e\u003e\u003e+\u003cIlli;i±∫√≤÷=\ni::::::::::::::::::::::::::::::::::::::::;ii;I∫∂∫∫-i;Iii;;i;;lI;I\u003c+++ +++----========------+\u003c!li::i;il+-====××=-×±≈≈×÷≈÷÷==\u003cl\u003c\u003c\u003c!l!lIi=≤∑°∇≥\ni:;l\u003e\u003c!;::::::::::::::::::::::::;I\u003c++i::;\u003e+\u003c\u003e-I+!-+ii!;;;;;:;II:I\u003e+--- ------==========----==-\u003e!i;;ili;I-====×××÷×+-÷≠∑∑√√√≠\u003eii!\u003e\u003c!Il!I×≥∫∫≤\u003e\nil\u003e+\u003e\u003e+\u003c:::::::::::::::::::::::;-i\u003cl\u003c\u003c;:\u003c÷-+\u003e+\u003c\u003cl\u003elii;;;;:,:;:i\u003c+-+\u003c! \u003c\u003e---============------+\u003cl;;;I!I;;\u003c--=××÷÷÷=\u003e÷≠≤≥≤≠≠±\u003cii!\u003c\u003clIIli×√∏∂≥\u003c\ni×±×=++÷i::::::::::::::::::::::;×+--+=;::×=--=!\u003c+lii;;;;,,:;,;\u003e+-==-- =+!Il\u003c+=×÷×=======---++\u003e\u003e!i:;;iIIiIIll!!!!!-±±±≈≈≈±÷±-\u003e+\u003c!ll!lii÷≤≥√≥÷\n::×--×±l::::::::::::::::::::::::,\u003c++l::::::i;;iIIIii;:,;i:,,,,I-=--\u003e\u003c!! !\u003c\u003c\u003c\u003cll!\u003e=××××====---+\u003e\u003e\u003e\u003cI;:i;IIIii!\u003c×÷±÷-=±≈±÷÷×÷≈≈≠≥√∑≠×-\u003c!ll÷≤∫∇∫≤\n:::,::::::::::::::::::::::::::::::::::::::::;iII;I::;iiiI:,;!=×=+\u003eI:,, ,;iIl!\u003c\u003c\u003e--======----+\u003e\u003e\u003e\u003cI;:;i;lIiill+=××\u003e\u003cl\u003e!××=≈≠≤≤≠≠≤≤×∑√∑≠×÷≥∏♦◦√\ni::::::::::::::::::Ili::::::::::::::;iiIlIIIii;iiii;i:,:,i\u003c-=×==-+\u003el; ,:\u003ei!!\u003c\u003c+--+-++\u003e\u003e+---+\u003e\u003c\u003cli;::;;;!Iiill=×=\u003e-====±±÷≠≤××≠≠≠∫√∑∫∂∫≈≠°♦♦√\nje:\u003cl!\u003ell:\u003c≤≤≤≠!::-≥×÷≠≈;::::::::;!==-i;i××llI:;iIi:;,,..;!--×××==-+\u003c\u003c!\u003c\u003c!l-++-×=+\u003e\u003c!liii!+-+\u003c!l;:::;;;I!i;I!=÷×\u003e-×=×≈≈≈≠≈±\u003clll\u003e=±≠≠≤≥≈≠°♦♦∫\nii!\u003c!!\u003cI\u003c≠≠≈≠≈±;I≤÷=÷×≠\u003e:::::::,li!\u003cIi:\u003c×-\u003e!IlI;:;;:,,,,;++-======-== =====--===+!IiiiiIIi;I\u003e!i::::;;:i+liiI!!!!\u003c+÷±≈≠≠≤≤≠+i;iiII!\u003c\u003c\u003c=≤•♦♦∂\n;,,;llI,!≈≈≈±≈±::±±±÷×±i:::::::,;I+\u003e\u003ei:;\u003ci;;;iIi;::;;;::l\u003e+--======== =======-==\u003c!!!Ii;iiIl!!iI,,::;;i;;!\u003ciiliiI\u003e≈≤±≈≠≠≤≤≠±\u003cl!IiiII\u003c\u003eI×≤∇∇∇±\n;:, ;;.,,\u003c÷±±+::::\u003c××\u003e::::::::::,:l\u003c;;IIi;:iI;:::I::Ii;l\u003e++-----====××= =======-\u003c\u003c+\u003ei::\u003e::iIli:.:::::i:;i!II!+-=±≥≤±±±≠±×--!II!!l!\u003c!ll≤°∏∂∑≈\n;::::;::::,,::::::::,::::::::::::::;IIii::;;::::I,.,:Il!++++++--===== =---=====+\u003c\u003e+\u003elllli,:II;.,,:,,,;:::lIi\u003e-==÷±±≈≠×\u003e-×--I:::;Ii;iiI√∂∫∫∂÷\n;:\u003e±-=±+:::::::::::::::l!\u003c;::::::i;i\u003e\u003e!::;;::,:i..,,,!l\u003e++++++++----++ ++---=××-\u003e\u003e+-++\u003e!Il!lIi,.,...,::,::lii\u003c!\u003c\u003c+---=---=--+\u003e\u003e\u003c\u003c\u003e\u003c\u003c\u003e\u003e+÷≠≤≤≠=\n;;±-×=-=l:::::::::::,l\u003e++-+i::,:::;÷\u003e\u003cl;!;;::I;;,,:,,\u003c!\u003e++++\u003e+\u003e+++-=--\u003elii!!!!\u003c\u003e--===---+\u003cl; ....,,,,:!;II≈≠∑∑≥≥≥≥≥∑≥≥≥∑≥≥∑∑≥≥≥≥∑∑≥≥≥≥≤≤≥≥\n;:÷+---+:,:::::::::::,:l!!l!;::::;i;+-\u003e!!!IIIi:::I:,,\u003cI\u003c\u003e++++\u003e\u003e\u003e\u003e\u003e\u003e\u003e-------+!i,iI\u003c----==--+\u003cI, ,..,,.,:ii:;;:;IIIii;;;;;;;ii:,,::,,::,,,,,,,,\n;:,I\u003e!I::::::::::::,,,;!\u003c!i,::::::;IIII;i::;::,,:I;,+,I\u003c\u003e++\u003e++\u003e\u003ciill!!\u003c\u003e+\u003e++\u003e\u003c\u003c\u003e+-++++++\u003e\u003cl: .,..,,.,::::;i;,...... ...,,. .\n;:::::::::::::::::::,,,,,,,::::::::;;;;;ii;i:;:,,;l;i.,l\u003e+\u003e\u003e\u003e+--+\u003c!!!ll!lll!\u003e\u003e++++\u003e\u003e\u003e\u003e\u003c!l, .:.,,.,,,,,;ii;:. ..... ..,. ,\n:,::,:::::::::::::::::::::,::::::::::;iiii;:;l::,,:;;;,:i\u003c\u003e+\u003e+---++\u003e\u003c\u003c-+\u003eliiii!\u003e\u003e\u003e\u003e\u003e\u003c!!II,., ,::::,,,,:;:;i:i,.....,,.,,,,,,,:,,,,,..,,..,.,\n:::::::::::::,:::::::,:,,:::,::::::;II:;;;l;;:,:,:,:,::;i\u003c++++++---+\u003c!lllll!I:;\u003c\u003c\u003e!!llIi;:,. :;,;i:,::i;i+i=!±≈±≈÷÷≤I-!Il!!lll!!l!!lIIlliIIi\n:::::;IllilliIIlll!lll!\u003c\u003c\u003c!!\u003c\u003cIiI!lI!i:;I;;,,::::,,,;,:iiI\u003c++++---==-\u003e\u003e\u003cllIl!\u003e\u003e\u003e!llIIiiii:; ,i:;;:,:;;l-lIl\u003e=××--\u003e=l=÷!\u003e\u003el!lll!l!!!!llIill!\n:,:::!\u003e\u003e=\u003e\u003e+Il!!!!:;;IiIl\u003cll!lii:;;:iIiii;::,,:;:::. .illiI\u003c+++--=====-+\u003e\u003c\u003c\u003c\u003c\u003clIlIIi; .\u003e, ,::;,:;;\u003c!\u003cl\u003c-=×=++!\u003c+;≈+!!!liiIIl!!!lllliI!l\n::,:,l\u003c\u003c\u003cI!\u003elll\u003e+!lii;:,,Il\u003c\u003c\u003cIi;:;ll!!i:,,,,:;:::,. ,llllii!++++++---+\u003e\u003c!!lIIIIIii: -!.::::,:;;;i!\u003c=×-××-\u003e+l=I\u003e≈!!!lll!\u003c\u003c\u003c\u003e\u003e\u003e\u003c\u003c!l!li\n:,:,,!III:!\u003cll!ll!iI\u003ci:;:\u003c!!\u003c\u003cl\u003el!IIiIIi;;::;:,,.. ;l!\u003c!li;il!\u003c\u003c\u003c\u003c\u003c\u003c\u003c!!lIIIIii;:, !\u003c.;::;:,:;;!+\u003e====-=\u003c\u003e!\u003c\u003e:÷-\u003c\u003e\u003e++++--=+++\u003e\u003c++\u003c\u003e\n::::,liil!llI!-\u003clIIii!II;!!!!\u003c\u003c!!lIiIIIlIi;;i,:::. i!!\u003c\u003c!lIIi;;iIll!!lIiii;::, ;; Ii:,:;,:;;I!\u003e=×××-=--=l×!l≠\u003e++\u003e--=×==---=+--××\n::,,,ll\u003e\u003e-×\u003elI+lliI!\u003c\u003c\u003cIill+l\u003ciili;II:ii;;::,:,.. .I!\u003c\u003c\u003c!llIii;::::;::::::::, ,! ,×\u003cI,,:::.,:Iil\u003c+====-=+=\u003c-=i×±\u003cl!!!!\u003c\u003c\u003e==-=---+\u003c\n::::,Il!l=-=\u003cI::I;;i!!!Iii:!ii;liiii;iii:::,..... .,I!\u003c\u003c\u003c\u003c!lIIi;;::::::::::::, ;I, ;Il,:,,:::,,:i\u003e\u003c\u003c\u003e-====×+-=l×\u003eI≠+\u003c\u003c--\u003c!!!\u003c\u003e\u003e\u003e\u003elIii\n::,,,l!lil\u003e+I:::IIi;;;i;i!:;:::;;i;;;;;;::,.,:,. .,I!\u003c\u003c\u003c\u003c\u003c!!lIIi;;:;;;;;iii;, .lI:IIl\u003ci,;,,,:::,,:I+\u003c\u003c+==××===+×l+=:+÷i;i!\u003e+\u003eIiiIIIl\u003e--\n:::,,i=+;;I\u003e×÷!\u003c!lIl!\u003c=\u003cll!lllli;lliIiiIi,::;;:.,...,Il!\u003c\u003c\u003c\u003c\u003c\u003c\u003c\u003c!!llIIiiIIII;, .,:;,,;i::,,::,::;I!+\u003e=±÷±≈÷×≠-÷-\u003c±!,×l,ilIiiiiI\u003e≈≈÷××=\n:,,,,il!..:il!i\u003cl:;i;;;;;i-+\u003e\u003cIi;I;:ill;:::;:,;l,,:,,,iIl!\u003c\u003c\u003e\u003e\u003e\u003c!\u003c!!!llll!lllI;,. ....,,,:i::::;:,:::;;l\u003e!=×±≈≈≈≈≠≠≠≠≠≠≠≤≤≠≠≠≠≠≠≠≈≠≠≠≠≠≠≠\n:,,,,iII:,:!lI;lI\u003e\u003c;,:,,,i×-\u003c!Ii;::;li;;;;;;:IiI\u003c::::iIll!\u003c\u003e\u003e\u003c\u003c\u003c!!!ll l!!!!lli:,,:::::,,;,.,,,,,,:;;iiill+\u003e+\u003e\u003e\u003e\u003e\u003e\u003c\u003c\u003e\u003e\u003e\u003e\u003e\u003e\u003e\u003e\u003e\u003e\u003e\u003c\u003c\u003e\u003e\u003e\u003c\u003c\u003e\u003c\u003c\u003c\u003c\n:,,,,i;I;,:;,;;lI:i++I-;,:\u003cllIi;;;i;;;:Ii:::i!\u003cI;;,i;IlIl!!\u003c\u003c\u003c\u003c!!!!ll!!!!llIi:...,,,,:;.... ..,,,,::;:iiiiI::;:;;;:;::::::;I;i;:;i:;l;....\n:,,,,;:...,,,:;lI:;;;iIIIii;:,,,;;:;;;;,,.:;;;;,,,:;Il!\u003c!l!\u003c\u003c\u003c!!!llll!ll!llIi:. .:::::...,:,,....,:iiiillIIii;;;iiIIIlIIIl!+===\u003e\u003c+-\u003e-=-÷≠≠≥\n:,,,,:;:,,. ...,,:, li!:li;!!,lIi:;i;;,:,:iiIi;i:,i;iI!\u003c\u003e\u003c!!\u003c\u003c!!lll!!!!!!!!lIi,.;::,:,....:,,..,,:;;::;;;Mall!+--+-==×××--==÷÷÷÷≈\u003e\u003c≈÷÷--=\u003e\u003c\n,,,,,i i\u003c;l,,i.;;:,..,,,,;.:.; .;:ii;;,:::i:;Il;,:;Ilil\u003c\u003e\u003e\u003c!\u003e\u003e\u003c!!!!\u003c\u003c\u003c\u003c\u003c\u003c\u003c\u003c!lIi;, .,......,.,,,:;:;;iiii;;iIIIiiiiiiIl;,,,,,:;l\u003c!;;±±≠\u003eIi\n:,,,,; \u003ciliI:Il;l!Iii::......,;iiII;i;;;;:::,:iIl\u003ci!\u003e\u003e+\u003e\u003c\u003c+\u003c!\u003c\u003e\u003e\u003e\u003e+\u003e++\u003e\u003c!llii:,. ....,,,,...,::::;;;ii;ii;ili:+≈≈≈÷≤≤≤÷≠≠≤±=\u003e\u003c\u003c=±≠≈l:I;:;\n:,,,,, .,:;,..;\u003e\u003e+I..,,:illiiIiii;;;:,,.,,;!!\u003cIl\u003c\u003e+--+\u003c\u003e+\u003c\u003e+---++\u003e\u003e\u003c!!lli;;,.,,:::,.....,,::;:,:;;:;;;i;iIl!\u003e\u003e\u003c-=-+≠≥≤=Iii:!--+IiII;i\n:,,,,,... ,l\u003e+++\u003e\u003c\u003e-+++:,::ilIIiiiiillI;:;;;;:,::;;l!\u003c\u003e\u003e\u003e+--\u003e-\u003c\u003e--++++\u003c\u003e\u003e\u003c\u003c!lI;:::::,::,:;:,...,,:::;::::;;;;iIIlll\u003e+\u003e\u003c=÷-+l\u003c=;l=-!iii;:l\nl\u003c\u003e×±×÷×+-÷÷=-\u003c!!Iiiii;;ilIIIIiiiiiii;;;:::II!i;::;;I\u003c\u003e\u003c\u003e\u003c=≈≠×÷≠=÷÷÷ =++\u003e++\u003e\u003e\u003e!I;::::,::,,,,...,,,,:,,:,,,,:;::;;iiiII\u003c\u003e!\u003e=×-\u003e!!!:l\u003e\u003cli!\u003ei;l\nll!!!!!!!l!!!!!\u003c\u003c\u003c-×=-+!lIIIiiiiiiiii;;;;;l\u003e\u003e\u003cl\u003c-=××\u003c;;;i;;I\u003c×÷=±≥≥≈≈≈= \u003e+--\u003e!i;;;i;i;,:,,,:;::,,::;:,::.,:,:;:::;;;iiiiIl\u003c\u003c+-×\u003e!++Il!lIIlI;;I\nIIIIIIIIIIIIIIIIlllIIIiiiiiiiii;;:;;+÷÷±±±≈≈≈≈≠≠≠≈\u003eiI;;;;;;;;;ii;; ;;;;;;;;;i\u003c+-+I,,.:,::::,;;:,::,,,,,:;:::;;;;;iiiiI\u003c\u003c!!\u003e\u003c+\u003eiI!I;iIi;;I\nIIIIIIIiiiIIIiiIllIiiii;;;;;;;;;;:;;;-±±≈±≈≠≈≈≈≈≈≈≈≈≈≈≠×\u003elii;;;;;;;; ;;;iil-±≈±=-=+!;:,,:iI;;;::;::::,,,,::::;;;;;;;;;iil!ll\u003e\u003e\u003e+I\u003e×+iiii;;I\nlIIIIIIiIIIiIiiiilIIii;;;;;;;;;;;;;;;::i÷≈≈±±≈≈≈≈≈≈≈≈≈≈≈≈≈±±±≈≈≈≈≈≈≈≈ ≈≈≈±±±±÷÷÷÷÷×=-I:,:;;;:;;;!li::,,,,:::::;;:;;;;;;iiI--\u003e\u003e\u003e-+l=≠÷\u003ciii;il\nllIIIiiiiiiiilIiiii;;;;::;;;;::;;;;i-≠≈≈±±±≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈÷≈±≈±±±±±±± ±±±±±±±±=±±÷÷÷\u003ei;;:il,:;i===\u003c:::,,::::::::;;;;;;ii\u003e±-\u003c\u003e--l=≠≈+IIi;il\nlllIIIIiiiiIii;;;;;;;::::;;:::;;;;i≈±±±≈±÷±≈≈≈≈±±≈±±±±±≈±÷±±±±±±±±± ±±±±±±±±÷±±±±÷÷×\u003c!Il;;Ii\u003c+÷×÷!::::::::::::::;;;;;iiI÷×+-×=\u003e×≈≈+\u003e--\u003e\u003c+\nllllIIIIIiiIii;;;;:::::::::::::::;;\u003e≈±±±±÷÷±≈≈±±±±±±±±±±±±÷±±±±±±±± ±±±±±±±÷÷÷÷±±÷÷××--lI!I+×××÷±±I:::::::::::::;;;;;ii\u003c---=×÷±×+=±≤≥≥≤≠\nIIlIIIIIIIiiii;;;;:::::::::,::::;;I≈±±±±±±±±±±±±±±±±±±±±±×±÷÷±±±± ±±÷±±±±×±±÷÷÷!I;!\u003c;;I!+×÷±×±×÷÷i:::::::::::;;;;;;iil-==\u003e++-÷-+\u003e=≤≤≥≤\nlIIIIIIIII;;;;;::::::::::::::::;-±÷÷±±±±÷±±±±×!iiii÷iii;;;l-±±±=li ;;i\u003e±=;i;;;;ii±\u003ci;:::l±±÷±±÷÷±×÷-:::,,::::::::::;;;iI=÷÷+\u003e\u003e=-!ll!×≠≠≤\nIIIIIIIIIIii;;;;;:::::::::::,::::;×±×÷±÷÷±÷±÷±\u003c;;;;iii÷Ii;l\u003el;;!±I;;; ;;;i;÷÷×-;;ii=±±±l;;i±±±±±±±×±÷-×I::,,::::::::::;;;;;i+-++\u003eiiIiIII\u003e±±≈\nllIIIIIIIiii;;;;:::::::::::::,:::;×=×÷÷÷÷±÷÷÷±!;;i≈±±±±li;i;;;;I÷;;;i ==;ii\u003e=I;;;iIiiI±±i;;±±±±±±÷÷±=+=:::,::,:::::::::;;;;;l×=++!\u003e\u003elIII!\u003e\u003e-\nllllIIIIII;;;::::::::::,::,:,::;===÷÷÷×÷÷±÷÷÷I;;;;;;-\u003eiii=;;;;\u003e÷i;; iii;ii-;i;;i;;iI×≈×±±±÷×\u003eI;-÷÷÷÷=-i:,:,::::,:::::::;;i=××=×=÷-III;,,,\nllllllIIIIii;;;;::::::::::::,:,,:;+=×÷×××÷÷---÷÷≈=\u003e\u003c\u003c!-=\u003c\u003e\u003c÷±=\u003e\u003c\u003e±÷×× ××==×=×=+\u003e!Ii;=!i;i×;;;;;;;l±÷÷÷÷--,,,,::,:::::::::;;;;\u003c÷÷≈±-×+IIi,,,,\nillllllIIIIi;;;::::::,::::::::,,,,,:+-××==×÷-ii;=÷÷÷×÷\u003ci;;;I=±\u003ci;I÷±iil !±l;;;×\u003e;;;;;;!×l;;×i;;;;;;i=×÷÷×=!i,,:,,:::::::::::;;i÷±±±±±-\u003cl::!-×\n:lllIIIIIII;;;;:::::::,,::,,:,,,,:\u003e+=---××=iii=÷×÷÷I;;;I;;;!-;;;÷÷I;; i÷\u003ciii==;;i;;i;××=÷×=!;:::;;I÷×=-=!;,,,:::,:::::::::;;;!--+---+-+++-=\n,IllIIIIIII;;:::::::::::,,,:,,:,,:\u003e-+\u003e==×××iiiI+=××i;;\u003c±I;;i×;;;l+;;; ;=+;ii\u003c×;;;;;;;\u003e×+ii;i;i;;i\u003c××=--+\u003ei,,,::,:::,::::::;;;I+----\u003el;;;i--\n.:IIIIIIIII;;;::::::::::::,,,:,,,,I\u003e-==-=×××iii;;;!×i;;;;;i-×-i;;;;;i ××=iI;l÷IiiiiII\u003c÷-\u003cl=±+::::;:,+=-++\u003ei.,,:,::,,::::::::;;;:,;;II;:l+×==\n..IllIIIIIi;;::::::,,,::::::,,,::,i++\u003e+-===-++===-=÷÷÷+\u003c\u003e××××++\u003e-=×\u003e\u003c !=×\u003c!il××;:::::i÷!;;I±;::IlI\u003c==-+++\u003e;,,,,,,,::::::::::;;;iIIIIIIIIIIIIi\n..;IIlIIIii;;::::::::,,,::,,:,,:,,;\u003c\u003c+----=I::=×××××l:::::;+×I::\u003c=×i: :+×\u003c=I;=×i::IlII-×\u003eI×÷-i:::;::+--++\u003el,:,,,,,:,:::::::::;;illllllIlllIl\n..:IIIIIIii;;:::::::::,,,,,::::,,,:l\u003c\u003e++--=\u003c,:-××××\u003e::l÷×;::-l::I=×I: :!--!\u003e;\u003e=l::;!\u003c+-××+Ii;;::::::+=-++\u003e\u003c:,,,,,::::::::::::::;iII;:;::::::\n ..iIIIiiii;;;::::::,:,::,,,,,:,,,:\u003c\u003c\u003e++-==+,,:\u003c\u003e\u003c+-:::\u003cl::;==:::;:::: +=-;\u003e:!=+::::::i××+;iiI!\u003c+-==+\u003e-+\u003e\u003e\u003c;,,,,,::,,,,,:::::;;;i\u003c\u003c\u003c;::,,...\n ..;iIiiii;::::::,::,,,::,:,,,,:,,I\u003c\u003e+--===\u003c:,:::!==l;:;;l===×\u003eI;;i\u003c= ===l-!\u003c==---+\u003e\u003c!\u003e=!ii\u003c=\u003ciii;;;I-+\u003e\u003c!i,,,,,,:,,,,::::::::;;IIl!\u003c\u003e\u003e\u003e\u003e\u003e\u003e\n  .:iiiiiii;:::::,,,:,,,,:::,,:,,,,i\u003c\u003e+-----\u003e\u003e-=××====+\u003c!\u003c+===!II+-=ii i\u003c--iii--\u003ciiiiIIl-\u003e\u003cil-IiiIlIi!+\u003e\u003c\u003c!;,,,,,,,,,,,,::::::::;.;l!!\u003c\u003c\u003c\u003c\u003c\n .,:iiiiiii;:::::::,,:,,,,,,,,,,,,,I\u003c\u003e\u003e++--\u003e;;\u003e=====\u003cIiIiiIi\u003e-!ii!--li il-=Iii!-+iiiIiii+-\u003e!--+Ii;;i:,I\u003c\u003c!l;,,,,,,,,,,,,,,:::::::;,:l\u003c!!!!\u003c\u003c\n  .;iiiiiii;:::::::,,,,,,,,,,,,,:,.;\u003c\u003c\u003e+++-\u003e;;\u003e-----Iii---iii-!iiI--!i iI--Iii;-+ii;\u003c\u003e\u003e!\u003e++I;;::::::,,l!llI:.,,,,,,,,,,,,,:::::::::,i!!!!!!!\n  .;iiiiii;;:::::::,,,,,,,,,,,,,,,,;!\u003c\u003c\u003e\u003e++\u003e;;;!\u003e\u003c\u003c-iiiI!Iiii-+I;;;;i; ;\u003c++I;;;++i;;;::;l\u003e\u003eI;IIl!\u003c!!I;ilIi:..,,,,,,,,,,,,,,,:::::;.,:iiIIII\n  .;iiiiii;;:::::,,,,,,,,,,,,,,,,,;!!\u003c\u003c\u003e\u003e\u003e+!;;:::i++!ii:;il+\u003e\u003e+\u003eIiiI!\u003e\u003e\u003e\u003e!!!!\u003e\u003e\u003cllIIi;I\u003c;::I!;:::::;ii;:,:;::,,,,,,,,,,,,,,:::::, :iiii\n ..;iiiiiii;:::::,,,,,,,,,,,,,,,,,,Il!!\u003c\u003c\u003e\u003c\u003c\u003c\u003c\u003e\u003e\u003e\u003e\u003e\u003e\u003e+\u003c!!!\u003e\u003e\u003e\u003cIii\u003c\u003c\u003c;;;l\u003cl;:;!\u003cI:::iIII!l:;lI,,,,..,;:iIIIIIIi,.,,,,,,,,,,,,:,:::,...illIl\n...;iiiiii;;::::,,,,,,,,,,,,,,,,,,,,je vais !!\u003c!:;I\u003c\u003c\u003c\u003c\u003c\u003ei;;;;:;;!\u003c;::l!! :::i!I:::Ili:,,::;iII;:,,.....,,;iiIlIiIIIIi;,,,,,,,,,,,::::::...,,,,,\n"  </script>
   <script>
-(() => {
-  const ART = JSON.parse(document.getElementById("art-data").textContent);
-  const art = document.getElementById("art");
-  const scaleEl = document.getElementById("scale");
-  const spot = document.getElementById("spot");
-  const flash = document.getElementById("flash");
-  const gline = document.getElementById("gline");
-  const term = document.getElementById("term");
-  const sig = document.getElementById("sig");
-  const whispersEl = document.getElementById("whispers");
-
-  art.textContent = ART;
-
-  const MSGS = [
-    "signal detecte...",
-    "tu ne devrais pas etre la",
-    "il regarde par l'ecran",
-    "erreur: sujet observe",
-    "fichier corrompu [████]",
-    "ne clique pas",
-    "ils savent",
-    "connexion non securisee",
-    "tu es deja dedans",
-    "ecoute...",
-  ];
-  const TERMS = [
-    "> lecture en cours...",
-    "> acces refuse ███",
-    "> trace active...",
-    "> il sait que tu es la",
-    "> buffer overflow",
-    "> signal: PERDU",
-    "> ne ferme pas",
-    "> analyse comportementale...",
-  ];
-  const WHISPERS = [
-    "regarde pas derriere",
-    "trop tard",
-    "pourquoi tu es la",
-    "il attend",
-    "tu entends",
-    "cesse",
-    "mal",
-    "fuis",
-  ];
-
-  let baseScale = 1;
-
-  function fit() {
-    baseScale = Math.max(Math.min(innerWidth * .94 / art.scrollWidth, innerHeight * .82 / art.scrollHeight, 4), .8);
-    scaleEl.style.transform = "scale(" + baseScale + ")";
-  }
-
-  document.addEventListener("mousemove", e => {
-    spot.style.setProperty("--mx", (e.clientX / innerWidth * 100) + "%");
-    spot.style.setProperty("--my", (e.clientY / innerHeight * 100) + "%");
-    const cx = innerWidth / 2, cy = innerHeight / 2;
-    const dx = (e.clientX - cx) / cx, dy = (e.clientY - cy) / cy;
-    scaleEl.style.transform = "scale(" + baseScale + ") perspective(800px) rotateX(" + (dy * -2.5) + "deg) rotateY(" + (dx * 2.5) + "deg)";
-  }, { passive: true });
-
-  // grain
-  const gc = document.getElementById("grain");
-  const gx = gc.getContext("2d");
-  function resizeGrain() {
-    gc.width = Math.ceil(innerWidth / 4);
-    gc.height = Math.ceil(innerHeight / 4);
-  }
-  function drawGrain() {
-    const w = gc.width, h = gc.height;
-    const img = gx.createImageData(w, h);
-    const d = img.data;
-    for (let i = 0; i < d.length; i += 4) {
-      const v = Math.random() * 80 | 0;
-      d[i] = 120; d[i+1] = v >> 2; d[i+2] = v >> 3; d[i+3] = 30 + Math.random() * 40;
+    const wrap = document.getElementById('wrap');
+    const art = document.getElementById('art');
+    function fit() {
+      art.style.transform = 'none';
+      const sw = art.scrollWidth, sh = art.scrollHeight;
+      const s = Math.min(innerWidth * .95 / sw, innerHeight * .95 / sh, 6);
+      wrap.style.transform = 'scale(' + Math.max(s, 1) + ')';
     }
-    gx.putImageData(img, 0, 0);
-    requestAnimationFrame(drawGrain);
-  }
-
-  function whisper() {
-    const el = document.createElement("div");
-    el.className = "whisper";
-    el.textContent = WHISPERS[Math.random() * WHISPERS.length | 0];
-    el.style.left = (8 + Math.random() * 75) + "%";
-    el.style.top = (10 + Math.random() * 70) + "%";
-    whispersEl.appendChild(el);
-    requestAnimationFrame(() => el.classList.add("show"));
-    setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 2000); }, 1800 + Math.random() * 2000);
-    setTimeout(whisper, 4000 + Math.random() * 7000);
-  }
-
-  function glitch() {
-    if (Math.random() < .35) {
-      gline.style.top = (Math.random() * 100) + "%";
-      gline.classList.add("on");
-      setTimeout(() => gline.classList.remove("on"), 120);
-    }
-    if (Math.random() < .12) {
-      flash.classList.add("on");
-      setTimeout(() => flash.classList.remove("on"), 50 + Math.random() * 80);
-    }
-    if (Math.random() < .08) {
-      art.style.transform = "translate(" + ((Math.random()-.5)*3) + "px," + ((Math.random()-.5)*2) + "px)";
-      setTimeout(() => art.style.transform = "", 60);
-    }
-    setTimeout(glitch, 800 + Math.random() * 2500);
-  }
-
-  let ti = 0;
-  setInterval(() => {
-    term.textContent = TERMS[ti++ % TERMS.length];
-    sig.textContent = "SIG: " + Math.random().toString(16).slice(2,6).toUpperCase() + "." + (Math.random()*999|0) + " // " + MSGS[Math.random()*MSGS.length|0].toUpperCase();
-  }, 3200);
-
-  fit();
-  resizeGrain();
-  drawGrain();
-  whisper();
-  glitch();
-  addEventListener("resize", () => { fit(); resizeGrain(); });
-})();
+    fit();
+    addEventListener('resize', fit);
+    if (document.fonts) document.fonts.ready.then(fit);
   </script>
 </body>
 </html>
