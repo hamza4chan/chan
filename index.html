@@ -18,25 +18,9 @@
   <meta name="twitter:description" content="4chan Hamza, Sofiane, Saphir, Since">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --black: #000000;
-      --black-soft: #050505;
-      --black-card: #0a0a0a;
-      --border: rgba(255, 255, 255, 0.06);
-      --border-hover: rgba(255, 255, 255, 0.12);
-      --text: rgba(255, 255, 255, 0.45);
-      --text-dim: rgba(255, 255, 255, 0.22);
-      --accent: #c41e3a;
-      --accent-glow: rgba(196, 30, 58, 0.15);
-      --board: #111111;
-      --board-inner: #0d0d0d;
-      --pin: #c41e3a;
-      --string: rgba(196, 30, 58, 0.35);
-    }
 
     html {
       -webkit-font-smoothing: antialiased;
@@ -46,437 +30,53 @@
     body {
       min-height: 100vh;
       min-height: 100dvh;
-      background: var(--black);
-      font-family: 'Inter', system-ui, sans-serif;
-      color: var(--text);
-      overflow-x: hidden;
-    }
-
-    /* ── Ambient background ── */
-    .scene {
-      position: relative;
-      min-height: 100vh;
-      padding: 2rem 1.25rem 3rem;
-      background:
-        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(196, 30, 58, 0.06) 0%, transparent 55%),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
-        var(--black);
-    }
-
-    .vignette {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.65) 100%);
-      z-index: 1;
-    }
-
-    .noise {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.025;
-      z-index: 2;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
-
-    /* ── Header UI ── */
-    .header {
-      position: relative;
-      z-index: 10;
-      max-width: 1200px;
-      margin: 0 auto 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-    }
-
-    .brand-icon {
-      width: 36px;
-      height: 36px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--black-card);
-      box-shadow: 0 0 24px var(--accent-glow);
-    }
-
-    .brand-icon svg {
-      width: 18px;
-      height: 18px;
-      stroke: var(--accent);
-      fill: none;
-      stroke-width: 1.5;
-    }
-
-    .brand-text h1 {
-      font-family: 'Oswald', sans-serif;
-      font-weight: 500;
-      font-size: 0.85rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .brand-text p {
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin-top: 2px;
-    }
-
-    .status-bar {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .status-pill {
-      font-size: 0.6rem;
-      font-weight: 500;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 0.4rem 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--text-dim);
-    }
-
-    .status-pill.live {
-      border-color: rgba(196, 30, 58, 0.3);
-      color: var(--accent);
-      background: rgba(196, 30, 58, 0.06);
-    }
-
-    .status-pill.live::before {
-      content: '';
-      display: inline-block;
-      width: 5px;
-      height: 5px;
-      background: var(--accent);
-      border-radius: 50%;
-      margin-right: 6px;
-      animation: pulse 2s ease infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    /* ── Board container ── */
-    .board-section {
-      position: relative;
-      z-index: 10;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .board-label {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.75rem;
-      padding: 0 0.25rem;
-    }
-
-    .board-label span {
-      font-size: 0.6rem;
-      font-weight: 500;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    .board-label .count {
-      color: var(--text-dim);
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* ── Interpol board (empty) ── */
-    .board-frame {
-      position: relative;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--black-card);
-      padding: 3px;
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.02) inset,
-        0 24px 80px rgba(0, 0, 0, 0.8),
-        0 0 60px var(--accent-glow);
-    }
-
-    .board {
-      position: relative;
-      min-height: min(70vh, 680px);
-      border-radius: 10px;
+      background: #000000;
       overflow: hidden;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.015) 0%, transparent 50%),
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 39px,
-          rgba(255, 255, 255, 0.012) 39px,
-          rgba(255, 255, 255, 0.012) 40px
-        ),
-        repeating-linear-gradient(
-          90deg,
-          transparent,
-          transparent 39px,
-          rgba(255, 255, 255, 0.012) 39px,
-          rgba(255, 255, 255, 0.012) 40px
-        ),
-        var(--board-inner);
     }
 
-    /* Empty string web (decorative, no content) */
-    .board-strings {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    .board-strings line {
-      stroke: var(--string);
-      stroke-width: 1;
-      opacity: 0.5;
-    }
-
-    /* Pin markers (empty placeholders) */
-    .pin-dot {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--pin);
-      box-shadow: 0 0 12px rgba(196, 30, 58, 0.5);
-      transform: translate(-50%, -50%);
-      opacity: 0.4;
-    }
-
-    .pin-dot::after {
-      content: '';
-      position: absolute;
-      top: 1px;
-      left: 2px;
-      width: 3px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.35);
-      border-radius: 50%;
-    }
-
-    /* Center hub (where connections meet — empty) */
-    .board-hub {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 48px;
-      height: 48px;
-      border: 1px dashed rgba(255, 255, 255, 0.08);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .board-hub::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      opacity: 0.5;
-      box-shadow: 0 0 16px var(--accent);
-    }
-
-    /* Empty state label */
-    .board-empty {
-      position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-      pointer-events: none;
-    }
-
-    .board-empty p {
-      font-size: 0.65rem;
-      font-weight: 500;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    .board-empty .line {
-      width: 40px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border-hover), transparent);
-      margin: 0.6rem auto 0;
-    }
-
-    /* Corner UI marks */
-    .corner-mark {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-color: rgba(255, 255, 255, 0.06);
-      border-style: solid;
-      pointer-events: none;
-    }
-
-    .corner-mark.tl { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
-    .corner-mark.tr { top: 12px; right: 12px; border-width: 1px 1px 0 0; }
-    .corner-mark.bl { bottom: 12px; left: 12px; border-width: 0 0 1px 1px; }
-    .corner-mark.br { bottom: 12px; right: 12px; border-width: 0 1px 1px 0; }
-
-    /* ── Footer UI ── */
-    footer {
-      position: relative;
-      z-index: 10;
-      max-width: 1200px;
-      margin: 2rem auto 0;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    footer span {
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    footer .credits {
+    .soon {
       font-family: 'Oswald', sans-serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      color: rgba(255, 255, 255, 0.25);
+      font-weight: 600;
+      font-size: clamp(4rem, 18vw, 12rem);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow:
+        0 0 20px rgba(255, 255, 255, 0.8),
+        0 0 40px rgba(255, 255, 255, 0.5),
+        0 0 80px rgba(255, 255, 255, 0.3),
+        0 0 120px rgba(255, 255, 255, 0.15),
+        0 0 200px rgba(255, 255, 255, 0.08);
+      animation: glow 3s ease-in-out infinite;
+      user-select: none;
     }
 
-    @media (max-width: 640px) {
-      .board { min-height: 55vh; }
-      .header { flex-direction: column; align-items: flex-start; }
+    @keyframes glow {
+      0%, 100% {
+        text-shadow:
+          0 0 20px rgba(255, 255, 255, 0.8),
+          0 0 40px rgba(255, 255, 255, 0.5),
+          0 0 80px rgba(255, 255, 255, 0.3),
+          0 0 120px rgba(255, 255, 255, 0.15),
+          0 0 200px rgba(255, 255, 255, 0.08);
+        opacity: 1;
+      }
+      50% {
+        text-shadow:
+          0 0 30px rgba(255, 255, 255, 1),
+          0 0 60px rgba(255, 255, 255, 0.7),
+          0 0 100px rgba(255, 255, 255, 0.45),
+          0 0 160px rgba(255, 255, 255, 0.25),
+          0 0 280px rgba(255, 255, 255, 0.12);
+        opacity: 0.92;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="vignette"></div>
-  <div class="noise"></div>
-
-  <div class="scene">
-    <header class="header">
-      <div class="brand">
-        <div class="brand-icon">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="3"/></svg>
-        </div>
-        <div class="brand-text">
-          <h1>Interpol</h1>
-          <p>Tableau d'enquête</p>
-        </div>
-      </div>
-      <div class="status-bar">
-        <span class="status-pill live">En attente</span>
-        <span class="status-pill">Dossier vide</span>
-        <span class="status-pill">Classifié</span>
-      </div>
-    </header>
-
-    <section class="board-section">
-      <div class="board-label">
-        <span>Mur de connexions</span>
-        <span class="count">0 éléments</span>
-      </div>
-
-      <div class="board-frame">
-        <div class="board" id="board">
-          <span class="corner-mark tl"></span>
-          <span class="corner-mark tr"></span>
-          <span class="corner-mark bl"></span>
-          <span class="corner-mark br"></span>
-
-          <svg class="board-strings" id="strings" viewBox="0 0 1200 680" preserveAspectRatio="none">
-            <!-- Empty web — pins only, no photos -->
-            <line x1="120" y1="80"  x2="600" y2="340" />
-            <line x1="300" y1="60"  x2="600" y2="340" />
-            <line x1="480" y1="100" x2="600" y2="340" />
-            <line x1="720" y1="70"  x2="600" y2="340" />
-            <line x1="900" y1="90"  x2="600" y2="340" />
-            <line x1="1080" y1="80" x2="600" y2="340" />
-            <line x1="100" y1="280" x2="600" y2="340" />
-            <line x1="280" y1="320" x2="600" y2="340" />
-            <line x1="920" y1="300" x2="600" y2="340" />
-            <line x1="1100" y1="280" x2="600" y2="340" />
-            <line x1="120" y1="560" x2="600" y2="340" />
-            <line x1="320" y1="580" x2="600" y2="340" />
-            <line x1="500" y1="550" x2="600" y2="340" />
-            <line x1="750" y1="570" x2="600" y2="340" />
-            <line x1="1000" y1="560" x2="600" y2="340" />
-          </svg>
-
-          <!-- Pin placeholders only -->
-          <span class="pin-dot" style="top:12%; left:10%"></span>
-          <span class="pin-dot" style="top:9%; left:25%"></span>
-          <span class="pin-dot" style="top:15%; left:40%"></span>
-          <span class="pin-dot" style="top:10%; left:60%"></span>
-          <span class="pin-dot" style="top:13%; left:75%"></span>
-          <span class="pin-dot" style="top:11%; left:90%"></span>
-          <span class="pin-dot" style="top:41%; left:8%"></span>
-          <span class="pin-dot" style="top:47%; left:23%"></span>
-          <span class="pin-dot" style="top:44%; left:77%"></span>
-          <span class="pin-dot" style="top:42%; left:92%"></span>
-          <span class="pin-dot" style="top:82%; left:10%"></span>
-          <span class="pin-dot" style="top:85%; left:27%"></span>
-          <span class="pin-dot" style="top:81%; left:42%"></span>
-          <span class="pin-dot" style="top:84%; left:63%"></span>
-          <span class="pin-dot" style="top:82%; left:83%"></span>
-
-          <div class="board-hub"></div>
-
-          <div class="board-empty">
-            <p>Aucun élément — tableau vide</p>
-            <div class="line"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      <span>GP-2026 · Accès restreint</span>
-      <span class="credits">4CHAN · HAMZA · SOFIANE · SAPHIR · SINCE</span>
-    </footer>
-  </div>
-
-  <script>
-    const board = document.getElementById('board');
-    const strings = document.getElementById('strings');
-
-    function fitStrings() {
-      strings.setAttribute('viewBox', `0 0 ${board.offsetWidth} ${board.offsetHeight}`);
-    }
-
-    window.addEventListener('load', fitStrings);
-    window.addEventListener('resize', fitStrings);
-  </script>
+  <h1 class="soon">SOON..</h1>
 </body>
 </html>
