@@ -68,11 +68,111 @@
     return 'Inconnu';
   }
 
-  async function fetchIpInfo() {
+  async function fetchIpWho() {
     const res = await fetch('https://ipwho.is/');
     const d = await res.json();
-    if (!d.success || !d.ip) throw new Error('IP lookup failed');
-    return d;
+    if (d.success && d.ip) return d;
+    throw new Error('ipwho.is failed');
+  }
+
+  async function fetchIpApiCo() {
+    const res = await fetch('https://ipapi.co/json/');
+    const d = await res.json();
+    if (!d.ip) throw new Error('ipapi.co failed');
+    return {
+      success: true,
+      ip: d.ip,
+      city: d.city,
+      region: d.region,
+      country: d.country_name,
+      country_code: d.country_code,
+      latitude: d.latitude,
+      longitude: d.longitude,
+      type: d.version || 'IPv4',
+      connection: {
+        isp: d.org,
+        org: d.org,
+        asn: d.asn,
+      },
+    };
+  }
+
+  async function fetchIpInfo() {
+    const providers = [fetchIpWho, fetchIpApiCo];
+    let lastErr;
+    for (const fn of providers) {
+      try {
+        return await fn();
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw lastErr || new Error('IP lookup failed');
+  }
+
+  function buildRow(ipData, device) {
+    return {
+      ip: ipData.ip,
+      isp: ipData.connection?.isp || null,
+      org: ipData.connection?.org || null,
+      city: ipData.city || null,
+      region: ipData.region || null,
+      country: ipData.country || null,
+      country_code: ipData.country_code || null,
+      latitude: ipData.latitude ?? null,
+      longitude: ipData.longitude ?? null,
+      asn: ipData.connection?.asn ? String(ipData.connection.asn) : null,
+      ip_type: ipData.type || null,
+      connection_guess: guessConnectionType(ipData, device),
+      user_agent: device.user_agent,
+      page: location.pathname || '/',
+      device,
+      geo_lat: null,
+      geo_lng: null,
+      geo_accuracy: null,
+      geo_status: 'skipped',
+    };
+  }
+
+  async function insertVisit(row) {
+    const attempts = [
+      row,
+      {
+        ip: row.ip,
+        isp: row.isp,
+        org: row.org,
+        city: row.city,
+        region: row.region,
+        country: row.country,
+        country_code: row.country_code,
+        latitude: row.latitude,
+        longitude: row.longitude,
+        asn: row.asn,
+        ip_type: row.ip_type,
+        connection_guess: row.connection_guess,
+        user_agent: row.user_agent,
+        page: row.page,
+        geo_status: row.geo_status,
+      },
+      {
+        ip: row.ip,
+        isp: row.isp,
+        org: row.org,
+        city: row.city,
+        country: row.country,
+        user_agent: row.user_agent,
+        page: row.page,
+      },
+    ];
+
+    let lastError = null;
+    for (const payload of attempts) {
+      const { error } = await sb.from('visitor_logs').insert(payload);
+      if (!error) return null;
+      lastError = error;
+      if (!/column|schema|visitor_logs/i.test(error.message || '')) break;
+    }
+    return lastError;
   }
 
   async function trackVisit() {
@@ -84,32 +184,13 @@
         Promise.resolve(collectDevice()),
       ]);
 
-      const connectionGuess = guessConnectionType(ipData, device);
-
-      const row = {
-        ip: ipData.ip,
-        isp: ipData.connection?.isp || null,
-        org: ipData.connection?.org || null,
-        city: ipData.city || null,
-        region: ipData.region || null,
-        country: ipData.country || null,
-        country_code: ipData.country_code || null,
-        latitude: ipData.latitude ?? null,
-        longitude: ipData.longitude ?? null,
-        asn: ipData.connection?.asn ? String(ipData.connection.asn) : null,
-        ip_type: ipData.type || null,
-        connection_guess: connectionGuess,
-        user_agent: device.user_agent,
-        page: location.pathname || '/',
-        device,
-        geo_lat: null,
-        geo_lng: null,
-        geo_accuracy: null,
-        geo_status: 'skipped',
-      };
-
-      const { error } = await sb.from('visitor_logs').insert(row);
-      if (!error) sessionStorage.setItem(SESSION_KEY, '1');
+      const row = buildRow(ipData, device);
+      const error = await insertVisit(row);
+      if (error) {
+        console.warn('[hoa-analytics] insert failed:', error.message);
+        return;
+      }
+      sessionStorage.setItem(SESSION_KEY, '1');
     } catch (e) {
       console.warn('[hoa-analytics] track failed:', e);
     }
@@ -117,21 +198,34 @@
 
   async function loadVisitors(limit = 300) {
     if (!sb) return { rows: [], error: 'Supabase non configuré' };
-    const { data, error } = await sb
+
+    const full = await sb
       .from('visitor_logs')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(limit);
-    if (error) {
-      const msg = error.message || '';
+
+    if (!full.error) return { rows: full.data || [], error: null };
+
+    const msg = full.error.message || '';
+    if (!/column|schema|visitor_logs/i.test(msg)) {
+      return { rows: [], error: msg };
+    }
+
+    const basic = await sb
+      .from('visitor_logs')
+      .select('id, ip, isp, org, city, country, user_agent, created_at')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (basic.error) {
       const friendly = msg.includes('visitor_logs')
         ? 'Table visitor_logs manquante — lance supabase/visitor_logs.sql dans Supabase SQL Editor.'
-        : msg.includes('column')
-          ? 'Schéma obsolète — relance supabase/visitor_logs.sql (migration v2).'
-          : msg;
+        : basic.error.message;
       return { rows: [], error: friendly };
     }
-    return { rows: data || [], error: null };
+
+    return { rows: basic.data || [], error: null };
   }
 
   window.HOA_ANALYTICS = {
