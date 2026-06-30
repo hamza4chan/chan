@@ -1,6 +1,6 @@
 // Persistance Supabase — site + images
 (function () {
-  const ROW_ID = 'main';
+  const ROW_ID = 1;
   let sb = null;
   let canWrite = false;
   let images = {};
@@ -28,8 +28,12 @@
       .eq('id', ROW_ID)
       .maybeSingle();
     if (error) {
-      console.warn('[hoa-store] load failed:', error.message);
-      return { error: error.message };
+      const msg = error.message || 'Erreur Supabase';
+      const hint = msg.includes('does not exist')
+        ? msg + ' — Lance supabase/setup.sql dans le SQL Editor.'
+        : msg;
+      console.warn('[hoa-store] load failed:', hint);
+      return { error: hint };
     }
     if (!data) return null;
     images = data.images && typeof data.images === 'object' ? data.images : {};
@@ -55,8 +59,14 @@
     };
 
     const { error } = await sb.from('site_config').upsert(payload, { onConflict: 'id' });
-    if (error) console.warn('[hoa-store] save failed:', error.message);
-    return { error: error?.message || null };
+    if (error) {
+      const hint = error.message?.includes('does not exist')
+        ? error.message + ' — Lance supabase/setup.sql dans le SQL Editor.'
+        : error.message;
+      console.warn('[hoa-store] save failed:', hint);
+      return { error: hint };
+    }
+    return { error: null };
   }
 
   async function flushImages(slots) {
@@ -81,7 +91,7 @@
       .channel('hoa-site-config')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'site_config', filter: 'id=eq.main' },
+        { event: '*', schema: 'public', table: 'site_config', filter: 'id=eq.1' },
         (payload) => {
           const row = payload.new;
           if (!row || !onRemoteChange) return;

@@ -1,38 +1,17 @@
--- ═══════════════════════════════════════════════════════════════
--- Hall of Autism — config Supabase (à lancer UNE FOIS)
--- Supabase Dashboard → SQL Editor → coller → Run
--- ═══════════════════════════════════════════════════════════════
+-- Hall of Autism — lance ça dans Supabase SQL Editor (UNE FOIS)
+-- https://supabase.com/dashboard/project/ajdykmhacevepykrmseo/sql/new
 
--- Colonnes nécessaires (safe si déjà présentes)
+-- Colonnes manquantes pour les fiches et les photos
 alter table public.site_config
-  add column if not exists id text,
-  add column if not exists title text,
-  add column if not exists subtitle text,
   add column if not exists people jsonb not null default '[]'::jsonb,
-  add column if not exists images jsonb not null default '{}'::jsonb,
-  add column if not exists updated_at timestamptz not null default now();
+  add column if not exists images jsonb not null default '{}'::jsonb;
 
--- Clé unique sur id
-create unique index if not exists site_config_id_key on public.site_config (id);
-
--- Ligne principale
-insert into public.site_config (id, title, subtitle, people, images)
-values (
-  'main',
-  '/aut/ — Hall of Autism',
-  'Galerie des plus grands esprits jamais diagnostiqués',
-  '[]'::jsonb,
-  '{}'::jsonb
-)
-on conflict (id) do nothing;
-
--- Sécurité : tout le monde lit, seuls les admins connectés écrivent
+-- Permissions lecture publique / écriture admin connecté
 alter table public.site_config enable row level security;
 
 drop policy if exists "site_config_public_read" on public.site_config;
 create policy "site_config_public_read"
-  on public.site_config for select
-  using (true);
+  on public.site_config for select using (true);
 
 drop policy if exists "site_config_auth_insert" on public.site_config;
 create policy "site_config_auth_insert"
@@ -45,19 +24,12 @@ create policy "site_config_auth_update"
   using (auth.role() = 'authenticated')
   with check (auth.role() = 'authenticated');
 
-drop policy if exists "site_config_auth_delete" on public.site_config;
-create policy "site_config_auth_delete"
-  on public.site_config for delete
-  using (auth.role() = 'authenticated');
-
 grant select on public.site_config to anon, authenticated;
 grant insert, update, delete on public.site_config to authenticated;
-grant all on public.site_config to service_role;
 
--- Realtime (sync live entre onglets / visiteurs)
+-- Realtime (sync live)
 do $$
 begin
   alter publication supabase_realtime add table public.site_config;
-exception
-  when duplicate_object then null;
+exception when duplicate_object then null;
 end $$;
