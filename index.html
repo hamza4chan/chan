@@ -33,17 +33,49 @@
       overflow: hidden;
     }
 
+    /* ——— ascii smile ——— */
     #hero {
       position: fixed;
       inset: 0;
       display: grid;
       place-items: center;
       padding-top: var(--bar-h);
-      font-size: clamp(6rem, 22vw, 14rem);
-      line-height: 1;
       user-select: none;
+      pointer-events: none;
     }
 
+    .ascii-smile {
+      font-size: clamp(14px, 2.8vw, 22px);
+      line-height: 1.15;
+      color: #c8c8c8;
+      text-align: center;
+      white-space: pre;
+    }
+
+    .ascii-smile .eyes {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      letter-spacing: 0;
+    }
+
+    .eye-socket {
+      display: inline-grid;
+      place-items: center;
+      width: 1.4em;
+      height: 1.1em;
+      position: relative;
+    }
+
+    .pupil {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      will-change: transform;
+    }
+
+    /* ——— barre dashboard ——— */
     #bar {
       position: fixed;
       top: 0;
@@ -76,8 +108,14 @@
       width: 120px;
     }
 
-    .auth-form input[type="email"] { width: 200px; }
-    .auth-form input:focus { outline: none; border-color: #444; }
+    .auth-form input[type="email"] {
+      width: 200px;
+    }
+
+    .auth-form input:focus {
+      outline: none;
+      border-color: #444;
+    }
 
     .btn {
       background: #111;
@@ -91,12 +129,25 @@
     .btn:hover { border-color: #444; color: #fff; }
     .btn:disabled { opacity: .4; cursor: wait; }
 
-    .session { display: none; align-items: center; gap: 12px; margin-left: auto; flex-wrap: wrap; }
+    .session {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
+
     .session.on { display: flex; }
+
     .session .who { color: var(--dim); }
     .session .who b { color: #fff; }
-    .stats { color: var(--dim); font-size: 10px; }
 
+    .stats {
+      color: var(--dim);
+      font-size: 10px;
+    }
+
+    /* ——— panneau logs ——— */
     #panel {
       display: none;
       position: fixed;
@@ -112,22 +163,71 @@
 
     #panel.on { display: block; }
 
-    .tbl-wrap { overflow: auto; border: 1px solid var(--line); background: var(--panel); }
-    table { width: 100%; border-collapse: collapse; font-size: 11px; }
-    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    th {
-      position: sticky; top: 0; background: #0e0e0e; color: var(--dim);
-      font-weight: 500; text-transform: uppercase; letter-spacing: .08em; font-size: 9px;
+    .tbl-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      background: var(--panel);
     }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #0e0e0e;
+      color: var(--dim);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 9px;
+    }
+
     tr:hover td { background: #111; }
 
-    .tag { display: inline-block; padding: 2px 6px; border: 1px solid var(--line); font-size: 9px; white-space: nowrap; }
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border: 1px solid var(--line);
+      font-size: 9px;
+      white-space: nowrap;
+    }
+
     .tag.mobile { border-color: #4a3030; color: #ff8a8a; }
     .tag.box { border-color: #2a3a2a; color: #8aff8a; }
     .tag.unk { color: var(--dim); }
-    .err { color: #ff6b6b; padding: 12px; border: 1px solid #3a1a1a; margin-bottom: 10px; }
-    .ua { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dim); }
-    .detail { color: var(--dim); font-size: 10px; line-height: 1.5; max-width: 220px; }
+
+    .err {
+      color: #ff6b6b;
+      padding: 12px;
+      border: 1px solid #3a1a1a;
+      margin-bottom: 10px;
+    }
+
+    .ua {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--dim);
+    }
+
+    .detail {
+      color: var(--dim);
+      font-size: 10px;
+      line-height: 1.5;
+      max-width: 220px;
+    }
 
     @media (max-width: 720px) {
       .auth-form input { width: 90px; }
@@ -139,7 +239,7 @@
 
   <header id="bar">
     <form id="auth" class="auth-form">
-      <input name="email" type="email" value="hamza4chan@grossepute.org" autocomplete="username" required>
+      <input name="email" type="email" placeholder="email" autocomplete="username" required>
       <input name="password" type="password" placeholder="password" autocomplete="current-password" required>
       <button type="submit" class="btn">login</button>
     </form>
@@ -153,7 +253,21 @@
     </div>
   </header>
 
-  <div id="hero" aria-hidden="true">🙂</div>
+  <div id="hero" aria-hidden="true">
+    <div class="ascii-smile">
+      <div>  .───────────.</div>
+      <div> /             \</div>
+      <div class="eyes">
+        <span>|&nbsp;&nbsp;</span>
+        <span class="eye-socket" id="socket-l"><span class="pupil" id="pupil-l">o</span></span>
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span class="eye-socket" id="socket-r"><span class="pupil" id="pupil-r">o</span></span>
+        <span>&nbsp;&nbsp;|</span>
+      </div>
+      <div>|      \_/      |</div>
+      <div> '─────────────'</div>
+    </div>
+  </div>
 
   <div id="panel">
     <div id="panel-err" class="err" hidden></div>
@@ -190,7 +304,44 @@
     const panel = document.getElementById('panel');
     const rowsEl = document.getElementById('rows');
     const panelErr = document.getElementById('panel-err');
+
     let panelOpen = false;
+
+    // Yeux ASCII → curseur
+    const pupils = [
+      document.getElementById('pupil-l'),
+      document.getElementById('pupil-r'),
+    ];
+    const sockets = [
+      document.getElementById('socket-l'),
+      document.getElementById('socket-r'),
+    ];
+    let mx = innerWidth / 2;
+    let my = innerHeight / 2;
+
+    function moveEyes() {
+      sockets.forEach((socket, i) => {
+        const r = socket.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = mx - cx;
+        const dy = my - cy;
+        const angle = Math.atan2(dy, dx);
+        const max = Math.min(r.width, r.height) * 0.28;
+        const dist = Math.min(Math.hypot(dx, dy) * 0.06, max);
+        const px = Math.cos(angle) * dist;
+        const py = Math.sin(angle) * dist;
+        pupils[i].style.transform = 'translate(calc(-50% + ' + px + 'px), calc(-50% + ' + py + 'px))';
+      });
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      mx = e.clientX;
+      my = e.clientY;
+      moveEyes();
+    });
+    window.addEventListener('resize', moveEyes);
+    moveEyes();
 
     function esc(s) {
       const d = document.createElement('div');
@@ -214,7 +365,10 @@
     function deviceSummary(d) {
       if (!d || typeof d !== 'object') return '—';
       const parts = [
-        d.platform, d.screen, d.language, d.timezone,
+        d.platform,
+        d.screen,
+        d.language,
+        d.timezone,
         d.connection_type && ('net:' + d.connection_type),
         d.effective_type,
         d.mobile_ua ? 'mobile UA' : 'desktop UA',
@@ -304,12 +458,15 @@
     async function init() {
       if (!sb) return;
       window.HOA_ANALYTICS.setClient(sb);
+
       const { data: { session } } = await sb.auth.getSession();
       if (session?.user) enterSession(session.user);
+
       sb.auth.onAuthStateChange((_e, session) => {
         if (session?.user) enterSession(session.user);
         else leaveSession();
       });
+
       window.HOA_ANALYTICS.trackVisit();
     }
 
