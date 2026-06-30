@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./supabase-config.js"></script>
 <script src="./hoa-store.js"></script>
+<script src="./hoa-analytics.js"></script>
 </head>
 <body>
 <x-dc>
@@ -189,6 +190,45 @@
       </sc-for>
     </div>
 
+    <!-- visitors -->
+    <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:10px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+        <div style="font-size:12px;font-weight:700;color:#0F0C5D;text-transform:uppercase;letter-spacing:.3px">Connexions — IP &amp; FAI</div>
+        <span style="font-size:11px;color:#5a5a5a">{{ visitorsLabel }}</span>
+        <button onClick="{{ refreshVisitors }}" style="margin-left:auto;font-size:11px;color:#34345C;background:#EEE7DA;border:1px solid #B7A99A;border-radius:2px;padding:2px 10px;cursor:pointer">↻ Actualiser</button>
+      </div>
+      <sc-if value="{{ visitorsLoading }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:11px;color:#888;padding:8px 0">Chargement des logs…</div>
+      </sc-if>
+      <sc-if value="{{ visitorsErr }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:11px;color:#AF0A0F;padding:4px 0">{{ visitorsErr }}</div>
+      </sc-if>
+      <div style="overflow:auto;max-height:340px;border:1px solid #D9BFB7;background:#fffdf4">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;color:#000">
+          <thead>
+            <tr style="background:#EEE7DA;text-align:left">
+              <th style="padding:5px 8px;border-bottom:1px solid #D9BFB7;color:#5a5a5a;font-weight:700">Date</th>
+              <th style="padding:5px 8px;border-bottom:1px solid #D9BFB7;color:#5a5a5a;font-weight:700">IP</th>
+              <th style="padding:5px 8px;border-bottom:1px solid #D9BFB7;color:#5a5a5a;font-weight:700">FAI</th>
+              <th style="padding:5px 8px;border-bottom:1px solid #D9BFB7;color:#5a5a5a;font-weight:700">Ville</th>
+              <th style="padding:5px 8px;border-bottom:1px solid #D9BFB7;color:#5a5a5a;font-weight:700">Pays</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ visitorRows }}" as="v" hint-placeholder-count="3">
+              <tr style="border-bottom:1px solid #E8D5CC">
+                <td style="padding:4px 8px;white-space:nowrap;color:#34345C">{{ v.when }}</td>
+                <td style="padding:4px 8px;font-family:monospace;color:#0F0C5D">{{ v.ip }}</td>
+                <td style="padding:4px 8px;color:#800000">{{ v.ispLabel }}</td>
+                <td style="padding:4px 8px">{{ v.city }}</td>
+                <td style="padding:4px 8px">{{ v.country }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- site identity -->
     <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:10px;margin-bottom:16px">
       <div style="font-size:12px;font-weight:700;color:#0F0C5D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px">Identité du site</div>
@@ -307,6 +347,7 @@ class Component extends DCLogic {
     editMode: false,
     loginOpen: false, loginUser: '', loginPass: '', loginErr: false, loginErrMsg: '', loginLoading: false,
     saved: false, saving: false, saveErr: '', syncErr: '',
+    visitorRows: [], visitorsLoading: false, visitorsErr: '',
   };
 
   getSupabase() {
@@ -324,6 +365,7 @@ class Component extends DCLogic {
 
     if (sb && window.HOA_STORE) {
       window.HOA_STORE.setClient(sb);
+      window.HOA_ANALYTICS?.setClient(sb);
       window.HOA_STORE.subscribeRealtime();
       window.HOA_STORE.onRemote((data) => {
         if (!data) return;
@@ -356,6 +398,8 @@ class Component extends DCLogic {
 
     if (!sb) return;
 
+    window.HOA_ANALYTICS?.trackVisit();
+
     const { data: { session } } = await sb.auth.getSession();
     if (session?.user) {
       window.HOA_STORE?.setCanWrite(true);
@@ -376,6 +420,34 @@ class Component extends DCLogic {
     if (!this.state.admin) return;
     clearTimeout(this._autoSaveT);
     this._autoSaveT = setTimeout(() => this.save(), 1500);
+  }
+
+  formatVisitWhen(iso) {
+    if (!iso) return '—';
+    try {
+      return new Date(iso).toLocaleString('fr-FR', {
+        day: '2-digit', month: '2-digit', year: '2-digit',
+        hour: '2-digit', minute: '2-digit',
+      });
+    } catch (e) { return iso; }
+  }
+
+  async loadVisitors() {
+    if (!window.HOA_ANALYTICS) return;
+    this.setState({ visitorsLoading: true, visitorsErr: '' });
+    const { rows, error } = await window.HOA_ANALYTICS.loadVisitors();
+    const visitorRows = rows.map(r => ({
+      ip: r.ip || '—',
+      ispLabel: r.isp || r.org || 'inconnu',
+      city: r.city || '—',
+      country: r.country || '—',
+      when: this.formatVisitWhen(r.created_at),
+    }));
+    this.setState({
+      visitorRows,
+      visitorsLoading: false,
+      visitorsErr: error || '',
+    });
   }
 
   today() {
@@ -478,6 +550,11 @@ class Component extends DCLogic {
 
     const sortLabel = this.state.sort === 'autism' ? 'niveau ↓' : this.state.sort === 'name' ? 'pseudo A→Z' : 'No. (défaut)';
 
+    const uniqueIps = new Set(this.state.visitorRows.map(v => v.ip)).size;
+    const visitorsLabel = this.state.visitorRows.length
+      ? this.state.visitorRows.length + ' visites · ' + uniqueIps + ' IP uniques'
+      : 'aucune visite enregistrée';
+
     return {
       title: this.state.title, subtitle: this.state.subtitle,
       cards, current, rows, stats,
@@ -490,6 +567,8 @@ class Component extends DCLogic {
       notEditMode: !(this.state.admin && this.state.editMode),
       editLabel: this.state.editMode ? 'ON' : 'OFF',
       saved: this.state.saved, saving: this.state.saving, saveErr: this.state.saveErr,
+      visitorRows: this.state.visitorRows, visitorsLoading: this.state.visitorsLoading,
+      visitorsErr: this.state.visitorsErr, visitorsLabel,
       countLabel: ppl.length + ' fiches indexées',
       sortLabel,
       loginOpen: this.state.loginOpen, loginUser: this.state.loginUser,
@@ -498,7 +577,8 @@ class Component extends DCLogic {
       loginBtnLabel: this.state.loginLoading ? 'Connexion…' : 'Se connecter',
 
       goCatalog: (e) => { if (e) e.preventDefault(); this.setState({ view: 'catalog', selectedId: null }); },
-      goDashboard: (e) => { if (e) e.preventDefault(); this.setState({ view: 'dashboard' }); },
+      goDashboard: (e) => { if (e) e.preventDefault(); this.setState({ view: 'dashboard' }); this.loadVisitors(); },
+      refreshVisitors: (e) => { if (e) e.preventDefault(); this.loadVisitors(); },
       cycleSort: () => this.setState(s => ({ sort: s.sort === 'none' ? 'autism' : s.sort === 'autism' ? 'name' : 'none' })),
       toggleEdit: (e) => { if (e) e.preventDefault(); this.setState(s => ({ editMode: !s.editMode })); },
       save: (e) => { if (e) e.preventDefault(); this.save(); },
@@ -576,6 +656,7 @@ class Component extends DCLogic {
       view: 'dashboard',
     });
     window.HOA_STORE?.setCanWrite(true);
+    this.loadVisitors();
   }
 }
 </script>
