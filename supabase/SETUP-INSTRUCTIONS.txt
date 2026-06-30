@@ -1,0 +1,8 @@
+@echo off
+echo.
+echo  Ouvre Supabase SQL Editor et colle le contenu de :
+echo  supabase\setup.sql
+echo.
+echo  Lien : https://supabase.com/dashboard/project/ajdykmhacevepykrmseo/sql/new
+echo.
+pause

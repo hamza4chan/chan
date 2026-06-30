@@ -75,6 +75,25 @@
 
   function load() {
     if (loadP) return loadP;
+    if (window.HOA_IMAGE_STORE) {
+      loadP = window.HOA_IMAGE_STORE.load()
+        .then((j) => {
+          if (j && typeof j === 'object') {
+            const merged = Object.assign({}, j, slots);
+            for (const k in slots) {
+              if (merged[k] && !merged[k].u && j[k]) {
+                merged[k].u = typeof j[k] === 'string' ? j[k] : j[k].u;
+              }
+            }
+            for (const id of tombstones) delete merged[id];
+            slots = merged;
+          }
+          tombstones.clear();
+        })
+        .catch(() => {})
+        .then(() => { loaded = true; subs.forEach((fn) => fn()); });
+      return loadP;
+    }
     loadP = fetch(STATE_FILE)
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
@@ -108,6 +127,14 @@
   let saveDirty = false;
   function save() {
     if (saving) { saveDirty = true; return; }
+    if (window.HOA_IMAGE_STORE) {
+      if (!window.HOA_IMAGE_STORE.canSave()) return;
+      saving = true;
+      Promise.resolve(window.HOA_IMAGE_STORE.save(slots))
+        .catch(() => {})
+        .then(() => { saving = false; if (saveDirty) { saveDirty = false; save(); } });
+      return;
+    }
     const w = window.omelette && window.omelette.writeFile;
     if (!w) return;
     saving = true;
@@ -119,7 +146,14 @@
   const S_MAX = 5;
   const clampS = (s) => Math.max(1, Math.min(S_MAX, s));
 
-  // Normalize a stored slot value. Pre-reframe sidecars stored a bare
+  window.addEventListener('hoa-images-updated', (e) => {
+    if (!e.detail || typeof e.detail !== 'object') return;
+    slots = Object.assign({}, e.detail, slots);
+    for (const id of tombstones) delete slots[id];
+    subs.forEach((fn) => fn());
+  });
+
+  // Normalize a stored slot value.
   // data-URL string; newer ones store {u, s, x, y}. Either shape is valid.
   function getSlot(id) {
     const v = slots[id];

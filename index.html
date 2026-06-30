@@ -8,6 +8,7 @@
 <script src="./support.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./supabase-config.js"></script>
+<script src="./hoa-store.js"></script>
 </head>
 <body>
 <x-dc>
@@ -39,6 +40,8 @@
         <a onClick="{{ save }}" style="color:#AF0A0F;font-weight:700">[ Enregistrer ]</a>
         <a onClick="{{ logout }}" style="color:#34345C">[ Déconnexion ]</a>
         <sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><span style="color:#117743;font-weight:700">enregistré ✓</span></sc-if>
+        <sc-if value="{{ saving }}" hint-placeholder-val="{{ false }}"><span style="color:#888">sync…</span></sc-if>
+        <sc-if value="{{ saveErr }}" hint-placeholder-val="{{ false }}"><span style="color:#AF0A0F;font-weight:700">{{ saveErr }}</span></sc-if>
       </span>
     </sc-if>
     <sc-if value="{{ notAdmin }}" hint-placeholder-val="{{ true }}">
@@ -303,7 +306,7 @@ class Component extends DCLogic {
     admin: false, adminEmail: '',
     editMode: false,
     loginOpen: false, loginUser: '', loginPass: '', loginErr: false, loginErrMsg: '', loginLoading: false,
-    saved: false,
+    saved: false, saving: false, saveErr: '', syncErr: '',
   };
 
   getSupabase() {
@@ -316,29 +319,63 @@ class Component extends DCLogic {
   }
 
   async componentDidMount() {
-    try {
-      const raw = localStorage.getItem(this.STORE);
-      if (raw) {
-        const d = JSON.parse(raw);
-        if (d && d.people) this.setState({ title: d.title, subtitle: d.subtitle, people: d.people });
-      }
-    } catch (e) {}
-
     const sb = this.getSupabase();
+    const defs = this.defaults();
+
+    if (sb && window.HOA_STORE) {
+      window.HOA_STORE.setClient(sb);
+      window.HOA_STORE.subscribeRealtime();
+      window.HOA_STORE.onRemote((data) => {
+        if (!data) return;
+        this.setState(s => ({
+          title: data.title ?? s.title,
+          subtitle: data.subtitle ?? s.subtitle,
+          people: Array.isArray(data.people) ? data.people : s.people,
+        }));
+      });
+
+      const remote = await window.HOA_STORE.loadSite();
+      if (remote?.error) {
+        this.setState({ syncErr: remote.error });
+      } else if (remote) {
+        this.setState({
+          title: remote.title || defs.title,
+          subtitle: remote.subtitle || defs.subtitle,
+          people: Array.isArray(remote.people) && remote.people.length ? remote.people : defs.people,
+        });
+      }
+    } else {
+      try {
+        const raw = localStorage.getItem(this.STORE);
+        if (raw) {
+          const d = JSON.parse(raw);
+          if (d && d.people) this.setState({ title: d.title, subtitle: d.subtitle, people: d.people });
+        }
+      } catch (e) {}
+    }
+
     if (!sb) return;
 
     const { data: { session } } = await sb.auth.getSession();
     if (session?.user) {
+      window.HOA_STORE?.setCanWrite(true);
       this.setState({ admin: true, adminEmail: session.user.email || 'admin' });
     }
 
     sb.auth.onAuthStateChange((_event, session) => {
+      window.HOA_STORE?.setCanWrite(!!session?.user);
       if (session?.user) {
         this.setState({ admin: true, adminEmail: session.user.email || 'admin' });
       } else {
         this.setState({ admin: false, adminEmail: '', editMode: false });
       }
     });
+  }
+
+  scheduleAutoSave() {
+    if (!this.state.admin) return;
+    clearTimeout(this._autoSaveT);
+    this._autoSaveT = setTimeout(() => this.save(), 1500);
   }
 
   today() {
@@ -368,10 +405,21 @@ class Component extends DCLogic {
     return ppl;
   }
 
-  save() {
+  async save() {
     const { title, subtitle, people } = this.state;
-    try { localStorage.setItem(this.STORE, JSON.stringify({ title, subtitle, people })); } catch (e) {}
-    this.setState({ saved: true });
+
+    if (window.HOA_STORE) {
+      this.setState({ saving: true, saveErr: '' });
+      const { error } = await window.HOA_STORE.saveSite({ title, subtitle, people });
+      if (error) {
+        this.setState({ saving: false, saveErr: error });
+        return;
+      }
+    } else {
+      try { localStorage.setItem(this.STORE, JSON.stringify({ title, subtitle, people })); } catch (e) {}
+    }
+
+    this.setState({ saved: true, saving: false, saveErr: '' });
     clearTimeout(this._t);
     this._t = setTimeout(() => this.setState({ saved: false }), 2200);
   }
@@ -381,7 +429,7 @@ class Component extends DCLogic {
       people: s.people.map(p => p.id === id
         ? { ...p, [field]: field === 'autism' ? Math.max(0, Math.min(100, parseInt(value) || 0)) : value }
         : p)
-    }));
+    }), () => this.scheduleAutoSave());
   }
 
   renderVals() {
@@ -416,7 +464,7 @@ class Component extends DCLogic {
       onBio:    e => this.updatePerson(p.id, 'bio', e.target.value),
       onAutism: e => this.updatePerson(p.id, 'autism', e.target.value),
       onStatus: e => this.updatePerson(p.id, 'status', e.target.value),
-      onDelete: () => this.setState(s => ({ people: s.people.filter(x => x.id !== p.id) })),
+      onDelete: () => this.setState(s => ({ people: s.people.filter(x => x.id !== p.id) }), () => this.scheduleAutoSave()),
     }));
 
     const ppl = this.state.people;
@@ -441,7 +489,7 @@ class Component extends DCLogic {
       editMode: this.state.admin && this.state.editMode,
       notEditMode: !(this.state.admin && this.state.editMode),
       editLabel: this.state.editMode ? 'ON' : 'OFF',
-      saved: this.state.saved,
+      saved: this.state.saved, saving: this.state.saving, saveErr: this.state.saveErr,
       countLabel: ppl.length + ' fiches indexées',
       sortLabel,
       loginOpen: this.state.loginOpen, loginUser: this.state.loginUser,
@@ -454,14 +502,20 @@ class Component extends DCLogic {
       cycleSort: () => this.setState(s => ({ sort: s.sort === 'none' ? 'autism' : s.sort === 'autism' ? 'name' : 'none' })),
       toggleEdit: (e) => { if (e) e.preventDefault(); this.setState(s => ({ editMode: !s.editMode })); },
       save: (e) => { if (e) e.preventDefault(); this.save(); },
-      onTitle: e => this.setState({ title: e.target.value }),
-      onSubtitle: e => this.setState({ subtitle: e.target.value }),
+      onTitle: e => this.setState({ title: e.target.value }, () => this.scheduleAutoSave()),
+      onSubtitle: e => this.setState({ subtitle: e.target.value }, () => this.scheduleAutoSave()),
       addPerson: () => this.setState(s => {
         const id = Math.max(0, ...s.people.map(p=>p.id)) + 1;
         const no = Math.max(0, ...s.people.map(p=>p.no)) + 1;
         return { people: [...s.people, { id, no, slot:'aut-custom-'+id, name:'nouveau_membre', tripcode:'', autism:50, status:'afk', joined:this.today(), bio:'' }] };
-      }),
-      resetAll: () => { if (confirm('Réinitialiser le site avec les données par défaut ?')) { const d=this.defaults(); this.setState({ ...d }); try{localStorage.removeItem(this.STORE);}catch(e){} } },
+      }, () => this.scheduleAutoSave()),
+      resetAll: async () => {
+        if (!confirm('Réinitialiser le site avec les données par défaut ?')) return;
+        const d = this.defaults();
+        this.setState({ title: d.title, subtitle: d.subtitle, people: d.people });
+        if (window.HOA_STORE && this.state.admin) await this.save();
+        else try { localStorage.removeItem(this.STORE); } catch (e) {}
+      },
 
       openLogin: (e) => { if (e) e.preventDefault(); this.setState({ loginOpen: true, loginErr: false, loginUser: '', loginPass: '' }); },
       closeLogin: (e) => { if (e) e.preventDefault(); this.setState({ loginOpen: false }); },
@@ -521,6 +575,7 @@ class Component extends DCLogic {
       loginLoading: false,
       view: 'dashboard',
     });
+    window.HOA_STORE?.setCanWrite(true);
   }
 }
 </script>
