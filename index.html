@@ -1,664 +1,536 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="canonical" href="https://grossepute.org/">
-<title>/aut/ — Hall of Autism</title>
-<script src="./support.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./supabase-config.js"></script>
-<script src="./hoa-store.js"></script>
-<script src="./hoa-analytics.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="canonical" href="https://grossepute.org/">
+  <title>grossepute.org</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-config.js"></script>
+  <script src="./hoa-analytics.js"></script>
+  <style>
+    :root {
+      --bg: #000;
+      --panel: #0a0a0a;
+      --line: #1a1a1a;
+      --text: #c8c8c8;
+      --dim: #555;
+      --accent: #fff;
+      --ip-dot: #666;
+      --gps-dot: #ff3b3b;
+      --bar-h: 48px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      overflow: hidden;
+    }
+
+    /* ——— carte monde ——— */
+    #map-wrap {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding-top: var(--bar-h);
+    }
+
+    #map-wrap svg {
+      width: min(96vw, 1400px);
+      height: auto;
+      opacity: .9;
+    }
+
+    .land {
+      fill: #080808;
+      stroke: #161616;
+      stroke-width: .4;
+    }
+
+    .marker {
+      pointer-events: none;
+    }
+
+    .marker.ip { fill: var(--ip-dot); }
+    .marker.gps { fill: var(--gps-dot); }
+
+    /* ——— barre dashboard ——— */
+    #bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      height: var(--bar-h);
+      background: rgba(0,0,0,.92);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      backdrop-filter: blur(8px);
+    }
+
+  #brand {
+      color: var(--dim);
+      font-size: 10px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .auth-form {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .auth-form input {
+      background: #111;
+      border: 1px solid var(--line);
+      color: var(--accent);
+      padding: 6px 10px;
+      font: inherit;
+      width: 120px;
+    }
+
+    .auth-form input:focus {
+      outline: none;
+      border-color: #444;
+    }
+
+    .btn {
+      background: #111;
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 6px 12px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .btn:hover { border-color: #444; color: #fff; }
+    .btn:disabled { opacity: .4; cursor: wait; }
+
+    .session {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
+
+    .session.on { display: flex; }
+
+    .session .who { color: var(--dim); }
+    .session .who b { color: #fff; }
+
+    .stats {
+      color: var(--dim);
+      font-size: 10px;
+    }
+
+    /* ——— panneau logs ——— */
+    #panel {
+      display: none;
+      position: fixed;
+      top: var(--bar-h);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 15;
+      background: rgba(0,0,0,.88);
+      overflow: auto;
+      padding: 12px 14px 24px;
+    }
+
+    #panel.on { display: block; }
+
+    .tbl-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #0e0e0e;
+      color: var(--dim);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 9px;
+    }
+
+    tr:hover td { background: #111; }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border: 1px solid var(--line);
+      font-size: 9px;
+      white-space: nowrap;
+    }
+
+    .tag.mobile { border-color: #4a3030; color: #ff8a8a; }
+    .tag.box { border-color: #2a3a2a; color: #8aff8a; }
+    .tag.unk { color: var(--dim); }
+
+    .err {
+      color: #ff6b6b;
+      padding: 12px;
+      border: 1px solid #3a1a1a;
+      margin-bottom: 10px;
+    }
+
+    .ua {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--dim);
+    }
+
+    .detail {
+      color: var(--dim);
+      font-size: 10px;
+      line-height: 1.5;
+      max-width: 220px;
+    }
+
+    /* ——— bannière géoloc (style Google) ——— */
+    #geo-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: #1a1a1a;
+      border-top: 1px solid #2a2a2a;
+      padding: 10px 16px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: #bbb;
+    }
+
+    #geo-banner.show { display: flex; }
+
+    #geo-banner .loc {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    #geo-banner a {
+      color: #8ab4f8;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    #geo-banner a:hover { text-decoration: underline; }
+
+    @media (max-width: 720px) {
+      .auth-form input { width: 90px; }
+      th, td { padding: 6px; font-size: 10px; }
+    }
+  </style>
 </head>
 <body>
-<x-dc>
-<helmet>
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; }
-    a { text-decoration: none; cursor: pointer; }
-    a:hover { text-decoration: underline; }
-    ::selection { background: #f0c0b0; }
-    input, textarea, select, button { font-family: inherit; }
-  </style>
-</helmet>
 
-<div style="position:absolute;width:0;height:0;overflow:hidden;visibility:hidden;pointer-events:none">
-  <x-import component-from-global-scope="image-slot" from="./image-slot.js" hint-size="0,0"></x-import>
-</div>
+  <header id="bar">
+    <div id="brand">● live</div>
 
-<div style="min-height:100vh;background:#FFFFEE;font-family:'Arial','Helvetica',sans-serif;font-size:13px;color:#800000;padding-bottom:60px">
+    <form id="auth" class="auth-form">
+      <input name="pseudo" placeholder="pseudo" autocomplete="username" required>
+      <input name="password" type="password" placeholder="password" autocomplete="current-password" required>
+      <button type="submit" class="btn">login</button>
+    </form>
 
-  <!-- ===== admin utility strip ===== -->
-  <div style="background:#EEE7DA;border-bottom:1px solid #D9BFB7;padding:3px 10px;display:flex;align-items:center;gap:10px;font-size:11px;color:#34345C;min-height:24px">
-    <span style="color:#AF0A0F;font-weight:700;letter-spacing:.3px">/aut/</span>
-    <sc-if value="{{ admin }}" hint-placeholder-val="{{ false }}">
-      <span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span style="color:#117743;font-weight:700">● connecté : {{ adminEmail }}</span>
-        <a onClick="{{ goDashboard }}" style="color:#34345C">[ Dashboard ]</a>
-        <a onClick="{{ toggleEdit }}" style="color:#34345C">[ Édition en direct : {{ editLabel }} ]</a>
-        <a onClick="{{ save }}" style="color:#AF0A0F;font-weight:700">[ Enregistrer ]</a>
-        <a onClick="{{ logout }}" style="color:#34345C">[ Déconnexion ]</a>
-        <sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><span style="color:#117743;font-weight:700">enregistré ✓</span></sc-if>
-        <sc-if value="{{ saving }}" hint-placeholder-val="{{ false }}"><span style="color:#888">sync…</span></sc-if>
-        <sc-if value="{{ saveErr }}" hint-placeholder-val="{{ false }}"><span style="color:#AF0A0F;font-weight:700">{{ saveErr }}</span></sc-if>
-      </span>
-    </sc-if>
-    <sc-if value="{{ notAdmin }}" hint-placeholder-val="{{ true }}">
-      <a onClick="{{ openLogin }}" style="color:#34345C;margin-left:0">[ admin ]</a>
-    </sc-if>
+    <div id="session" class="session">
+      <span class="who"><b id="who">—</b></span>
+      <span class="stats" id="stats">—</span>
+      <button type="button" class="btn" id="btn-toggle">visiteurs</button>
+      <button type="button" class="btn" id="btn-refresh">↻</button>
+      <button type="button" class="btn" id="btn-out">logout</button>
+    </div>
+  </header>
+
+  <div id="map-wrap">
+    <svg id="world" viewBox="0 0 1000 507" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="1000" height="507" fill="#000"/>
+      <g fill="#060606" stroke="#141414" stroke-width=".35" id="continents">
+        <path d="M158,92c22-18,48-22,72-12,28-14,58-18,86-8,32-12,66-16,98-6,30-12,64-16,94-6,28-12,60-14,90-4,24-8,48-4,68,8,18,10,32,26,38,46,6,18,4,38-4,56-10,20-28,36-50,44-24,8-52,8-78,2-26-6-50-18-74-28-24-10-48-18-72-22-24-4-48-4-72-2-24,2-48,4-70,0-22-4-42-14-56-28-12-12-20-28-24-44-4-16-2-32,4-46,6-14,16-26,28-34z"/>
+        <path d="M95,210c-14,18-22,42-20,66,2,24,14,46,34,60,20,14,46,18,70,12,24-6,44-22,54-44,10-22,10-48,0-70-10-22-30-40-54-48-24-8-52-6-74,4-14,6-26,14-34,24z"/>
+        <path d="M248,282c-8,18-4,40,10,54,14,14,36,20,56,16,20-4,36-18,42-38,6-20,0-42-16-56-16-14-40-16-60-8-12,4-22,14-28,26z"/>
+        <path d="M448,245c-14,22-18,48-10,72,8,24,26,44,50,54,24,10,52,10,76,0,24-10,42-30,50-54,8-24,4-50-10-70-14-20-38-34-64-38-26-4-52,4-72,22-8,6-14,12-18,16z"/>
+        <path d="M538,192c14-18,36-28,58-26,22,2,42,16,52,36,10,20,10,44,0,64-10,20-30,34-52,38-22,4-46-4-62-22-16-18-20-44-14-66,4-12,10-18,18-24z"/>
+        <path d="M672,188c16-14,38-20,58-14,20,6,36,24,42,44,6,20,2,42-10,58-12,16-32,26-52,26-20,0-40-10-50-28-10-18-10-40-2-58,6-12,14-20,24-28z"/>
+        <path d="M772,242c-10,22-4,48,12,64,16,16,42,24,66,20,24-4,44-20,52-42,8-22,4-46-10-64-14-18-38-28-62-26-24,2-46,16-56,38-2,4-0,6,2,10z"/>
+        <path d="M112,352c-18,22-26,52-20,80,6,28,24,52,50,64,26,12,56,12,82,0,26-12,46-36,54-64,8-28,2-58-16-80-18-22-46-36-74-36-28,0-54,14-70,36-2,0-4,0-6,0z"/>
+        <path d="M188,392c-8,18-4,38,10,50,14,12,34,16,52,10,18-6,32-22,36-40,4-18-4-36-20-46-16-10-38-10-56-2-10,4-18,12-22,20z"/>
+        <path d="M342,392c-12,24-4,52,16,68,20,16,50,20,74,8,24-12,38-38,36-64-2-26-22-50-50-58-28-8-58,2-74,26-2,4,0,14-2,20z"/>
+        <path d="M512,392c-12,22-4,48,16,64,20,16,48,18,70,6,22-12,34-36,32-62-2-26-24-48-52-54-28-6-56,6-70,30-2,4,4,10,4,16z"/>
+        <path d="M708,352c-14,24-8,54,10,74,18,20,48,26,74,18,26-8,46-30,50-56,4-26-10-52-34-66-24-14-56-10-78,8-12,10-18,16-22,22z"/>
+        <path d="M838,392c-10,18-4,38,10,50,14,12,36,14,52,4,16-10,24-30,18-48-6-18-24-32-44-34-20-2-40,8-48,24-2,2,8,6,12,4z"/>
+        <path d="M862,118c18-8,38-6,52,8,14,14,18,36,10,54-8,18-26,32-46,36-20,4-42-4-54-22-12-18-10-42,2-60,8-10,20-14,36-16z"/>
+        <path d="M902,145c8-6,18-8,28-4,10,4,16,14,16,24,0,10-6,20-16,24-10,4-22,2-30-6-8-8-10-20-4-30,4-6,8-6,12-8z"/>
+      </g>
+      <g id="markers"></g>
+    </svg>
   </div>
 
-  <!-- ===== top board banner ===== -->
-  <div style="text-align:center;padding:8px 8px 2px">
-    <div style="font-size:11px;color:#34345C;letter-spacing:.2px;margin-bottom:6px">
-      [ <a style="color:#34345C" onClick="{{ goCatalog }}">home</a> / <a style="color:#34345C" onClick="{{ goCatalog }}">catalog</a> / archive / rules ]
-    </div>
-    <sc-if value="{{ editMode }}" hint-placeholder-val="{{ false }}">
-      <div style="max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:4px">
-        <input value="{{ title }}" onChange="{{ onTitle }}" style="font-size:24px;font-weight:700;color:#AF0A0F;text-align:center;font-family:'Times New Roman',Georgia,serif;border:1px dashed #c98;background:#fffdf4;padding:2px 6px"/>
-        <input value="{{ subtitle }}" onChange="{{ onSubtitle }}" style="font-size:13px;color:#AF0A0F;text-align:center;font-style:italic;font-family:'Times New Roman',Georgia,serif;border:1px dashed #c98;background:#fffdf4;padding:2px 6px"/>
-        <div style="font-size:10px;color:#888">↑ modifie le titre de la page d'accueil en direct, puis clique « Enregistrer »</div>
-      </div>
-    </sc-if>
-    <sc-if value="{{ notEditMode }}" hint-placeholder-val="{{ true }}">
-      <div style="font-size:34px;font-weight:700;color:#AF0A0F;line-height:1;font-family:'Times New Roman',Georgia,serif">{{ title }}</div>
-      <div style="font-size:13px;color:#AF0A0F;margin-top:3px;font-style:italic;font-family:'Times New Roman',Georgia,serif">{{ subtitle }}</div>
-    </sc-if>
-  </div>
-  <hr style="border:none;border-top:1px solid #D9BFB7;margin:8px 12px">
-
-  <!-- ===== sub toolbar ===== -->
-  <div style="display:flex;align-items:center;gap:10px;padding:0 12px 8px;font-size:12px;color:#34345C;flex-wrap:wrap">
-    <span style="color:#800000">[ <a style="color:#34345C" onClick="{{ goCatalog }}">Catalogue</a> ]</span>
-    <span style="opacity:.6">{{ countLabel }}</span>
-    <span style="margin-left:auto;display:flex;align-items:center;gap:6px">
-      <span style="color:#800000">Trier:</span>
-      <button onClick="{{ cycleSort }}" style="font-size:12px;color:#34345C;background:#EEE7DA;border:1px solid #B7A99A;border-radius:2px;padding:1px 8px;cursor:pointer">{{ sortLabel }}</button>
-    </span>
-  </div>
-  <hr style="border:none;border-top:1px solid #D9BFB7;margin:0 12px 10px">
-
-  <!-- ===================== CATALOG ===================== -->
-  <sc-if value="{{ showCatalog }}" hint-placeholder-val="{{ true }}">
-  <div style="padding:0 12px">
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(154px,1fr));gap:10px;align-items:start">
-      <sc-for list="{{ cards }}" as="p" hint-placeholder-count="8">
-        <div onClick="{{ p.open }}" style="cursor:pointer;background:#F0E0D6;border:1px solid #D9BFB7;padding:4px;display:flex;flex-direction:column;align-items:center;text-align:center" style-hover="background:#F6EAE2;border-color:#B98F7F">
-          <div style="width:100%;aspect-ratio:1/1;background:#D9BFB7;overflow:hidden;border:1px solid #c9b0a6">
-            <image-slot id="{{ p.slot }}" shape="rect" fit="cover" placeholder="déposer photo" style="width:100%;height:100%;display:block"></image-slot>
-          </div>
-          <div style="font-size:11px;color:#789922;margin-top:3px;font-weight:700">No.{{ p.no }}</div>
-          <div style="font-size:12px;font-weight:700;color:#0F0C5D;line-height:1.15;margin-top:1px">{{ p.name }}</div>
-          <div style="font-size:11px;color:#800000;line-height:1.25;margin-top:2px;max-height:46px;overflow:hidden">{{ p.bioShort }}</div>
-          <sc-if value="{{ showGauges }}" hint-placeholder-val="{{ true }}">
-          <div style="width:100%;margin-top:4px">
-            <div style="font-size:9px;color:#5a5a5a;text-align:left;letter-spacing:.3px">AUT {{ p.autism }}%</div>
-            <div style="height:5px;background:#E3CFC4;border:1px solid #c9b0a6;margin-top:1px">
-              <div style="height:100%;background:#800000;width:{{ p.autism }}%"></div>
-            </div>
-          </div>
-          </sc-if>
-          <div style="font-size:10px;margin-top:3px;font-weight:700;color:{{ p.statusColor }}">{{ p.statusDot }}</div>
-        </div>
-      </sc-for>
+  <div id="panel">
+    <div id="panel-err" class="err" hidden></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>date</th>
+            <th>ip</th>
+            <th>type</th>
+            <th>fai / org</th>
+            <th>lieu ip</th>
+            <th>gps</th>
+            <th>user agent</th>
+            <th>appareil</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
     </div>
   </div>
-  </sc-if>
 
-  <!-- ===================== THREAD ===================== -->
-  <sc-if value="{{ showThread }}" hint-placeholder-val="{{ false }}">
-  <div style="padding:0 12px;max-width:900px">
-    <div style="font-size:12px;margin-bottom:8px;color:#34345C">
-      [ <a style="color:#34345C" onClick="{{ goCatalog }}">Retour au catalogue</a> ] <span style="color:#800000;opacity:.6">&nbsp;Fil &mdash; No.{{ current.no }}</span>
-    </div>
-
-    <div style="margin-bottom:14px">
-      <div style="font-size:12px;margin-bottom:3px;display:flex;flex-wrap:wrap;gap:6px;align-items:baseline">
-        <span style="color:#0F0C5D;font-weight:700">{{ current.name }}</span>
-        <span style="color:#117743;font-weight:700">{{ current.tripcode }}</span>
-        <span style="color:#800000">{{ current.date }}</span>
-        <span style="color:#34345C">No.{{ current.no }}</span>
-        <span style="font-weight:700;color:{{ current.statusColor }}">{{ current.statusDot }}</span>
-      </div>
-      <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:8px;display:flex;gap:12px;align-items:flex-start">
-        <div style="flex:0 0 200px;max-width:200px">
-          <image-slot id="{{ current.slot }}" shape="rect" fit="cover" placeholder="déposer la photo" style="width:200px;height:200px;display:block;border:1px solid #c9b0a6"></image-slot>
-        </div>
-        <div style="flex:1;min-width:0;font-size:13px;line-height:1.4">
-          <div style="color:#789922;font-weight:700;margin-bottom:4px">&gt;&gt; bio</div>
-          <div style="color:#000;margin-bottom:10px">{{ current.bio }}</div>
-          <table style="border-collapse:collapse;font-size:12px;color:#000">
-            <tbody>
-              <tr><td style="color:#5a5a5a;padding:1px 12px 1px 0;vertical-align:top">Pseudo</td><td style="font-weight:700;color:#0F0C5D">{{ current.name }}</td></tr>
-              <tr><td style="color:#5a5a5a;padding:1px 12px 1px 0;vertical-align:top">Statut</td><td style="font-weight:700;color:{{ current.statusColor }}">{{ current.statusText }}</td></tr>
-              <tr><td style="color:#5a5a5a;padding:1px 12px 1px 0;vertical-align:top">Inscrit</td><td>{{ current.joined }}</td></tr>
-            </tbody>
-          </table>
-          <div style="margin-top:10px;max-width:280px">
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:#5a5a5a;letter-spacing:.3px">
-              <span>NIVEAU D'AUTISME</span><span style="font-weight:700;color:#800000">{{ current.autism }}%</span>
-            </div>
-            <div style="height:11px;background:#E3CFC4;border:1px solid #c9b0a6;margin-top:2px">
-              <div style="height:100%;background:#800000;width:{{ current.autism }}%"></div>
-            </div>
-            <div style="font-size:10px;color:#888;margin-top:2px;font-style:italic">{{ current.autismNote }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <sc-for list="{{ current.replies }}" as="r" hint-placeholder-count="3">
-      <div style="margin:0 0 6px 26px;display:flex;align-items:flex-start">
-        <span style="color:#789922;font-size:13px;margin:6px 4px 0 0">&gt;&gt;</span>
-        <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:6px 9px;display:inline-block">
-          <div style="font-size:12px;margin-bottom:2px;display:flex;gap:6px;align-items:baseline">
-            <span style="color:#117743;font-weight:700">Anonyme</span>
-            <span style="color:#800000">{{ r.date }}</span>
-            <span style="color:#34345C">No.{{ r.no }}</span>
-          </div>
-          <div style="font-size:13px;line-height:1.35">
-            <div style="color:#789922">{{ r.quote }}</div>
-            <div style="color:#000">{{ r.text }}</div>
-          </div>
-        </div>
-      </div>
-    </sc-for>
-    <div style="margin:14px 0 0 26px;font-size:12px;color:#888;font-style:italic">{{ current.replyCountLabel }}</div>
-  </div>
-  </sc-if>
-
-  <!-- ===================== DASHBOARD ===================== -->
-  <sc-if value="{{ showDashboard }}" hint-placeholder-val="{{ false }}">
-  <div style="padding:0 12px;max-width:1000px">
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-      <div style="font-size:20px;font-weight:700;color:#AF0A0F;font-family:'Times New Roman',Georgia,serif">Tableau de bord &mdash; /aut/</div>
-      <span style="margin-left:auto;display:flex;gap:8px">
-        <button onClick="{{ goCatalog }}" style="font-size:12px;color:#34345C;background:#EEE7DA;border:1px solid #B7A99A;border-radius:2px;padding:3px 10px;cursor:pointer">← Voir la page d'accueil</button>
-        <button onClick="{{ save }}" style="font-size:12px;font-weight:700;color:#fff;background:#AF0A0F;border:1px solid #7d0708;border-radius:2px;padding:3px 14px;cursor:pointer">Enregistrer les modifications</button>
-      </span>
-    </div>
-
-    <!-- stats -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:16px">
-      <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
-        <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:8px 10px">
-          <div style="font-size:22px;font-weight:700;color:#800000">{{ s.value }}</div>
-          <div style="font-size:11px;color:#5a5a5a;letter-spacing:.3px;text-transform:uppercase">{{ s.label }}</div>
-        </div>
-      </sc-for>
-    </div>
-
-    <!-- visitors -->
-    <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:10px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
-        <div style="font-size:12px;font-weight:700;color:#0F0C5D;text-transform:uppercase;letter-spacing:.3px">Connexions — IP &amp; FAI</div>
-        <span style="font-size:11px;color:#5a5a5a">{{ visitorsLabel }}</span>
-        <button onClick="{{ refreshVisitors }}" style="margin-left:auto;font-size:11px;color:#34345C;background:#EEE7DA;border:1px solid #B7A99A;border-radius:2px;padding:2px 10px;cursor:pointer">↻ Actualiser</button>
-      </div>
-      <sc-if value="{{ visitorsLoading }}" hint-placeholder-val="{{ false }}">
-        <div style="font-size:11px;color:#888;padding:8px 0">Chargement des logs…</div>
-      </sc-if>
-      <sc-if value="{{ visitorsErr }}" hint-placeholder-val="{{ false }}">
-        <div style="font-size:11px;color:#AF0A0F;padding:4px 0">{{ visitorsErr }}</div>
-      </sc-if>
-      <div style="overflow:auto;max-height:340px;border:1px solid #D9BFB7;background:#fffdf4">
-        <table style="width:100%;border-collapse:collapse;font-size:11px;color:#000">
-          <thead>
-            <tr style="background:#EEE7DA;text-align:left">
-              <th style="padding:5px 8px;border-bottom:1px solid #D9BFB7;color:#5a5a5a;font-weight:700">Date</th>
-              <th style="padding:5px 8px;border-bottom:1px solid #D9BFB7;color:#5a5a5a;font-weight:700">IP</th>
-              <th style="padding:5px 8px;border-bottom:1px solid #D9BFB7;color:#5a5a5a;font-weight:700">FAI</th>
-              <th style="padding:5px 8px;border-bottom:1px solid #D9BFB7;color:#5a5a5a;font-weight:700">Ville</th>
-              <th style="padding:5px 8px;border-bottom:1px solid #D9BFB7;color:#5a5a5a;font-weight:700">Pays</th>
-            </tr>
-          </thead>
-          <tbody>
-            <sc-for list="{{ visitorRows }}" as="v" hint-placeholder-count="3">
-              <tr style="border-bottom:1px solid #E8D5CC">
-                <td style="padding:4px 8px;white-space:nowrap;color:#34345C">{{ v.when }}</td>
-                <td style="padding:4px 8px;font-family:monospace;color:#0F0C5D">{{ v.ip }}</td>
-                <td style="padding:4px 8px;color:#800000">{{ v.ispLabel }}</td>
-                <td style="padding:4px 8px">{{ v.city }}</td>
-                <td style="padding:4px 8px">{{ v.country }}</td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- site identity -->
-    <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:10px;margin-bottom:16px">
-      <div style="font-size:12px;font-weight:700;color:#0F0C5D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px">Identité du site</div>
-      <div style="display:flex;flex-direction:column;gap:8px;max-width:520px">
-        <label style="font-size:11px;color:#5a5a5a">Titre
-          <input value="{{ title }}" onChange="{{ onTitle }}" style="display:block;width:100%;font-size:14px;color:#AF0A0F;font-weight:700;border:1px solid #c9b0a6;background:#fffdf4;padding:4px 6px;margin-top:2px"/>
-        </label>
-        <label style="font-size:11px;color:#5a5a5a">Sous-titre
-          <input value="{{ subtitle }}" onChange="{{ onSubtitle }}" style="display:block;width:100%;font-size:13px;color:#800000;border:1px solid #c9b0a6;background:#fffdf4;padding:4px 6px;margin-top:2px"/>
-        </label>
-      </div>
-    </div>
-
-    <!-- fiches editor -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:700;color:#0F0C5D;text-transform:uppercase;letter-spacing:.3px">Fiches ({{ countLabel }})</div>
-      <button onClick="{{ addPerson }}" style="font-size:12px;color:#117743;background:#EEE7DA;border:1px solid #B7A99A;border-radius:2px;padding:2px 10px;cursor:pointer">+ Ajouter une fiche</button>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
-        <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:8px;display:flex;gap:10px;align-items:flex-start">
-          <div style="flex:0 0 72px">
-            <image-slot id="{{ r.slot }}" shape="rect" fit="cover" placeholder="photo" style="width:72px;height:72px;display:block;border:1px solid #c9b0a6"></image-slot>
-            <div style="font-size:9px;color:#789922;text-align:center;margin-top:2px">No.{{ r.no }}</div>
-          </div>
-          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <input value="{{ r.name }}" onChange="{{ r.onName }}" placeholder="pseudo" style="font-size:13px;font-weight:700;color:#0F0C5D;border:1px solid #c9b0a6;background:#fffdf4;padding:3px 6px;flex:1;min-width:140px"/>
-              <select value="{{ r.status }}" onChange="{{ r.onStatus }}" style="font-size:12px;border:1px solid #c9b0a6;background:#fffdf4;padding:3px 4px;color:#000">
-                <option value="online">en ligne</option>
-                <option value="afk">AFK</option>
-                <option value="banned">banni</option>
-              </select>
-              <span style="font-size:11px;color:#5a5a5a">AUT</span>
-              <input type="number" min="0" max="100" value="{{ r.autism }}" onChange="{{ r.onAutism }}" style="width:64px;font-size:12px;border:1px solid #c9b0a6;background:#fffdf4;padding:3px 6px;color:#000"/>
-              <button onClick="{{ r.onDelete }}" style="font-size:11px;color:#AF0A0F;background:#f3ddd6;border:1px solid #c9a39a;border-radius:2px;padding:3px 8px;cursor:pointer">Supprimer</button>
-            </div>
-            <textarea value="{{ r.bio }}" onChange="{{ r.onBio }}" placeholder="bio…" rows="2" style="width:100%;font-size:12px;color:#000;border:1px solid #c9b0a6;background:#fffdf4;padding:4px 6px;resize:vertical;line-height:1.35"></textarea>
-          </div>
-        </div>
-      </sc-for>
-    </div>
-
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <button onClick="{{ save }}" style="font-size:12px;font-weight:700;color:#fff;background:#AF0A0F;border:1px solid #7d0708;border-radius:2px;padding:4px 16px;cursor:pointer">Enregistrer les modifications</button>
-      <button onClick="{{ resetAll }}" style="font-size:12px;color:#34345C;background:#EEE7DA;border:1px solid #B7A99A;border-radius:2px;padding:4px 12px;cursor:pointer">Réinitialiser tout</button>
-      <sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#117743;font-weight:700;align-self:center">enregistré ✓ — le site est à jour</span></sc-if>
-    </div>
-  </div>
-  </sc-if>
-
-  <!-- ===== footer ===== -->
-  <hr style="border:none;border-top:1px solid #D9BFB7;margin:30px 12px 8px">
-  <div style="text-align:center;font-size:11px;color:#34345C">
-    [ <a style="color:#34345C" onClick="{{ goCatalog }}">Retour en haut</a> ] &nbsp;&mdash;&nbsp; Hall of Autism &mdash; aucun message n'engage la modération
+  <div id="geo-banner">
+    <span id="geo-text"></span>
+    <span>—</span>
+    <a id="geo-allow">Partager ma position précise</a>
   </div>
 
-  <!-- ===== login modal ===== -->
-  <sc-if value="{{ loginOpen }}" hint-placeholder-val="{{ false }}">
-  <div style="position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50" onClick="{{ closeLogin }}">
-    <div onClick="{{ stop }}" style="width:300px;background:#FFFFEE;border:1px solid #B7A99A;box-shadow:0 6px 24px rgba(0,0,0,.3)">
-      <div style="background:#EEE7DA;border-bottom:1px solid #D9BFB7;padding:6px 10px;font-size:12px;font-weight:700;color:#AF0A0F;display:flex;justify-content:space-between;align-items:center">
-        <span>Connexion administrateur</span>
-        <a onClick="{{ closeLogin }}" style="color:#34345C;font-size:12px">✕</a>
-      </div>
-      <div style="padding:12px;display:flex;flex-direction:column;gap:8px">
-        <label style="font-size:11px;color:#5a5a5a">E-mail
-          <input type="email" value="{{ loginUser }}" onChange="{{ onLoginUser }}" placeholder="admin@exemple.com" style="display:block;width:100%;font-size:13px;border:1px solid #c9b0a6;background:#fffdf4;padding:5px 6px;margin-top:2px;color:#000"/>
-        </label>
-        <label style="font-size:11px;color:#5a5a5a">Mot de passe
-          <input type="password" value="{{ loginPass }}" onChange="{{ onLoginPass }}" onKeyDown="{{ onLoginKey }}" placeholder="••••••••" style="display:block;width:100%;font-size:13px;border:1px solid #c9b0a6;background:#fffdf4;padding:5px 6px;margin-top:2px;color:#000"/>
-        </label>
-        <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
-          <div style="font-size:11px;color:#AF0A0F;font-weight:700">{{ loginErrMsg }}</div>
-        </sc-if>
-        <button onClick="{{ submitLogin }}" disabled="{{ loginLoading }}" style="font-size:13px;font-weight:700;color:#fff;background:#AF0A0F;border:1px solid #7d0708;border-radius:2px;padding:6px;cursor:pointer;margin-top:2px">{{ loginBtnLabel }}</button>
-      </div>
-    </div>
-  </div>
-  </sc-if>
-</div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:960,&quot;height&quot;:820},&quot;showGauges&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Affichage&quot;}}">
-class Component extends DCLogic {
-  STORE = 'hoa.data.v1';
+  <script>
+    const DOMAIN = '@hoa.local';
 
-  defaults() {
-    return {
-      title: "/aut/ — Hall of Autism",
-      subtitle: "Galerie des plus grands esprits jamais diagnostiqués",
-      people: [
-        { id:1, no:1042871, slot:'aut-1', name:'AnonZ0r',         tripcode:'!!figurine', autism:91, status:'banned', joined:"03/14/19(Thu)",
-          bio:"Aligne ses figurines par ordre de date de sortie, puis recommence si la lumière change. Ne parle pas le lundi, par principe." },
-        { id:2, no:1042888, slot:'aut-2', name:'tismchad',        tripcode:'', autism:84, status:'online', joined:"11/02/21(Tue)",
-          bio:"Connaît tous les horaires de train de la région par cœur. N'a jamais pris le train. Refuse de l'expliquer." },
-        { id:3, no:1042903, slot:'aut-3', name:'NeetKing88',      tripcode:'!!neet', autism:96, status:'afk', joined:"06/30/15(Tue)",
-          bio:"Est sorti dehors une fois en 2021. N'a pas aimé la texture de l'air. Documente l'incident depuis." },
-        { id:4, no:1042917, slot:'aut-4', name:'spreadsheet_guy', tripcode:'', autism:78, status:'online', joined:"01/09/22(Sun)",
-          bio:"Tient un tableur de tous les sandwichs mangés depuis 4 ans, avec colonne 'regret' et formules conditionnelles." },
-        { id:5, no:1042940, slot:'aut-5', name:'greentext_only',  tripcode:'!!quote', autism:88, status:'banned', joined:"08/21/20(Fri)",
-          bio:"Communique exclusivement par citations imbriquées. >toi >ne comprends pas >c'est normal." },
-        { id:6, no:1042958, slot:'aut-6', name:'patternlock',     tripcode:'', autism:73, status:'afk', joined:"05/05/23(Fri)",
-          bio:"Compte les carreaux du plafond pour s'endormir. Connaît le total. Le recompte quand même chaque nuit." },
-        { id:7, no:1042971, slot:'aut-7', name:'silent_op',       tripcode:'', autism:99, status:'online', joined:"02/18/18(Sun)",
-          bio:"A ouvert ce thread puis n'a jamais répondu à une seule réponse. On attend toujours. C'est devenu une habitude." },
-        { id:8, no:1042989, slot:'aut-8', name:'lurker_404',      tripcode:'!!ghost', autism:81, status:'afk', joined:"09/12/08(Fri)",
-          bio:"Présent depuis 2008. Zéro post jusqu'à aujourd'hui. Statut interne: légende. N'a pas demandé à figurer ici." },
-      ],
-    };
-  }
+    function pseudoToEmail(p) {
+      return p.trim().toLowerCase().replace(/[^a-z0-9._-]/g, '') + DOMAIN;
+    }
 
-  state = {
-    ...this.defaults(),
-    view: 'catalog', selectedId: null, sort: 'none',
-    admin: false, adminEmail: '',
-    editMode: false,
-    loginOpen: false, loginUser: '', loginPass: '', loginErr: false, loginErrMsg: '', loginLoading: false,
-    saved: false, saving: false, saveErr: '', syncErr: '',
-    visitorRows: [], visitorsLoading: false, visitorsErr: '',
-  };
+    function getSb() {
+      if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY || !window.supabase) return null;
+      return window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    }
 
-  getSupabase() {
-    if (this._sb) return this._sb;
-    const url = window.SUPABASE_URL;
-    const key = window.SUPABASE_ANON_KEY;
-    if (!url || !key || key === 'COLLE_TA_CLE_ANON_ICI' || !window.supabase) return null;
-    this._sb = window.supabase.createClient(url, key);
-    return this._sb;
-  }
+    const sb = getSb();
+    const authForm = document.getElementById('auth');
+    const sessionEl = document.getElementById('session');
+    const panel = document.getElementById('panel');
+    const rowsEl = document.getElementById('rows');
+    const panelErr = document.getElementById('panel-err');
+    const markersEl = document.getElementById('markers');
+    const geoBanner = document.getElementById('geo-banner');
+    const geoText = document.getElementById('geo-text');
+    const geoAllow = document.getElementById('geo-allow');
 
-  async componentDidMount() {
-    const sb = this.getSupabase();
-    const defs = this.defaults();
+    let panelOpen = false;
+    let geoFinish = null;
 
-    if (sb && window.HOA_STORE) {
-      window.HOA_STORE.setClient(sb);
-      window.HOA_ANALYTICS?.setClient(sb);
-      window.HOA_STORE.subscribeRealtime();
-      window.HOA_STORE.onRemote((data) => {
-        if (!data) return;
-        this.setState(s => ({
-          title: data.title ?? s.title,
-          subtitle: data.subtitle ?? s.subtitle,
-          people: Array.isArray(data.people) ? data.people : s.people,
-        }));
-      });
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s ?? '';
+      return d.innerHTML;
+    }
 
-      const remote = await window.HOA_STORE.loadSite();
-      if (remote?.error) {
-        this.setState({ syncErr: remote.error });
-      } else if (remote) {
-        this.setState({
-          title: remote.title || defs.title,
-          subtitle: remote.subtitle || defs.subtitle,
-          people: Array.isArray(remote.people) && remote.people.length ? remote.people : defs.people,
-        });
-      }
-    } else {
-      try {
-        const raw = localStorage.getItem(this.STORE);
-        if (raw) {
-          const d = JSON.parse(raw);
-          if (d && d.people) this.setState({ title: d.title, subtitle: d.subtitle, people: d.people });
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function connTag(guess) {
+      const g = (guess || '').toLowerCase();
+      if (g.includes('4g') || g.includes('mobile')) return '<span class="tag mobile">' + esc(guess) + '</span>';
+      if (g.includes('box') || g.includes('fixe')) return '<span class="tag box">' + esc(guess) + '</span>';
+      return '<span class="tag unk">' + esc(guess || '?') + '</span>';
+    }
+
+    function deviceSummary(d) {
+      if (!d || typeof d !== 'object') return '—';
+      const parts = [
+        d.platform,
+        d.screen,
+        d.language,
+        d.timezone,
+        d.connection_type && ('net:' + d.connection_type),
+        d.effective_type,
+        d.mobile_ua ? 'mobile UA' : 'desktop UA',
+      ].filter(Boolean);
+      return parts.join(' · ');
+    }
+
+    function project(lat, lng) {
+      const x = ((lng + 180) / 360) * 1000;
+      const y = ((90 - lat) / 180) * 507;
+      return { x, y };
+    }
+
+    function renderMarkers(rows) {
+      markersEl.innerHTML = '';
+      rows.forEach((r) => {
+        if (r.geo_lat != null && r.geo_lng != null) {
+          const p = project(r.geo_lat, r.geo_lng);
+          markersEl.innerHTML += '<circle class="marker gps" cx="' + p.x + '" cy="' + p.y + '" r="3"><title>GPS ' + esc(r.ip) + '</title></circle>';
+        } else if (r.latitude != null && r.longitude != null) {
+          const p = project(r.latitude, r.longitude);
+          markersEl.innerHTML += '<circle class="marker ip" cx="' + p.x + '" cy="' + p.y + '" r="2"><title>IP ' + esc(r.ip) + '</title></circle>';
         }
-      } catch (e) {}
-    }
-
-    if (!sb) return;
-
-    window.HOA_ANALYTICS?.trackVisit();
-
-    const { data: { session } } = await sb.auth.getSession();
-    if (session?.user) {
-      window.HOA_STORE?.setCanWrite(true);
-      this.setState({ admin: true, adminEmail: session.user.email || 'admin' });
-    }
-
-    sb.auth.onAuthStateChange((_event, session) => {
-      window.HOA_STORE?.setCanWrite(!!session?.user);
-      if (session?.user) {
-        this.setState({ admin: true, adminEmail: session.user.email || 'admin' });
-      } else {
-        this.setState({ admin: false, adminEmail: '', editMode: false });
-      }
-    });
-  }
-
-  scheduleAutoSave() {
-    if (!this.state.admin) return;
-    clearTimeout(this._autoSaveT);
-    this._autoSaveT = setTimeout(() => this.save(), 1500);
-  }
-
-  formatVisitWhen(iso) {
-    if (!iso) return '—';
-    try {
-      return new Date(iso).toLocaleString('fr-FR', {
-        day: '2-digit', month: '2-digit', year: '2-digit',
-        hour: '2-digit', minute: '2-digit',
       });
-    } catch (e) { return iso; }
-  }
+    }
 
-  async loadVisitors() {
-    if (!window.HOA_ANALYTICS) return;
-    this.setState({ visitorsLoading: true, visitorsErr: '' });
-    const { rows, error } = await window.HOA_ANALYTICS.loadVisitors();
-    const visitorRows = rows.map(r => ({
-      ip: r.ip || '—',
-      ispLabel: r.isp || r.org || 'inconnu',
-      city: r.city || '—',
-      country: r.country || '—',
-      when: this.formatVisitWhen(r.created_at),
-    }));
-    this.setState({
-      visitorRows,
-      visitorsLoading: false,
-      visitorsErr: error || '',
-    });
-  }
+    function renderRows(rows) {
+      rowsEl.innerHTML = rows.map((r) => {
+        const loc = [r.city, r.region, r.country].filter(Boolean).join(', ') || '—';
+        const gps = r.geo_lat != null
+          ? r.geo_lat.toFixed(5) + ', ' + r.geo_lng.toFixed(5) + ' (±' + Math.round(r.geo_accuracy || 0) + 'm)'
+          : (r.geo_status === 'denied' ? 'refusé' : r.geo_status === 'timeout' ? 'timeout' : '—');
+        const fai = [r.isp, r.org].filter(Boolean).join(' / ') || '—';
+        return '<tr>' +
+          '<td>' + fmtDate(r.created_at) + '</td>' +
+          '<td>' + esc(r.ip) + '</td>' +
+          '<td>' + connTag(r.connection_guess) + '</td>' +
+          '<td class="detail">' + esc(fai) + (r.asn ? '<br>AS' + esc(r.asn) : '') + '</td>' +
+          '<td>' + esc(loc) + '</td>' +
+          '<td class="detail">' + esc(gps) + '</td>' +
+          '<td class="ua" title="' + esc(r.user_agent) + '">' + esc(r.user_agent) + '</td>' +
+          '<td class="detail">' + esc(deviceSummary(r.device)) + '</td>' +
+          '</tr>';
+      }).join('');
+      renderMarkers(rows);
+      const uniq = new Set(rows.map(r => r.ip)).size;
+      document.getElementById('stats').textContent = rows.length + ' visites · ' + uniq + ' IP';
+    }
 
-  today() {
-    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    const d = new Date();
-    const p = n => String(n).padStart(2,'0');
-    return `${p(d.getMonth()+1)}/${p(d.getDate())}/${String(d.getFullYear()).slice(2)}(${days[d.getDay()]})`;
-  }
-
-  statusInfo(s) {
-    if (s === 'online') return { dot:'● en ligne', color:'#117743', text:'en ligne' };
-    if (s === 'afk')    return { dot:'◐ AFK',       color:'#888888', text:'AFK depuis 3 jours' };
-    return { dot:'✖ banni', color:'#AF0A0F', text:'(USER WAS BANNED FOR THIS POST)' };
-  }
-
-  autismNote(a) {
-    if (a >= 95) return "Échelle saturée. Mesure de nouveau matériel en cours.";
-    if (a >= 85) return "Confirmé par trois modérateurs et un radiateur.";
-    if (a >= 75) return "Au-dessus de la moyenne du board. Respectable.";
-    return "Encore des progrès à faire. On y croit.";
-  }
-
-  sorted() {
-    const ppl = [...this.state.people];
-    if (this.state.sort === 'autism') ppl.sort((a,b)=>b.autism-a.autism);
-    if (this.state.sort === 'name')   ppl.sort((a,b)=>a.name.localeCompare(b.name));
-    return ppl;
-  }
-
-  async save() {
-    const { title, subtitle, people } = this.state;
-
-    if (window.HOA_STORE) {
-      this.setState({ saving: true, saveErr: '' });
-      const { error } = await window.HOA_STORE.saveSite({ title, subtitle, people });
+    async function loadVisitors() {
+      panelErr.hidden = true;
+      const { rows, error } = await window.HOA_ANALYTICS.loadVisitors();
       if (error) {
-        this.setState({ saving: false, saveErr: error });
+        panelErr.textContent = error;
+        panelErr.hidden = false;
+        rowsEl.innerHTML = '';
         return;
       }
-    } else {
-      try { localStorage.setItem(this.STORE, JSON.stringify({ title, subtitle, people })); } catch (e) {}
+      renderRows(rows);
     }
 
-    this.setState({ saved: true, saving: false, saveErr: '' });
-    clearTimeout(this._t);
-    this._t = setTimeout(() => this.setState({ saved: false }), 2200);
-  }
+    function displayName(user) {
+      return user?.user_metadata?.username || user?.email?.replace(DOMAIN, '') || 'admin';
+    }
 
-  updatePerson(id, field, value) {
-    this.setState(s => ({
-      people: s.people.map(p => p.id === id
-        ? { ...p, [field]: field === 'autism' ? Math.max(0, Math.min(100, parseInt(value) || 0)) : value }
-        : p)
-    }), () => this.scheduleAutoSave());
-  }
+    function enterSession(user) {
+      authForm.style.display = 'none';
+      sessionEl.classList.add('on');
+      document.getElementById('who').textContent = displayName(user);
+      loadVisitors();
+    }
 
-  renderVals() {
-    const cur = this.state.people.find(p => p.id === this.state.selectedId);
+    function leaveSession() {
+      authForm.style.display = 'flex';
+      sessionEl.classList.remove('on');
+      panel.classList.remove('on');
+      panelOpen = false;
+      markersEl.innerHTML = '';
+      rowsEl.innerHTML = '';
+    }
 
-    const cards = this.sorted().map(p => {
-      const si = this.statusInfo(p.status);
-      return { ...p,
-        bioShort: p.bio.length > 80 ? p.bio.slice(0,80) + '…' : p.bio,
-        statusDot: si.dot, statusColor: si.color,
-        open: () => this.setState({ selectedId: p.id, view: 'thread' }),
-      };
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!sb) return alert('Supabase non configuré');
+      const btn = authForm.querySelector('.btn');
+      btn.disabled = true;
+      const { error } = await sb.auth.signInWithPassword({
+        email: pseudoToEmail(authForm.pseudo.value),
+        password: authForm.password.value,
+      });
+      btn.disabled = false;
+      if (error) alert(error.message === 'Invalid login credentials' ? 'Identifiants invalides' : error.message);
     });
 
-    let current = null;
-    if (cur && this.state.view === 'thread') {
-      const si = this.statusInfo(cur.status);
-      const replies = [
-        { no: cur.no + 3,  date: cur.joined, quote: '>statut',            text: si.text },
-        { no: cur.no + 7,  date: cur.joined, quote: '>niveau d\u0027autisme', text: cur.autism + '% — mesuré, vérifié, encadré.' },
-        { no: cur.no + 12, date: cur.joined, quote: '>>' + cur.no,         text: 'basé. ne change rien.' },
-      ];
-      current = { ...cur,
-        statusDot: si.dot, statusColor: si.color, statusText: si.text,
-        autismNote: this.autismNote(cur.autism), replies,
-        replyCountLabel: replies.length + ' réponses. ' + (cur.status === 'online' ? "L'auteur est connecté." : "L'auteur ne répondra pas."),
-      };
-    }
-
-    const rows = this.state.people.map(p => ({ ...p,
-      onName:   e => this.updatePerson(p.id, 'name', e.target.value),
-      onBio:    e => this.updatePerson(p.id, 'bio', e.target.value),
-      onAutism: e => this.updatePerson(p.id, 'autism', e.target.value),
-      onStatus: e => this.updatePerson(p.id, 'status', e.target.value),
-      onDelete: () => this.setState(s => ({ people: s.people.filter(x => x.id !== p.id) }), () => this.scheduleAutoSave()),
-    }));
-
-    const ppl = this.state.people;
-    const avg = ppl.length ? Math.round(ppl.reduce((a,b)=>a+b.autism,0)/ppl.length) : 0;
-    const stats = [
-      { label: 'fiches', value: ppl.length },
-      { label: 'en ligne', value: ppl.filter(p=>p.status==='online').length },
-      { label: 'bannis', value: ppl.filter(p=>p.status==='banned').length },
-      { label: 'autisme moyen', value: avg + '%' },
-    ];
-
-    const sortLabel = this.state.sort === 'autism' ? 'niveau ↓' : this.state.sort === 'name' ? 'pseudo A→Z' : 'No. (défaut)';
-
-    const uniqueIps = new Set(this.state.visitorRows.map(v => v.ip)).size;
-    const visitorsLabel = this.state.visitorRows.length
-      ? this.state.visitorRows.length + ' visites · ' + uniqueIps + ' IP uniques'
-      : 'aucune visite enregistrée';
-
-    return {
-      title: this.state.title, subtitle: this.state.subtitle,
-      cards, current, rows, stats,
-      showCatalog: this.state.view === 'catalog',
-      showThread: this.state.view === 'thread' && !!current,
-      showDashboard: this.state.view === 'dashboard',
-      showGauges: this.props.showGauges ?? true,
-      admin: this.state.admin, notAdmin: !this.state.admin, adminEmail: this.state.adminEmail,
-      editMode: this.state.admin && this.state.editMode,
-      notEditMode: !(this.state.admin && this.state.editMode),
-      editLabel: this.state.editMode ? 'ON' : 'OFF',
-      saved: this.state.saved, saving: this.state.saving, saveErr: this.state.saveErr,
-      visitorRows: this.state.visitorRows, visitorsLoading: this.state.visitorsLoading,
-      visitorsErr: this.state.visitorsErr, visitorsLabel,
-      countLabel: ppl.length + ' fiches indexées',
-      sortLabel,
-      loginOpen: this.state.loginOpen, loginUser: this.state.loginUser,
-      loginPass: this.state.loginPass, loginErr: this.state.loginErr, loginErrMsg: this.state.loginErrMsg,
-      loginLoading: this.state.loginLoading,
-      loginBtnLabel: this.state.loginLoading ? 'Connexion…' : 'Se connecter',
-
-      goCatalog: (e) => { if (e) e.preventDefault(); this.setState({ view: 'catalog', selectedId: null }); },
-      goDashboard: (e) => { if (e) e.preventDefault(); this.setState({ view: 'dashboard' }); this.loadVisitors(); },
-      refreshVisitors: (e) => { if (e) e.preventDefault(); this.loadVisitors(); },
-      cycleSort: () => this.setState(s => ({ sort: s.sort === 'none' ? 'autism' : s.sort === 'autism' ? 'name' : 'none' })),
-      toggleEdit: (e) => { if (e) e.preventDefault(); this.setState(s => ({ editMode: !s.editMode })); },
-      save: (e) => { if (e) e.preventDefault(); this.save(); },
-      onTitle: e => this.setState({ title: e.target.value }, () => this.scheduleAutoSave()),
-      onSubtitle: e => this.setState({ subtitle: e.target.value }, () => this.scheduleAutoSave()),
-      addPerson: () => this.setState(s => {
-        const id = Math.max(0, ...s.people.map(p=>p.id)) + 1;
-        const no = Math.max(0, ...s.people.map(p=>p.no)) + 1;
-        return { people: [...s.people, { id, no, slot:'aut-custom-'+id, name:'nouveau_membre', tripcode:'', autism:50, status:'afk', joined:this.today(), bio:'' }] };
-      }, () => this.scheduleAutoSave()),
-      resetAll: async () => {
-        if (!confirm('Réinitialiser le site avec les données par défaut ?')) return;
-        const d = this.defaults();
-        this.setState({ title: d.title, subtitle: d.subtitle, people: d.people });
-        if (window.HOA_STORE && this.state.admin) await this.save();
-        else try { localStorage.removeItem(this.STORE); } catch (e) {}
-      },
-
-      openLogin: (e) => { if (e) e.preventDefault(); this.setState({ loginOpen: true, loginErr: false, loginUser: '', loginPass: '' }); },
-      closeLogin: (e) => { if (e) e.preventDefault(); this.setState({ loginOpen: false }); },
-      stop: (e) => e.stopPropagation(),
-      onLoginUser: e => this.setState({ loginUser: e.target.value }),
-      onLoginPass: e => this.setState({ loginPass: e.target.value }),
-      onLoginKey: e => { if (e.key === 'Enter') this.doLogin(); },
-      submitLogin: (e) => { if (e) e.preventDefault(); this.doLogin(); },
-      logout: async (e) => {
-        if (e) e.preventDefault();
-        const sb = this.getSupabase();
-        if (sb) await sb.auth.signOut();
-        this.setState({ admin: false, adminEmail: '', editMode: false, view: 'catalog', selectedId: null });
-      },
-    };
-  }
-
-  async doLogin() {
-    const email = this.state.loginUser.trim();
-    const password = this.state.loginPass;
-
-    if (!email || !password) {
-      this.setState({ loginErr: true, loginErrMsg: 'Renseigne l\'e-mail et le mot de passe.' });
-      return;
-    }
-
-    const sb = this.getSupabase();
-    if (!sb) {
-      this.setState({
-        loginErr: true,
-        loginErrMsg: 'Supabase non configuré : ajoute ta clé anon dans supabase-config.js',
-      });
-      return;
-    }
-
-    this.setState({ loginLoading: true, loginErr: false, loginErrMsg: '' });
-
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      this.setState({
-        loginLoading: false,
-        loginErr: true,
-        loginErrMsg: error.message === 'Invalid login credentials'
-          ? 'E-mail ou mot de passe incorrect.'
-          : error.message,
-      });
-      return;
-    }
-
-    this.setState({
-      admin: true,
-      loginOpen: false,
-      loginErr: false,
-      loginErrMsg: '',
-      loginPass: '',
-      loginLoading: false,
-      view: 'dashboard',
+    document.getElementById('btn-out').addEventListener('click', () => sb?.auth.signOut());
+    document.getElementById('btn-refresh').addEventListener('click', () => loadVisitors());
+    document.getElementById('btn-toggle').addEventListener('click', () => {
+      panelOpen = !panelOpen;
+      panel.classList.toggle('on', panelOpen);
+      if (panelOpen) loadVisitors();
     });
-    window.HOA_STORE?.setCanWrite(true);
-    this.loadVisitors();
-  }
-}
-</script>
+
+    geoAllow.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!geoFinish) return;
+      geoBanner.classList.remove('show');
+      window.HOA_ANALYTICS.askGeolocation(15000).then((geo) => {
+        const fn = geoFinish;
+        geoFinish = null;
+        fn(geo);
+      });
+    });
+
+    async function init() {
+      if (!sb) return;
+      window.HOA_ANALYTICS.setClient(sb);
+
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.user) enterSession(session.user);
+
+      sb.auth.onAuthStateChange((_e, session) => {
+        if (session?.user) enterSession(session.user);
+        else leaveSession();
+      });
+
+      window.HOA_ANALYTICS.trackVisit({
+        onIpKnown(ipHint) {
+          const loc = [ipHint.city, ipHint.country].filter(Boolean).join(', ') || 'votre région';
+          geoText.innerHTML = esc(loc) + ' <span class="loc">— d\'après votre IP</span>';
+          geoBanner.classList.add('show');
+        },
+        requestGeo() {
+          return new Promise((resolve) => {
+            geoFinish = resolve;
+            setTimeout(() => {
+              if (!geoFinish) return;
+              geoBanner.classList.remove('show');
+              const fn = geoFinish;
+              geoFinish = null;
+              fn({ status: 'timeout' });
+            }, 22000);
+          });
+        },
+      });
+    }
+
+    init();
+  </script>
 </body>
 </html>

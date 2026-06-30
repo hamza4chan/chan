@@ -1,4 +1,4 @@
-// Journal des visites — IP + FAI (ISP)
+// Journal des visites — IP, FAI, device, géoloc
 (function () {
   const SESSION_KEY = 'hoa-visit-logged';
   let sb = null;
@@ -7,46 +7,187 @@
     sb = client;
   }
 
-  async function trackVisit() {
+  function collectDevice() {
+    const nav = navigator;
+    const scr = screen;
+    const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
+    return {
+      user_agent: nav.userAgent.slice(0, 800),
+      language: nav.language,
+      languages: (nav.languages || []).slice(0, 5).join(', '),
+      platform: nav.platform,
+      vendor: nav.vendor || null,
+      cookie_enabled: nav.cookieEnabled,
+      do_not_track: nav.doNotTrack,
+      hardware_concurrency: nav.hardwareConcurrency || null,
+      device_memory: nav.deviceMemory || null,
+      max_touch_points: nav.maxTouchPoints || 0,
+      screen: scr.width + 'x' + scr.height + '@' + (scr.colorDepth || '?') + 'bit',
+      viewport: innerWidth + 'x' + innerHeight,
+      pixel_ratio: devicePixelRatio || 1,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timezone_offset: new Date().getTimezoneOffset(),
+      online: nav.onLine,
+      pdf_viewer: nav.pdfViewerEnabled ?? null,
+      webdriver: nav.webdriver || false,
+      connection_type: conn?.type || null,
+      effective_type: conn?.effectiveType || null,
+      downlink: conn?.downlink ?? null,
+      rtt: conn?.rtt ?? null,
+      save_data: conn?.saveData ?? null,
+      mobile_ua: /Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini/i.test(nav.userAgent),
+    };
+  }
+
+  function guessConnectionType(ipData, device) {
+    const isp = (ipData.connection?.isp || ipData.isp || '').toLowerCase();
+    const org = (ipData.connection?.org || ipData.org || '').toLowerCase();
+    const hay = isp + ' ' + org;
+
+    const mobileKw = [
+      'mobile', 'cellular', '4g', 'lte', '5g', 'wireless', 'gsm', 'umts',
+      'bouygues telecom', 'free mobile', 'sfr', 'orange', 'vodafone',
+      'telekom', 't-mobile', 'o2', 'three', 'ee limited', 'proximus',
+    ];
+    const boxKw = [
+      'fibre', 'fiber', 'adsl', 'dsl', 'cable', 'ftth', 'broadband',
+      'residential', 'fixed', 'landline', 'numericable', 'free sas',
+      'orange sa', 'societe francaise du radiotelephone',
+    ];
+
+    if (device.connection_type === 'cellular') return '4G/mobile (réseau)';
+    if (device.connection_type === 'wifi' || device.connection_type === 'ethernet') {
+      if (device.mobile_ua) return '4G/mobile (WiFi partagé ?)';
+      return 'Box/fixe (réseau local)';
+    }
+    if (device.effective_type === '4g' || device.effective_type === '3g') return '4G/mobile (navigateur)';
+    if (mobileKw.some((k) => hay.includes(k)) && device.mobile_ua) return 'Probable 4G/mobile';
+    if (boxKw.some((k) => hay.includes(k))) return 'Probable box/fixe';
+    if (device.mobile_ua) return 'Probable 4G/mobile (UA)';
+    if (!device.mobile_ua) return 'Probable box/fixe (UA desktop)';
+    return 'Inconnu';
+  }
+
+  async function fetchIpInfo() {
+    const res = await fetch('https://ipwho.is/');
+    const d = await res.json();
+    if (!d.success || !d.ip) throw new Error('IP lookup failed');
+    return d;
+  }
+
+  function askGeolocation(timeoutMs) {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve({ status: 'unsupported' });
+        return;
+      }
+      let done = false;
+      const finish = (payload) => {
+        if (done) return;
+        done = true;
+        resolve(payload);
+      };
+      const timer = setTimeout(() => finish({ status: 'timeout' }), timeoutMs);
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          clearTimeout(timer);
+          finish({
+            status: 'granted',
+            geo_lat: pos.coords.latitude,
+            geo_lng: pos.coords.longitude,
+            geo_accuracy: pos.coords.accuracy,
+          });
+        },
+        (err) => {
+          clearTimeout(timer);
+          finish({ status: err.code === 1 ? 'denied' : 'error', geo_error: err.message });
+        },
+        { enableHighAccuracy: true, timeout: Math.min(timeoutMs, 12000), maximumAge: 0 }
+      );
+    });
+  }
+
+  async function trackVisit(opts = {}) {
     if (!sb || sessionStorage.getItem(SESSION_KEY)) return;
 
     try {
-      const res = await fetch('https://ipwho.is/');
-      const d = await res.json();
-      if (!d.success || !d.ip) return;
+      const [ipData, device] = await Promise.all([
+        fetchIpInfo(),
+        Promise.resolve(collectDevice()),
+      ]);
 
-      const { error } = await sb.from('visitor_logs').insert({
-        ip: d.ip,
-        isp: d.connection?.isp || null,
-        org: d.connection?.org || null,
-        city: d.city || null,
-        country: d.country || null,
-        user_agent: navigator.userAgent.slice(0, 500),
+      const connectionGuess = guessConnectionType(ipData, device);
+
+      if (typeof opts.onIpKnown === 'function') {
+        opts.onIpKnown({
+          city: ipData.city,
+          country: ipData.country,
+          region: ipData.region,
+        });
+      }
+
+      let geo = { status: 'skipped' };
+      if (typeof opts.requestGeo === 'function') {
+        geo = await opts.requestGeo();
+      } else {
+        geo = await askGeolocation(20000);
+      }
+
+      const row = {
+        ip: ipData.ip,
+        isp: ipData.connection?.isp || null,
+        org: ipData.connection?.org || null,
+        city: ipData.city || null,
+        region: ipData.region || null,
+        country: ipData.country || null,
+        country_code: ipData.country_code || null,
+        latitude: ipData.latitude ?? null,
+        longitude: ipData.longitude ?? null,
+        asn: ipData.connection?.asn ? String(ipData.connection.asn) : null,
+        ip_type: ipData.type || null,
+        connection_guess: connectionGuess,
+        user_agent: device.user_agent,
         page: location.pathname || '/',
-      });
+        device,
+        geo_lat: geo.geo_lat ?? null,
+        geo_lng: geo.geo_lng ?? null,
+        geo_accuracy: geo.geo_accuracy ?? null,
+        geo_status: geo.status,
+      };
 
+      const { error } = await sb.from('visitor_logs').insert(row);
       if (!error) sessionStorage.setItem(SESSION_KEY, '1');
     } catch (e) {
       console.warn('[hoa-analytics] track failed:', e);
     }
   }
 
-  async function loadVisitors(limit = 200) {
+  async function loadVisitors(limit = 300) {
     if (!sb) return { rows: [], error: 'Supabase non configuré' };
     const { data, error } = await sb
       .from('visitor_logs')
-      .select('id, ip, isp, org, city, country, created_at')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(limit);
     if (error) {
       const msg = error.message || '';
       const friendly = msg.includes('visitor_logs')
-        ? 'Table visitor_logs manquante — lance supabase/visitor_logs.sql dans le SQL Editor Supabase, puis Actualiser.'
-        : msg;
+        ? 'Table visitor_logs manquante — lance supabase/visitor_logs.sql dans Supabase SQL Editor.'
+        : msg.includes('column')
+          ? 'Schéma obsolète — relance supabase/visitor_logs.sql (migration v2).'
+          : msg;
       return { rows: [], error: friendly };
     }
     return { rows: data || [], error: null };
   }
 
-  window.HOA_ANALYTICS = { setClient, trackVisit, loadVisitors };
+  window.HOA_ANALYTICS = {
+    setClient,
+    trackVisit,
+    loadVisitors,
+    collectDevice,
+    guessConnectionType,
+    askGeolocation,
+  };
 })();
