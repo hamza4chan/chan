@@ -1,4 +1,4 @@
-// Journal des visites — IP, FAI, device, géoloc
+// Journal des visites — IP, FAI, device
 (function () {
   const SESSION_KEY = 'hoa-visit-logged';
   let sb = null;
@@ -75,40 +75,7 @@
     return d;
   }
 
-  function askGeolocation(timeoutMs) {
-    return new Promise((resolve) => {
-      if (!navigator.geolocation) {
-        resolve({ status: 'unsupported' });
-        return;
-      }
-      let done = false;
-      const finish = (payload) => {
-        if (done) return;
-        done = true;
-        resolve(payload);
-      };
-      const timer = setTimeout(() => finish({ status: 'timeout' }), timeoutMs);
-
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          clearTimeout(timer);
-          finish({
-            status: 'granted',
-            geo_lat: pos.coords.latitude,
-            geo_lng: pos.coords.longitude,
-            geo_accuracy: pos.coords.accuracy,
-          });
-        },
-        (err) => {
-          clearTimeout(timer);
-          finish({ status: err.code === 1 ? 'denied' : 'error', geo_error: err.message });
-        },
-        { enableHighAccuracy: true, timeout: Math.min(timeoutMs, 12000), maximumAge: 0 }
-      );
-    });
-  }
-
-  async function trackVisit(opts = {}) {
+  async function trackVisit() {
     if (!sb || sessionStorage.getItem(SESSION_KEY)) return;
 
     try {
@@ -118,21 +85,6 @@
       ]);
 
       const connectionGuess = guessConnectionType(ipData, device);
-
-      if (typeof opts.onIpKnown === 'function') {
-        opts.onIpKnown({
-          city: ipData.city,
-          country: ipData.country,
-          region: ipData.region,
-        });
-      }
-
-      let geo = { status: 'skipped' };
-      if (typeof opts.requestGeo === 'function') {
-        geo = await opts.requestGeo();
-      } else {
-        geo = await askGeolocation(20000);
-      }
 
       const row = {
         ip: ipData.ip,
@@ -150,10 +102,10 @@
         user_agent: device.user_agent,
         page: location.pathname || '/',
         device,
-        geo_lat: geo.geo_lat ?? null,
-        geo_lng: geo.geo_lng ?? null,
-        geo_accuracy: geo.geo_accuracy ?? null,
-        geo_status: geo.status,
+        geo_lat: null,
+        geo_lng: null,
+        geo_accuracy: null,
+        geo_status: 'skipped',
       };
 
       const { error } = await sb.from('visitor_logs').insert(row);
@@ -188,6 +140,5 @@
     loadVisitors,
     collectDevice,
     guessConnectionType,
-    askGeolocation,
   };
 })();

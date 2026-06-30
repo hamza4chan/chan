@@ -19,8 +19,6 @@
       --text: #c8c8c8;
       --dim: #555;
       --accent: #fff;
-      --ip-dot: #666;
-      --gps-dot: #ff3b3b;
       --bar-h: 48px;
     }
 
@@ -35,33 +33,17 @@
       overflow: hidden;
     }
 
-    /* ——— carte monde ——— */
-    #map-wrap {
+    /* ——— emoji ——— */
+    #hero {
       position: fixed;
       inset: 0;
       display: grid;
       place-items: center;
       padding-top: var(--bar-h);
+      font-size: clamp(6rem, 22vw, 14rem);
+      line-height: 1;
+      user-select: none;
     }
-
-    #map-wrap svg {
-      width: min(96vw, 1400px);
-      height: auto;
-      opacity: .9;
-    }
-
-    .land {
-      fill: #080808;
-      stroke: #161616;
-      stroke-width: .4;
-    }
-
-    .marker {
-      pointer-events: none;
-    }
-
-    .marker.ip { fill: var(--ip-dot); }
-    .marker.gps { fill: var(--gps-dot); }
 
     /* ——— barre dashboard ——— */
     #bar {
@@ -78,14 +60,6 @@
       gap: 12px;
       padding: 0 14px;
       backdrop-filter: blur(8px);
-    }
-
-  #brand {
-      color: var(--dim);
-      font-size: 10px;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      white-space: nowrap;
     }
 
     .auth-form {
@@ -221,40 +195,6 @@
       max-width: 220px;
     }
 
-    /* ——— bannière géoloc (style Google) ——— */
-    #geo-banner {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 30;
-      background: #1a1a1a;
-      border-top: 1px solid #2a2a2a;
-      padding: 10px 16px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      font-size: 12px;
-      color: #bbb;
-    }
-
-    #geo-banner.show { display: flex; }
-
-    #geo-banner .loc {
-      color: #fff;
-      font-weight: 600;
-    }
-
-    #geo-banner a {
-      color: #8ab4f8;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    #geo-banner a:hover { text-decoration: underline; }
-
     @media (max-width: 720px) {
       .auth-form input { width: 90px; }
       th, td { padding: 6px; font-size: 10px; }
@@ -264,8 +204,6 @@
 <body>
 
   <header id="bar">
-    <div id="brand">● live</div>
-
     <form id="auth" class="auth-form">
       <input name="pseudo" placeholder="pseudo" autocomplete="username" required>
       <input name="password" type="password" placeholder="password" autocomplete="current-password" required>
@@ -281,29 +219,7 @@
     </div>
   </header>
 
-  <div id="map-wrap">
-    <svg id="world" viewBox="0 0 1000 507" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <rect width="1000" height="507" fill="#000"/>
-      <g fill="#060606" stroke="#141414" stroke-width=".35" id="continents">
-        <path d="M158,92c22-18,48-22,72-12,28-14,58-18,86-8,32-12,66-16,98-6,30-12,64-16,94-6,28-12,60-14,90-4,24-8,48-4,68,8,18,10,32,26,38,46,6,18,4,38-4,56-10,20-28,36-50,44-24,8-52,8-78,2-26-6-50-18-74-28-24-10-48-18-72-22-24-4-48-4-72-2-24,2-48,4-70,0-22-4-42-14-56-28-12-12-20-28-24-44-4-16-2-32,4-46,6-14,16-26,28-34z"/>
-        <path d="M95,210c-14,18-22,42-20,66,2,24,14,46,34,60,20,14,46,18,70,12,24-6,44-22,54-44,10-22,10-48,0-70-10-22-30-40-54-48-24-8-52-6-74,4-14,6-26,14-34,24z"/>
-        <path d="M248,282c-8,18-4,40,10,54,14,14,36,20,56,16,20-4,36-18,42-38,6-20,0-42-16-56-16-14-40-16-60-8-12,4-22,14-28,26z"/>
-        <path d="M448,245c-14,22-18,48-10,72,8,24,26,44,50,54,24,10,52,10,76,0,24-10,42-30,50-54,8-24,4-50-10-70-14-20-38-34-64-38-26-4-52,4-72,22-8,6-14,12-18,16z"/>
-        <path d="M538,192c14-18,36-28,58-26,22,2,42,16,52,36,10,20,10,44,0,64-10,20-30,34-52,38-22,4-46-4-62-22-16-18-20-44-14-66,4-12,10-18,18-24z"/>
-        <path d="M672,188c16-14,38-20,58-14,20,6,36,24,42,44,6,20,2,42-10,58-12,16-32,26-52,26-20,0-40-10-50-28-10-18-10-40-2-58,6-12,14-20,24-28z"/>
-        <path d="M772,242c-10,22-4,48,12,64,16,16,42,24,66,20,24-4,44-20,52-42,8-22,4-46-10-64-14-18-38-28-62-26-24,2-46,16-56,38-2,4-0,6,2,10z"/>
-        <path d="M112,352c-18,22-26,52-20,80,6,28,24,52,50,64,26,12,56,12,82,0,26-12,46-36,54-64,8-28,2-58-16-80-18-22-46-36-74-36-28,0-54,14-70,36-2,0-4,0-6,0z"/>
-        <path d="M188,392c-8,18-4,38,10,50,14,12,34,16,52,10,18-6,32-22,36-40,4-18-4-36-20-46-16-10-38-10-56-2-10,4-18,12-22,20z"/>
-        <path d="M342,392c-12,24-4,52,16,68,20,16,50,20,74,8,24-12,38-38,36-64-2-26-22-50-50-58-28-8-58,2-74,26-2,4,0,14-2,20z"/>
-        <path d="M512,392c-12,22-4,48,16,64,20,16,48,18,70,6,22-12,34-36,32-62-2-26-24-48-52-54-28-6-56,6-70,30-2,4,4,10,4,16z"/>
-        <path d="M708,352c-14,24-8,54,10,74,18,20,48,26,74,18,26-8,46-30,50-56,4-26-10-52-34-66-24-14-56-10-78,8-12,10-18,16-22,22z"/>
-        <path d="M838,392c-10,18-4,38,10,50,14,12,36,14,52,4,16-10,24-30,18-48-6-18-24-32-44-34-20-2-40,8-48,24-2,2,8,6,12,4z"/>
-        <path d="M862,118c18-8,38-6,52,8,14,14,18,36,10,54-8,18-26,32-46,36-20,4-42-4-54-22-12-18-10-42,2-60,8-10,20-14,36-16z"/>
-        <path d="M902,145c8-6,18-8,28-4,10,4,16,14,16,24,0,10-6,20-16,24-10,4-22,2-30-6-8-8-10-20-4-30,4-6,8-6,12-8z"/>
-      </g>
-      <g id="markers"></g>
-    </svg>
-  </div>
+  <div id="hero" aria-hidden="true">🙂</div>
 
   <div id="panel">
     <div id="panel-err" class="err" hidden></div>
@@ -326,12 +242,6 @@
     </div>
   </div>
 
-  <div id="geo-banner">
-    <span id="geo-text"></span>
-    <span>—</span>
-    <a id="geo-allow">Partager ma position précise</a>
-  </div>
-
   <script>
     const DOMAIN = '@hoa.local';
 
@@ -350,13 +260,8 @@
     const panel = document.getElementById('panel');
     const rowsEl = document.getElementById('rows');
     const panelErr = document.getElementById('panel-err');
-    const markersEl = document.getElementById('markers');
-    const geoBanner = document.getElementById('geo-banner');
-    const geoText = document.getElementById('geo-text');
-    const geoAllow = document.getElementById('geo-allow');
 
     let panelOpen = false;
-    let geoFinish = null;
 
     function esc(s) {
       const d = document.createElement('div');
@@ -391,25 +296,6 @@
       return parts.join(' · ');
     }
 
-    function project(lat, lng) {
-      const x = ((lng + 180) / 360) * 1000;
-      const y = ((90 - lat) / 180) * 507;
-      return { x, y };
-    }
-
-    function renderMarkers(rows) {
-      markersEl.innerHTML = '';
-      rows.forEach((r) => {
-        if (r.geo_lat != null && r.geo_lng != null) {
-          const p = project(r.geo_lat, r.geo_lng);
-          markersEl.innerHTML += '<circle class="marker gps" cx="' + p.x + '" cy="' + p.y + '" r="3"><title>GPS ' + esc(r.ip) + '</title></circle>';
-        } else if (r.latitude != null && r.longitude != null) {
-          const p = project(r.latitude, r.longitude);
-          markersEl.innerHTML += '<circle class="marker ip" cx="' + p.x + '" cy="' + p.y + '" r="2"><title>IP ' + esc(r.ip) + '</title></circle>';
-        }
-      });
-    }
-
     function renderRows(rows) {
       rowsEl.innerHTML = rows.map((r) => {
         const loc = [r.city, r.region, r.country].filter(Boolean).join(', ') || '—';
@@ -428,7 +314,6 @@
           '<td class="detail">' + esc(deviceSummary(r.device)) + '</td>' +
           '</tr>';
       }).join('');
-      renderMarkers(rows);
       const uniq = new Set(rows.map(r => r.ip)).size;
       document.getElementById('stats').textContent = rows.length + ' visites · ' + uniq + ' IP';
     }
@@ -461,7 +346,6 @@
       sessionEl.classList.remove('on');
       panel.classList.remove('on');
       panelOpen = false;
-      markersEl.innerHTML = '';
       rowsEl.innerHTML = '';
     }
 
@@ -486,17 +370,6 @@
       if (panelOpen) loadVisitors();
     });
 
-    geoAllow.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (!geoFinish) return;
-      geoBanner.classList.remove('show');
-      window.HOA_ANALYTICS.askGeolocation(15000).then((geo) => {
-        const fn = geoFinish;
-        geoFinish = null;
-        fn(geo);
-      });
-    });
-
     async function init() {
       if (!sb) return;
       window.HOA_ANALYTICS.setClient(sb);
@@ -509,25 +382,7 @@
         else leaveSession();
       });
 
-      window.HOA_ANALYTICS.trackVisit({
-        onIpKnown(ipHint) {
-          const loc = [ipHint.city, ipHint.country].filter(Boolean).join(', ') || 'votre région';
-          geoText.innerHTML = esc(loc) + ' <span class="loc">— d\'après votre IP</span>';
-          geoBanner.classList.add('show');
-        },
-        requestGeo() {
-          return new Promise((resolve) => {
-            geoFinish = resolve;
-            setTimeout(() => {
-              if (!geoFinish) return;
-              geoBanner.classList.remove('show');
-              const fn = geoFinish;
-              geoFinish = null;
-              fn({ status: 'timeout' });
-            }, 22000);
-          });
-        },
-      });
+      window.HOA_ANALYTICS.trackVisit();
     }
 
     init();
