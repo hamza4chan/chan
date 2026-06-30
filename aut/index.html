@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="https://grossepute.org/aut/">
+<title>/aut/ — Hall of Autism</title>
+<script src="./support.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    a { text-decoration: none; cursor: pointer; }
+    a:hover { text-decoration: underline; }
+    ::selection { background: #f0c0b0; }
+    input, textarea, select, button { font-family: inherit; }
+  </style>
+</helmet>
+
+<div style="position:absolute;width:0;height:0;overflow:hidden;visibility:hidden;pointer-events:none">
+  <x-import component-from-global-scope="image-slot" from="./image-slot.js" hint-size="0,0"></x-import>
+</div>
+
+<div style="min-height:100vh;background:#FFFFEE;font-family:'Arial','Helvetica',sans-serif;font-size:13px;color:#800000;padding-bottom:60px">
+
+  <!-- ===== admin utility strip ===== -->
+  <div style="background:#EEE7DA;border-bottom:1px solid #D9BFB7;padding:3px 10px;display:flex;align-items:center;gap:10px;font-size:11px;color:#34345C;min-height:24px">
+    <span style="color:#AF0A0F;font-weight:700;letter-spacing:.3px">/aut/</span>
+    <sc-if value="{{ admin }}" hint-placeholder-val="{{ false }}">
+      <span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="color:#117743;font-weight:700">● connecté : {{ adminEmail }}</span>
+        <a onClick="{{ goDashboard }}" style="color:#34345C">[ Dashboard ]</a>
+        <a onClick="{{ toggleEdit }}" style="color:#34345C">[ Édition en direct : {{ editLabel }} ]</a>
+        <a onClick="{{ save }}" style="color:#AF0A0F;font-weight:700">[ Enregistrer ]</a>
+        <a onClick="{{ logout }}" style="color:#34345C">[ Déconnexion ]</a>
+        <sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><span style="color:#117743;font-weight:700">enregistré ✓</span></sc-if>
+      </span>
+    </sc-if>
+    <sc-if value="{{ notAdmin }}" hint-placeholder-val="{{ true }}">
+      <a onClick="{{ openLogin }}" style="color:#34345C;margin-left:0">[ admin ]</a>
+    </sc-if>
+  </div>
+
+  <!-- ===== top board banner ===== -->
+  <div style="text-align:center;padding:8px 8px 2px">
+    <div style="font-size:11px;color:#34345C;letter-spacing:.2px;margin-bottom:6px">
+      [ <a style="color:#34345C" onClick="{{ goCatalog }}">home</a> / <a style="color:#34345C" onClick="{{ goCatalog }}">catalog</a> / archive / rules ]
+    </div>
+    <sc-if value="{{ editMode }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:4px">
+        <input value="{{ title }}" onChange="{{ onTitle }}" style="font-size:24px;font-weight:700;color:#AF0A0F;text-align:center;font-family:'Times New Roman',Georgia,serif;border:1px dashed #c98;background:#fffdf4;padding:2px 6px"/>
+        <input value="{{ subtitle }}" onChange="{{ onSubtitle }}" style="font-size:13px;color:#AF0A0F;text-align:center;font-style:italic;font-family:'Times New Roman',Georgia,serif;border:1px dashed #c98;background:#fffdf4;padding:2px 6px"/>
+        <div style="font-size:10px;color:#888">↑ modifie le titre de la page d'accueil en direct, puis clique « Enregistrer »</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ notEditMode }}" hint-placeholder-val="{{ true }}">
+      <div style="font-size:34px;font-weight:700;color:#AF0A0F;line-height:1;font-family:'Times New Roman',Georgia,serif">{{ title }}</div>
+      <div style="font-size:13px;color:#AF0A0F;margin-top:3px;font-style:italic;font-family:'Times New Roman',Georgia,serif">{{ subtitle }}</div>
+    </sc-if>
+  </div>
+  <hr style="border:none;border-top:1px solid #D9BFB7;margin:8px 12px">
+
+  <!-- ===== sub toolbar ===== -->
+  <div style="display:flex;align-items:center;gap:10px;padding:0 12px 8px;font-size:12px;color:#34345C;flex-wrap:wrap">
+    <span style="color:#800000">[ <a style="color:#34345C" onClick="{{ goCatalog }}">Catalogue</a> ]</span>
+    <span style="opacity:.6">{{ countLabel }}</span>
+    <span style="margin-left:auto;display:flex;align-items:center;gap:6px">
+      <span style="color:#800000">Trier:</span>
+      <button onClick="{{ cycleSort }}" style="font-size:12px;color:#34345C;background:#EEE7DA;border:1px solid #B7A99A;border-radius:2px;padding:1px 8px;cursor:pointer">{{ sortLabel }}</button>
+    </span>
+  </div>
+  <hr style="border:none;border-top:1px solid #D9BFB7;margin:0 12px 10px">
+
+  <!-- ===================== CATALOG ===================== -->
+  <sc-if value="{{ showCatalog }}" hint-placeholder-val="{{ true }}">
+  <div style="padding:0 12px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(154px,1fr));gap:10px;align-items:start">
+      <sc-for list="{{ cards }}" as="p" hint-placeholder-count="8">
+        <div onClick="{{ p.open }}" style="cursor:pointer;background:#F0E0D6;border:1px solid #D9BFB7;padding:4px;display:flex;flex-direction:column;align-items:center;text-align:center" style-hover="background:#F6EAE2;border-color:#B98F7F">
+          <div style="width:100%;aspect-ratio:1/1;background:#D9BFB7;overflow:hidden;border:1px solid #c9b0a6">
+            <image-slot id="{{ p.slot }}" shape="rect" fit="cover" placeholder="déposer photo" style="width:100%;height:100%;display:block"></image-slot>
+          </div>
+          <div style="font-size:11px;color:#789922;margin-top:3px;font-weight:700">No.{{ p.no }}</div>
+          <div style="font-size:12px;font-weight:700;color:#0F0C5D;line-height:1.15;margin-top:1px">{{ p.name }}</div>
+          <div style="font-size:11px;color:#800000;line-height:1.25;margin-top:2px;max-height:46px;overflow:hidden">{{ p.bioShort }}</div>
+          <sc-if value="{{ showGauges }}" hint-placeholder-val="{{ true }}">
+          <div style="width:100%;margin-top:4px">
+            <div style="font-size:9px;color:#5a5a5a;text-align:left;letter-spacing:.3px">AUT {{ p.autism }}%</div>
+            <div style="height:5px;background:#E3CFC4;border:1px solid #c9b0a6;margin-top:1px">
+              <div style="height:100%;background:#800000;width:{{ p.autism }}%"></div>
+            </div>
+          </div>
+          </sc-if>
+          <div style="font-size:10px;margin-top:3px;font-weight:700;color:{{ p.statusColor }}">{{ p.statusDot }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== THREAD ===================== -->
+  <sc-if value="{{ showThread }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:0 12px;max-width:900px">
+    <div style="font-size:12px;margin-bottom:8px;color:#34345C">
+      [ <a style="color:#34345C" onClick="{{ goCatalog }}">Retour au catalogue</a> ] <span style="color:#800000;opacity:.6">&nbsp;Fil &mdash; No.{{ current.no }}</span>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;margin-bottom:3px;display:flex;flex-wrap:wrap;gap:6px;align-items:baseline">
+        <span style="color:#0F0C5D;font-weight:700">{{ current.name }}</span>
+        <span style="color:#117743;font-weight:700">{{ current.tripcode }}</span>
+        <span style="color:#800000">{{ current.date }}</span>
+        <span style="color:#34345C">No.{{ current.no }}</span>
+        <span style="font-weight:700;color:{{ current.statusColor }}">{{ current.statusDot }}</span>
+      </div>
+      <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:8px;display:flex;gap:12px;align-items:flex-start">
+        <div style="flex:0 0 200px;max-width:200px">
+          <image-slot id="{{ current.slot }}" shape="rect" fit="cover" placeholder="déposer la photo" style="width:200px;height:200px;display:block;border:1px solid #c9b0a6"></image-slot>
+        </div>
+        <div style="flex:1;min-width:0;font-size:13px;line-height:1.4">
+          <div style="color:#789922;font-weight:700;margin-bottom:4px">&gt;&gt; bio</div>
+          <div style="color:#000;margin-bottom:10px">{{ current.bio }}</div>
+          <table style="border-collapse:collapse;font-size:12px;color:#000">
+            <tbody>
+              <tr><td style="color:#5a5a5a;padding:1px 12px 1px 0;vertical-align:top">Pseudo</td><td style="font-weight:700;color:#0F0C5D">{{ current.name }}</td></tr>
+              <tr><td style="color:#5a5a5a;padding:1px 12px 1px 0;vertical-align:top">Statut</td><td style="font-weight:700;color:{{ current.statusColor }}">{{ current.statusText }}</td></tr>
+              <tr><td style="color:#5a5a5a;padding:1px 12px 1px 0;vertical-align:top">Inscrit</td><td>{{ current.joined }}</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:10px;max-width:280px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#5a5a5a;letter-spacing:.3px">
+              <span>NIVEAU D'AUTISME</span><span style="font-weight:700;color:#800000">{{ current.autism }}%</span>
+            </div>
+            <div style="height:11px;background:#E3CFC4;border:1px solid #c9b0a6;margin-top:2px">
+              <div style="height:100%;background:#800000;width:{{ current.autism }}%"></div>
+            </div>
+            <div style="font-size:10px;color:#888;margin-top:2px;font-style:italic">{{ current.autismNote }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <sc-for list="{{ current.replies }}" as="r" hint-placeholder-count="3">
+      <div style="margin:0 0 6px 26px;display:flex;align-items:flex-start">
+        <span style="color:#789922;font-size:13px;margin:6px 4px 0 0">&gt;&gt;</span>
+        <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:6px 9px;display:inline-block">
+          <div style="font-size:12px;margin-bottom:2px;display:flex;gap:6px;align-items:baseline">
+            <span style="color:#117743;font-weight:700">Anonyme</span>
+            <span style="color:#800000">{{ r.date }}</span>
+            <span style="color:#34345C">No.{{ r.no }}</span>
+          </div>
+          <div style="font-size:13px;line-height:1.35">
+            <div style="color:#789922">{{ r.quote }}</div>
+            <div style="color:#000">{{ r.text }}</div>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+    <div style="margin:14px 0 0 26px;font-size:12px;color:#888;font-style:italic">{{ current.replyCountLabel }}</div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <sc-if value="{{ showDashboard }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:0 12px;max-width:1000px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+      <div style="font-size:20px;font-weight:700;color:#AF0A0F;font-family:'Times New Roman',Georgia,serif">Tableau de bord &mdash; /aut/</div>
+      <span style="margin-left:auto;display:flex;gap:8px">
+        <button onClick="{{ goCatalog }}" style="font-size:12px;color:#34345C;background:#EEE7DA;border:1px solid #B7A99A;border-radius:2px;padding:3px 10px;cursor:pointer">← Voir la page d'accueil</button>
+        <button onClick="{{ save }}" style="font-size:12px;font-weight:700;color:#fff;background:#AF0A0F;border:1px solid #7d0708;border-radius:2px;padding:3px 14px;cursor:pointer">Enregistrer les modifications</button>
+      </span>
+    </div>
+
+    <!-- stats -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:16px">
+      <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+        <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:8px 10px">
+          <div style="font-size:22px;font-weight:700;color:#800000">{{ s.value }}</div>
+          <div style="font-size:11px;color:#5a5a5a;letter-spacing:.3px;text-transform:uppercase">{{ s.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- site identity -->
+    <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:10px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:#0F0C5D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px">Identité du site</div>
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:520px">
+        <label style="font-size:11px;color:#5a5a5a">Titre
+          <input value="{{ title }}" onChange="{{ onTitle }}" style="display:block;width:100%;font-size:14px;color:#AF0A0F;font-weight:700;border:1px solid #c9b0a6;background:#fffdf4;padding:4px 6px;margin-top:2px"/>
+        </label>
+        <label style="font-size:11px;color:#5a5a5a">Sous-titre
+          <input value="{{ subtitle }}" onChange="{{ onSubtitle }}" style="display:block;width:100%;font-size:13px;color:#800000;border:1px solid #c9b0a6;background:#fffdf4;padding:4px 6px;margin-top:2px"/>
+        </label>
+      </div>
+    </div>
+
+    <!-- fiches editor -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:700;color:#0F0C5D;text-transform:uppercase;letter-spacing:.3px">Fiches ({{ countLabel }})</div>
+      <button onClick="{{ addPerson }}" style="font-size:12px;color:#117743;background:#EEE7DA;border:1px solid #B7A99A;border-radius:2px;padding:2px 10px;cursor:pointer">+ Ajouter une fiche</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+        <div style="background:#F0E0D6;border:1px solid #D9BFB7;padding:8px;display:flex;gap:10px;align-items:flex-start">
+          <div style="flex:0 0 72px">
+            <image-slot id="{{ r.slot }}" shape="rect" fit="cover" placeholder="photo" style="width:72px;height:72px;display:block;border:1px solid #c9b0a6"></image-slot>
+            <div style="font-size:9px;color:#789922;text-align:center;margin-top:2px">No.{{ r.no }}</div>
+          </div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <input value="{{ r.name }}" onChange="{{ r.onName }}" placeholder="pseudo" style="font-size:13px;font-weight:700;color:#0F0C5D;border:1px solid #c9b0a6;background:#fffdf4;padding:3px 6px;flex:1;min-width:140px"/>
+              <select value="{{ r.status }}" onChange="{{ r.onStatus }}" style="font-size:12px;border:1px solid #c9b0a6;background:#fffdf4;padding:3px 4px;color:#000">
+                <option value="online">en ligne</option>
+                <option value="afk">AFK</option>
+                <option value="banned">banni</option>
+              </select>
+              <span style="font-size:11px;color:#5a5a5a">AUT</span>
+              <input type="number" min="0" max="100" value="{{ r.autism }}" onChange="{{ r.onAutism }}" style="width:64px;font-size:12px;border:1px solid #c9b0a6;background:#fffdf4;padding:3px 6px;color:#000"/>
+              <button onClick="{{ r.onDelete }}" style="font-size:11px;color:#AF0A0F;background:#f3ddd6;border:1px solid #c9a39a;border-radius:2px;padding:3px 8px;cursor:pointer">Supprimer</button>
+            </div>
+            <textarea value="{{ r.bio }}" onChange="{{ r.onBio }}" placeholder="bio…" rows="2" style="width:100%;font-size:12px;color:#000;border:1px solid #c9b0a6;background:#fffdf4;padding:4px 6px;resize:vertical;line-height:1.35"></textarea>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button onClick="{{ save }}" style="font-size:12px;font-weight:700;color:#fff;background:#AF0A0F;border:1px solid #7d0708;border-radius:2px;padding:4px 16px;cursor:pointer">Enregistrer les modifications</button>
+      <button onClick="{{ resetAll }}" style="font-size:12px;color:#34345C;background:#EEE7DA;border:1px solid #B7A99A;border-radius:2px;padding:4px 12px;cursor:pointer">Réinitialiser tout</button>
+      <sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#117743;font-weight:700;align-self:center">enregistré ✓ — le site est à jour</span></sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===== footer ===== -->
+  <hr style="border:none;border-top:1px solid #D9BFB7;margin:30px 12px 8px">
+  <div style="text-align:center;font-size:11px;color:#34345C">
+    [ <a style="color:#34345C" onClick="{{ goCatalog }}">Retour en haut</a> ] &nbsp;&mdash;&nbsp; Hall of Autism &mdash; aucun message n'engage la modération
+  </div>
+
+  <!-- ===== login modal ===== -->
+  <sc-if value="{{ loginOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50" onClick="{{ closeLogin }}">
+    <div onClick="{{ stop }}" style="width:300px;background:#FFFFEE;border:1px solid #B7A99A;box-shadow:0 6px 24px rgba(0,0,0,.3)">
+      <div style="background:#EEE7DA;border-bottom:1px solid #D9BFB7;padding:6px 10px;font-size:12px;font-weight:700;color:#AF0A0F;display:flex;justify-content:space-between;align-items:center">
+        <span>Connexion administrateur</span>
+        <a onClick="{{ closeLogin }}" style="color:#34345C;font-size:12px">✕</a>
+      </div>
+      <div style="padding:12px;display:flex;flex-direction:column;gap:8px">
+        <label style="font-size:11px;color:#5a5a5a">E-mail
+          <input type="email" value="{{ loginUser }}" onChange="{{ onLoginUser }}" placeholder="admin@exemple.com" style="display:block;width:100%;font-size:13px;border:1px solid #c9b0a6;background:#fffdf4;padding:5px 6px;margin-top:2px;color:#000"/>
+        </label>
+        <label style="font-size:11px;color:#5a5a5a">Mot de passe
+          <input type="password" value="{{ loginPass }}" onChange="{{ onLoginPass }}" onKeyDown="{{ onLoginKey }}" placeholder="••••••••" style="display:block;width:100%;font-size:13px;border:1px solid #c9b0a6;background:#fffdf4;padding:5px 6px;margin-top:2px;color:#000"/>
+        </label>
+        <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:11px;color:#AF0A0F;font-weight:700">{{ loginErrMsg }}</div>
+        </sc-if>
+        <button onClick="{{ submitLogin }}" disabled="{{ loginLoading }}" style="font-size:13px;font-weight:700;color:#fff;background:#AF0A0F;border:1px solid #7d0708;border-radius:2px;padding:6px;cursor:pointer;margin-top:2px">{{ loginBtnLabel }}</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:960,&quot;height&quot;:820},&quot;showGauges&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Affichage&quot;}}">
+class Component extends DCLogic {
+  STORE = 'hoa.data.v1';
+
+  defaults() {
+    return {
+      title: "/aut/ — Hall of Autism",
+      subtitle: "Galerie des plus grands esprits jamais diagnostiqués",
+      people: [
+        { id:1, no:1042871, slot:'aut-1', name:'AnonZ0r',         tripcode:'!!figurine', autism:91, status:'banned', joined:"03/14/19(Thu)",
+          bio:"Aligne ses figurines par ordre de date de sortie, puis recommence si la lumière change. Ne parle pas le lundi, par principe." },
+        { id:2, no:1042888, slot:'aut-2', name:'tismchad',        tripcode:'', autism:84, status:'online', joined:"11/02/21(Tue)",
+          bio:"Connaît tous les horaires de train de la région par cœur. N'a jamais pris le train. Refuse de l'expliquer." },
+        { id:3, no:1042903, slot:'aut-3', name:'NeetKing88',      tripcode:'!!neet', autism:96, status:'afk', joined:"06/30/15(Tue)",
+          bio:"Est sorti dehors une fois en 2021. N'a pas aimé la texture de l'air. Documente l'incident depuis." },
+        { id:4, no:1042917, slot:'aut-4', name:'spreadsheet_guy', tripcode:'', autism:78, status:'online', joined:"01/09/22(Sun)",
+          bio:"Tient un tableur de tous les sandwichs mangés depuis 4 ans, avec colonne 'regret' et formules conditionnelles." },
+        { id:5, no:1042940, slot:'aut-5', name:'greentext_only',  tripcode:'!!quote', autism:88, status:'banned', joined:"08/21/20(Fri)",
+          bio:"Communique exclusivement par citations imbriquées. >toi >ne comprends pas >c'est normal." },
+        { id:6, no:1042958, slot:'aut-6', name:'patternlock',     tripcode:'', autism:73, status:'afk', joined:"05/05/23(Fri)",
+          bio:"Compte les carreaux du plafond pour s'endormir. Connaît le total. Le recompte quand même chaque nuit." },
+        { id:7, no:1042971, slot:'aut-7', name:'silent_op',       tripcode:'', autism:99, status:'online', joined:"02/18/18(Sun)",
+          bio:"A ouvert ce thread puis n'a jamais répondu à une seule réponse. On attend toujours. C'est devenu une habitude." },
+        { id:8, no:1042989, slot:'aut-8', name:'lurker_404',      tripcode:'!!ghost', autism:81, status:'afk', joined:"09/12/08(Fri)",
+          bio:"Présent depuis 2008. Zéro post jusqu'à aujourd'hui. Statut interne: légende. N'a pas demandé à figurer ici." },
+      ],
+    };
+  }
+
+  state = {
+    ...this.defaults(),
+    view: 'catalog', selectedId: null, sort: 'none',
+    admin: false, adminEmail: '',
+    editMode: false,
+    loginOpen: false, loginUser: '', loginPass: '', loginErr: false, loginErrMsg: '', loginLoading: false,
+    saved: false,
+  };
+
+  getSupabase() {
+    if (this._sb) return this._sb;
+    const url = window.SUPABASE_URL;
+    const key = window.SUPABASE_ANON_KEY;
+    if (!url || !key || key === 'COLLE_TA_CLE_ANON_ICI' || !window.supabase) return null;
+    this._sb = window.supabase.createClient(url, key);
+    return this._sb;
+  }
+
+  async componentDidMount() {
+    try {
+      const raw = localStorage.getItem(this.STORE);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (d && d.people) this.setState({ title: d.title, subtitle: d.subtitle, people: d.people });
+      }
+    } catch (e) {}
+
+    const sb = this.getSupabase();
+    if (!sb) return;
+
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      this.setState({ admin: true, adminEmail: session.user.email || 'admin' });
+    }
+
+    sb.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        this.setState({ admin: true, adminEmail: session.user.email || 'admin' });
+      } else {
+        this.setState({ admin: false, adminEmail: '', editMode: false });
+      }
+    });
+  }
+
+  today() {
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const d = new Date();
+    const p = n => String(n).padStart(2,'0');
+    return `${p(d.getMonth()+1)}/${p(d.getDate())}/${String(d.getFullYear()).slice(2)}(${days[d.getDay()]})`;
+  }
+
+  statusInfo(s) {
+    if (s === 'online') return { dot:'● en ligne', color:'#117743', text:'en ligne' };
+    if (s === 'afk')    return { dot:'◐ AFK',       color:'#888888', text:'AFK depuis 3 jours' };
+    return { dot:'✖ banni', color:'#AF0A0F', text:'(USER WAS BANNED FOR THIS POST)' };
+  }
+
+  autismNote(a) {
+    if (a >= 95) return "Échelle saturée. Mesure de nouveau matériel en cours.";
+    if (a >= 85) return "Confirmé par trois modérateurs et un radiateur.";
+    if (a >= 75) return "Au-dessus de la moyenne du board. Respectable.";
+    return "Encore des progrès à faire. On y croit.";
+  }
+
+  sorted() {
+    const ppl = [...this.state.people];
+    if (this.state.sort === 'autism') ppl.sort((a,b)=>b.autism-a.autism);
+    if (this.state.sort === 'name')   ppl.sort((a,b)=>a.name.localeCompare(b.name));
+    return ppl;
+  }
+
+  save() {
+    const { title, subtitle, people } = this.state;
+    try { localStorage.setItem(this.STORE, JSON.stringify({ title, subtitle, people })); } catch (e) {}
+    this.setState({ saved: true });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ saved: false }), 2200);
+  }
+
+  updatePerson(id, field, value) {
+    this.setState(s => ({
+      people: s.people.map(p => p.id === id
+        ? { ...p, [field]: field === 'autism' ? Math.max(0, Math.min(100, parseInt(value) || 0)) : value }
+        : p)
+    }));
+  }
+
+  renderVals() {
+    const cur = this.state.people.find(p => p.id === this.state.selectedId);
+
+    const cards = this.sorted().map(p => {
+      const si = this.statusInfo(p.status);
+      return { ...p,
+        bioShort: p.bio.length > 80 ? p.bio.slice(0,80) + '…' : p.bio,
+        statusDot: si.dot, statusColor: si.color,
+        open: () => this.setState({ selectedId: p.id, view: 'thread' }),
+      };
+    });
+
+    let current = null;
+    if (cur && this.state.view === 'thread') {
+      const si = this.statusInfo(cur.status);
+      const replies = [
+        { no: cur.no + 3,  date: cur.joined, quote: '>statut',            text: si.text },
+        { no: cur.no + 7,  date: cur.joined, quote: '>niveau d\u0027autisme', text: cur.autism + '% — mesuré, vérifié, encadré.' },
+        { no: cur.no + 12, date: cur.joined, quote: '>>' + cur.no,         text: 'basé. ne change rien.' },
+      ];
+      current = { ...cur,
+        statusDot: si.dot, statusColor: si.color, statusText: si.text,
+        autismNote: this.autismNote(cur.autism), replies,
+        replyCountLabel: replies.length + ' réponses. ' + (cur.status === 'online' ? "L'auteur est connecté." : "L'auteur ne répondra pas."),
+      };
+    }
+
+    const rows = this.state.people.map(p => ({ ...p,
+      onName:   e => this.updatePerson(p.id, 'name', e.target.value),
+      onBio:    e => this.updatePerson(p.id, 'bio', e.target.value),
+      onAutism: e => this.updatePerson(p.id, 'autism', e.target.value),
+      onStatus: e => this.updatePerson(p.id, 'status', e.target.value),
+      onDelete: () => this.setState(s => ({ people: s.people.filter(x => x.id !== p.id) })),
+    }));
+
+    const ppl = this.state.people;
+    const avg = ppl.length ? Math.round(ppl.reduce((a,b)=>a+b.autism,0)/ppl.length) : 0;
+    const stats = [
+      { label: 'fiches', value: ppl.length },
+      { label: 'en ligne', value: ppl.filter(p=>p.status==='online').length },
+      { label: 'bannis', value: ppl.filter(p=>p.status==='banned').length },
+      { label: 'autisme moyen', value: avg + '%' },
+    ];
+
+    const sortLabel = this.state.sort === 'autism' ? 'niveau ↓' : this.state.sort === 'name' ? 'pseudo A→Z' : 'No. (défaut)';
+
+    return {
+      title: this.state.title, subtitle: this.state.subtitle,
+      cards, current, rows, stats,
+      showCatalog: this.state.view === 'catalog',
+      showThread: this.state.view === 'thread' && !!current,
+      showDashboard: this.state.view === 'dashboard',
+      showGauges: this.props.showGauges ?? true,
+      admin: this.state.admin, notAdmin: !this.state.admin, adminEmail: this.state.adminEmail,
+      editMode: this.state.admin && this.state.editMode,
+      notEditMode: !(this.state.admin && this.state.editMode),
+      editLabel: this.state.editMode ? 'ON' : 'OFF',
+      saved: this.state.saved,
+      countLabel: ppl.length + ' fiches indexées',
+      sortLabel,
+      loginOpen: this.state.loginOpen, loginUser: this.state.loginUser,
+      loginPass: this.state.loginPass, loginErr: this.state.loginErr, loginErrMsg: this.state.loginErrMsg,
+      loginLoading: this.state.loginLoading,
+      loginBtnLabel: this.state.loginLoading ? 'Connexion…' : 'Se connecter',
+
+      goCatalog: (e) => { if (e) e.preventDefault(); this.setState({ view: 'catalog', selectedId: null }); },
+      goDashboard: (e) => { if (e) e.preventDefault(); this.setState({ view: 'dashboard' }); },
+      cycleSort: () => this.setState(s => ({ sort: s.sort === 'none' ? 'autism' : s.sort === 'autism' ? 'name' : 'none' })),
+      toggleEdit: (e) => { if (e) e.preventDefault(); this.setState(s => ({ editMode: !s.editMode })); },
+      save: (e) => { if (e) e.preventDefault(); this.save(); },
+      onTitle: e => this.setState({ title: e.target.value }),
+      onSubtitle: e => this.setState({ subtitle: e.target.value }),
+      addPerson: () => this.setState(s => {
+        const id = Math.max(0, ...s.people.map(p=>p.id)) + 1;
+        const no = Math.max(0, ...s.people.map(p=>p.no)) + 1;
+        return { people: [...s.people, { id, no, slot:'aut-custom-'+id, name:'nouveau_membre', tripcode:'', autism:50, status:'afk', joined:this.today(), bio:'' }] };
+      }),
+      resetAll: () => { if (confirm('Réinitialiser le site avec les données par défaut ?')) { const d=this.defaults(); this.setState({ ...d }); try{localStorage.removeItem(this.STORE);}catch(e){} } },
+
+      openLogin: (e) => { if (e) e.preventDefault(); this.setState({ loginOpen: true, loginErr: false, loginUser: '', loginPass: '' }); },
+      closeLogin: (e) => { if (e) e.preventDefault(); this.setState({ loginOpen: false }); },
+      stop: (e) => e.stopPropagation(),
+      onLoginUser: e => this.setState({ loginUser: e.target.value }),
+      onLoginPass: e => this.setState({ loginPass: e.target.value }),
+      onLoginKey: e => { if (e.key === 'Enter') this.doLogin(); },
+      submitLogin: (e) => { if (e) e.preventDefault(); this.doLogin(); },
+      logout: async (e) => {
+        if (e) e.preventDefault();
+        const sb = this.getSupabase();
+        if (sb) await sb.auth.signOut();
+        this.setState({ admin: false, adminEmail: '', editMode: false, view: 'catalog', selectedId: null });
+      },
+    };
+  }
+
+  async doLogin() {
+    const email = this.state.loginUser.trim();
+    const password = this.state.loginPass;
+
+    if (!email || !password) {
+      this.setState({ loginErr: true, loginErrMsg: 'Renseigne l\'e-mail et le mot de passe.' });
+      return;
+    }
+
+    const sb = this.getSupabase();
+    if (!sb) {
+      this.setState({
+        loginErr: true,
+        loginErrMsg: 'Supabase non configuré : ajoute ta clé anon dans supabase-config.js',
+      });
+      return;
+    }
+
+    this.setState({ loginLoading: true, loginErr: false, loginErrMsg: '' });
+
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      this.setState({
+        loginLoading: false,
+        loginErr: true,
+        loginErrMsg: error.message === 'Invalid login credentials'
+          ? 'E-mail ou mot de passe incorrect.'
+          : error.message,
+      });
+      return;
+    }
+
+    this.setState({
+      admin: true,
+      loginOpen: false,
+      loginErr: false,
+      loginErrMsg: '',
+      loginPass: '',
+      loginLoading: false,
+      view: 'dashboard',
+    });
+  }
+}
+</script>
+</body>
+</html>
