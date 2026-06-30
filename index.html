@@ -33,7 +33,6 @@
       overflow: hidden;
     }
 
-    /* ——— emoji ——— */
     #hero {
       position: fixed;
       inset: 0;
@@ -45,7 +44,6 @@
       user-select: none;
     }
 
-    /* ——— barre dashboard ——— */
     #bar {
       position: fixed;
       top: 0;
@@ -78,10 +76,8 @@
       width: 120px;
     }
 
-    .auth-form input:focus {
-      outline: none;
-      border-color: #444;
-    }
+    .auth-form input[type="email"] { width: 200px; }
+    .auth-form input:focus { outline: none; border-color: #444; }
 
     .btn {
       background: #111;
@@ -95,25 +91,12 @@
     .btn:hover { border-color: #444; color: #fff; }
     .btn:disabled { opacity: .4; cursor: wait; }
 
-    .session {
-      display: none;
-      align-items: center;
-      gap: 12px;
-      margin-left: auto;
-      flex-wrap: wrap;
-    }
-
+    .session { display: none; align-items: center; gap: 12px; margin-left: auto; flex-wrap: wrap; }
     .session.on { display: flex; }
-
     .session .who { color: var(--dim); }
     .session .who b { color: #fff; }
+    .stats { color: var(--dim); font-size: 10px; }
 
-    .stats {
-      color: var(--dim);
-      font-size: 10px;
-    }
-
-    /* ——— panneau logs ——— */
     #panel {
       display: none;
       position: fixed;
@@ -129,71 +112,22 @@
 
     #panel.on { display: block; }
 
-    .tbl-wrap {
-      overflow: auto;
-      border: 1px solid var(--line);
-      background: var(--panel);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 11px;
-    }
-
-    th, td {
-      text-align: left;
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-
+    .tbl-wrap { overflow: auto; border: 1px solid var(--line); background: var(--panel); }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
     th {
-      position: sticky;
-      top: 0;
-      background: #0e0e0e;
-      color: var(--dim);
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      font-size: 9px;
+      position: sticky; top: 0; background: #0e0e0e; color: var(--dim);
+      font-weight: 500; text-transform: uppercase; letter-spacing: .08em; font-size: 9px;
     }
-
     tr:hover td { background: #111; }
 
-    .tag {
-      display: inline-block;
-      padding: 2px 6px;
-      border: 1px solid var(--line);
-      font-size: 9px;
-      white-space: nowrap;
-    }
-
+    .tag { display: inline-block; padding: 2px 6px; border: 1px solid var(--line); font-size: 9px; white-space: nowrap; }
     .tag.mobile { border-color: #4a3030; color: #ff8a8a; }
     .tag.box { border-color: #2a3a2a; color: #8aff8a; }
     .tag.unk { color: var(--dim); }
-
-    .err {
-      color: #ff6b6b;
-      padding: 12px;
-      border: 1px solid #3a1a1a;
-      margin-bottom: 10px;
-    }
-
-    .ua {
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      color: var(--dim);
-    }
-
-    .detail {
-      color: var(--dim);
-      font-size: 10px;
-      line-height: 1.5;
-      max-width: 220px;
-    }
+    .err { color: #ff6b6b; padding: 12px; border: 1px solid #3a1a1a; margin-bottom: 10px; }
+    .ua { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dim); }
+    .detail { color: var(--dim); font-size: 10px; line-height: 1.5; max-width: 220px; }
 
     @media (max-width: 720px) {
       .auth-form input { width: 90px; }
@@ -205,7 +139,7 @@
 
   <header id="bar">
     <form id="auth" class="auth-form">
-      <input name="pseudo" placeholder="pseudo" autocomplete="username" required>
+      <input name="email" type="email" value="hamza4chan@grossepute.org" autocomplete="username" required>
       <input name="password" type="password" placeholder="password" autocomplete="current-password" required>
       <button type="submit" class="btn">login</button>
     </form>
@@ -243,11 +177,7 @@
   </div>
 
   <script>
-    const DOMAIN = '@hoa.local';
-
-    function pseudoToEmail(p) {
-      return p.trim().toLowerCase().replace(/[^a-z0-9._-]/g, '') + DOMAIN;
-    }
+    const ADMIN_EMAIL = 'hamza4chan@grossepute.org';
 
     function getSb() {
       if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY || !window.supabase) return null;
@@ -260,7 +190,6 @@
     const panel = document.getElementById('panel');
     const rowsEl = document.getElementById('rows');
     const panelErr = document.getElementById('panel-err');
-
     let panelOpen = false;
 
     function esc(s) {
@@ -285,10 +214,7 @@
     function deviceSummary(d) {
       if (!d || typeof d !== 'object') return '—';
       const parts = [
-        d.platform,
-        d.screen,
-        d.language,
-        d.timezone,
+        d.platform, d.screen, d.language, d.timezone,
         d.connection_type && ('net:' + d.connection_type),
         d.effective_type,
         d.mobile_ua ? 'mobile UA' : 'desktop UA',
@@ -331,7 +257,7 @@
     }
 
     function displayName(user) {
-      return user?.user_metadata?.username || user?.email?.replace(DOMAIN, '') || 'admin';
+      return user?.user_metadata?.username || user?.email?.split('@')[0] || 'admin';
     }
 
     function enterSession(user) {
@@ -354,8 +280,13 @@
       if (!sb) return alert('Supabase non configuré');
       const btn = authForm.querySelector('.btn');
       btn.disabled = true;
+      const email = authForm.email.value.trim().toLowerCase();
+      if (email !== ADMIN_EMAIL) {
+        btn.disabled = false;
+        return alert('Accès réservé à l\'admin.');
+      }
       const { error } = await sb.auth.signInWithPassword({
-        email: pseudoToEmail(authForm.pseudo.value),
+        email,
         password: authForm.password.value,
       });
       btn.disabled = false;
@@ -373,15 +304,12 @@
     async function init() {
       if (!sb) return;
       window.HOA_ANALYTICS.setClient(sb);
-
       const { data: { session } } = await sb.auth.getSession();
       if (session?.user) enterSession(session.user);
-
       sb.auth.onAuthStateChange((_e, session) => {
         if (session?.user) enterSession(session.user);
         else leaveSession();
       });
-
       window.HOA_ANALYTICS.trackVisit();
     }
 
