@@ -38,7 +38,13 @@
       .select('id, ip, isp, org, city, country, created_at')
       .order('created_at', { ascending: false })
       .limit(limit);
-    if (error) return { rows: [], error: error.message };
+    if (error) {
+      const msg = error.message || '';
+      const friendly = msg.includes('visitor_logs')
+        ? 'Table visitor_logs manquante — lance supabase/visitor_logs.sql dans le SQL Editor Supabase, puis Actualiser.'
+        : msg;
+      return { rows: [], error: friendly };
+    }
     return { rows: data || [], error: null };
   }
 
