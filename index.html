@@ -15,17 +15,19 @@
   <style>
     :root {
       --bg: #050505;
-      --bg2: #0a0a0c;
-      --panel: rgba(10,10,12,.72);
-      --line: #1c1c20;
-      --line2: #2a2a30;
-      --text: #cfd2cf;
-      --dim: #6b6f6b;
-      --dimmer: #3a3d3a;
-      --accent: #e8ffe8;
-      --glow: #9cff9c;
-      --danger: #ff6b6b;
-      --bar-h: 46px;
+      --bg2: #0a0a0b;
+      --panel: rgba(14,14,15,.72);
+      --line: #1c1c1e;
+      --line2: #2b2b2e;
+      --text: #c7c9c7;
+      --dim: #6c6e6c;
+      --dimmer: #3a3b3a;
+      --accent: #f2f3f2;
+      /* couleur d'accent / lueur — pilotée par le sélecteur de thème */
+      --glow: #d3d6d3;
+      --glow-rgb: 211,214,211;
+      --danger: #e06b6b;
+      --bar-h: 52px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,9 +43,10 @@
 
     body {
       background:
-        radial-gradient(120% 90% at 50% -10%, #0d120d 0%, #050505 55%, #030303 100%);
+        radial-gradient(120% 90% at 50% -10%, #131315 0%, #070708 52%, #030303 100%);
       overflow-x: hidden;
     }
+    body.dragging { cursor: grabbing; user-select: none; }
 
     /* grain / scanlines CRT */
     body::after {
@@ -89,7 +92,7 @@
       letter-spacing: 0;
       white-space: pre;
       color: var(--glow);
-      text-shadow: 0 0 5px rgba(120,255,120,.45), 0 0 16px rgba(60,220,60,.22), 0 0 34px rgba(40,180,40,.12);
+      text-shadow: 0 0 5px rgba(var(--glow-rgb),.45), 0 0 16px rgba(var(--glow-rgb),.20), 0 0 34px rgba(var(--glow-rgb),.10);
       opacity: .5;
       transform: translateZ(0);
       -webkit-mask-image: radial-gradient(120% 95% at 50% 34%, #000 42%, rgba(0,0,0,.55) 74%, transparent 100%);
@@ -103,7 +106,7 @@
       transform: translateX(-50%);
       z-index: 1;
       pointer-events: none;
-      background: radial-gradient(60% 70% at 50% 8%, rgba(120,255,140,.10) 0%, rgba(60,200,90,.05) 32%, transparent 70%);
+      background: radial-gradient(60% 70% at 50% 8%, rgba(var(--glow-rgb),.12) 0%, rgba(var(--glow-rgb),.05) 32%, transparent 70%);
     }
 
     /* ————— barre top ————— */
@@ -112,54 +115,80 @@
       top: 0; left: 0; right: 0;
       z-index: 40;
       height: var(--bar-h);
-      background: rgba(4,4,5,.82);
+      background:
+        linear-gradient(180deg, rgba(16,16,18,.9) 0%, rgba(7,7,8,.82) 100%);
       border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 0 14px;
-      backdrop-filter: blur(10px);
+      padding: 0 16px;
+      backdrop-filter: blur(14px) saturate(1.1);
+      box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 10px 30px rgba(0,0,0,.45);
+    }
+    /* fine ligne d'accent lumineuse sous la barre */
+    #bar::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: -1px; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(var(--glow-rgb),.55) 50%, transparent 100%);
+      opacity: .6;
     }
     #bar .brand {
-      color: var(--dim);
-      letter-spacing: .18em;
+      display: flex; align-items: center; gap: 9px;
+      color: var(--text);
+      letter-spacing: .16em;
       text-transform: uppercase;
-      font-size: 10px;
+      font-size: 11px;
+      font-weight: 500;
       white-space: nowrap;
     }
-    #bar .brand b { color: var(--glow); text-shadow: 0 0 8px rgba(120,255,120,.4); }
+    #bar .brand .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--glow);
+      box-shadow: 0 0 8px rgba(var(--glow-rgb),.8), 0 0 16px rgba(var(--glow-rgb),.4);
+      animation: pulse 2.6s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+    #bar .brand b { color: var(--glow); }
+    #bar .brand span { color: var(--dim); }
 
     .spacer { flex: 1 1 auto; }
 
     .auth-form { display: flex; align-items: center; gap: 8px; }
     .auth-form input {
-      background: #0c0c0e;
+      background: #0b0b0c;
       border: 1px solid var(--line2);
       color: var(--accent);
-      padding: 6px 9px;
+      padding: 8px 11px;
       font: inherit;
       font-size: 12px;
       width: 150px;
+      border-radius: 7px;
+      transition: border-color .15s, box-shadow .15s, background .15s;
     }
+    .auth-form input::placeholder { color: var(--dimmer); }
     .auth-form input[type="email"] { width: 190px; }
-    .auth-form input:focus { outline: none; border-color: var(--glow); box-shadow: 0 0 0 1px rgba(120,255,120,.25); }
+    .auth-form input:focus { outline: none; border-color: var(--glow); box-shadow: 0 0 0 3px rgba(var(--glow-rgb),.14); background: #0e0e10; }
 
     .btn {
-      background: #0c0c0e;
+      background: linear-gradient(180deg, #161618 0%, #0c0c0d 100%);
       border: 1px solid var(--line2);
       color: var(--text);
-      padding: 6px 11px;
+      padding: 8px 13px;
       font: inherit;
       font-size: 12px;
       cursor: pointer;
       white-space: nowrap;
-      transition: border-color .15s, color .15s, background .15s;
+      border-radius: 7px;
+      transition: border-color .15s, color .15s, background .15s, box-shadow .15s, transform .05s;
     }
-    .btn:hover { border-color: var(--glow); color: var(--accent); }
+    .btn:hover { border-color: var(--glow); color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--glow-rgb),.10); }
+    .btn:active { transform: translateY(1px); }
     .btn:disabled { opacity: .4; cursor: wait; }
-    .btn.on { border-color: var(--glow); color: var(--glow); background: rgba(120,255,120,.06); }
-    .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
-    .btn.sm { padding: 3px 7px; font-size: 11px; }
+    .btn.on { border-color: var(--glow); color: var(--glow); background: rgba(var(--glow-rgb),.08); box-shadow: 0 0 0 3px rgba(var(--glow-rgb),.10); }
+    .btn.danger:hover { border-color: var(--danger); color: var(--danger); box-shadow: 0 0 0 3px rgba(224,107,107,.12); }
+    .btn.sm { padding: 5px 9px; font-size: 11px; border-radius: 6px; }
+    .btn.icon { padding: 7px 10px; }
 
     .session { display: none; align-items: center; gap: 8px; flex-wrap: wrap; }
     .session.on { display: flex; }
@@ -169,6 +198,37 @@
     .save-state { font-size: 10px; color: var(--dim); min-width: 74px; }
     .save-state.saved { color: var(--glow); }
     .save-state.error { color: var(--danger); }
+
+    /* ————— sélecteur de thème ————— */
+    .theme-wrap { position: relative; }
+    #theme-pop {
+      position: absolute;
+      top: calc(100% + 10px); right: 0;
+      z-index: 45;
+      display: none;
+      background: var(--bg2);
+      border: 1px solid var(--line2);
+      border-radius: 10px;
+      padding: 14px;
+      width: 250px;
+      box-shadow: 0 18px 44px rgba(0,0,0,.6);
+    }
+    #theme-pop.on { display: block; }
+    #theme-pop .lbl { color: var(--dim); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 10px; }
+    .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 14px; }
+    .swatch {
+      aspect-ratio: 1; border-radius: 50%; cursor: pointer;
+      border: 1px solid rgba(255,255,255,.12);
+      transition: transform .1s, box-shadow .15s;
+    }
+    .swatch:hover { transform: scale(1.14); }
+    .swatch.sel { box-shadow: 0 0 0 2px var(--bg2), 0 0 0 3px currentColor; }
+    .theme-custom { display: flex; align-items: center; gap: 10px; }
+    .theme-custom label { color: var(--dim); font-size: 11px; }
+    .theme-custom input[type="color"] {
+      width: 34px; height: 26px; padding: 0; border: 1px solid var(--line2);
+      border-radius: 6px; background: #0b0b0c; cursor: pointer;
+    }
 
     /* ————— contenu ————— */
     #wrap {
@@ -189,7 +249,7 @@
       font-weight: 700;
       letter-spacing: .04em;
       color: var(--accent);
-      text-shadow: 0 0 18px rgba(120,255,120,.25);
+      text-shadow: 0 0 18px rgba(var(--glow-rgb),.25);
     }
     .hero-sub {
       text-align: center;
@@ -207,6 +267,9 @@
     }
     .hero-title h1[contenteditable="true"]:focus,
     .hero-sub[contenteditable="true"]:focus { outline-color: var(--glow); }
+    .hero-sub[contenteditable="true"]:empty::before { content: attr(data-placeholder); color: var(--dimmer); }
+    .hero-title { position: relative; z-index: 10; }
+    .hero-sub { position: relative; z-index: 10; }
 
     #content { display: flex; flex-direction: column; gap: 22px; }
 
@@ -240,11 +303,11 @@
       white-space: pre;
       overflow-x: auto;
       color: var(--glow);
-      text-shadow: 0 0 4px rgba(120,255,120,.25);
+      text-shadow: 0 0 4px rgba(var(--glow-rgb),.25);
       text-align: center;
     }
 
-    .block .emoji { font-size: clamp(48px, 14vw, 110px); line-height: 1; filter: drop-shadow(0 0 20px rgba(120,255,120,.15)); }
+    .block .emoji { font-size: clamp(48px, 14vw, 110px); line-height: 1; filter: drop-shadow(0 0 20px rgba(var(--glow-rgb),.15)); }
 
     .block a.linkbtn {
       display: inline-block;
@@ -254,7 +317,7 @@
       padding: 8px 16px;
       transition: border-color .15s, background .15s;
     }
-    .block a.linkbtn:hover { border-color: var(--glow); background: rgba(120,255,120,.06); }
+    .block a.linkbtn:hover { border-color: var(--glow); background: rgba(var(--glow-rgb),.06); }
 
     .divline { color: var(--dimmer); letter-spacing: .4em; user-select: none; }
 
@@ -310,7 +373,7 @@
       background: var(--bg2);
       border: 1px solid var(--line2);
       padding: 22px;
-      box-shadow: 0 0 40px rgba(0,0,0,.6), 0 0 0 1px rgba(120,255,120,.05);
+      box-shadow: 0 0 40px rgba(0,0,0,.6), 0 0 0 1px rgba(var(--glow-rgb),.05);
     }
     .modal h3 { color: var(--accent); font-size: 14px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 16px; }
     .modal label { display: block; color: var(--dim); font-size: 11px; margin: 12px 0 5px; letter-spacing: .05em; }
@@ -377,7 +440,7 @@
   <div id="toplight" aria-hidden="true"></div>
 
   <header id="bar">
-    <span class="brand"><b>▚</b> grossepute<b>.</b>org</span>
+    <span class="brand"><span class="dot"></span> grossepute<b>.</b><span>org</span></span>
     <span class="spacer"></span>
 
     <form id="auth" class="auth-form">
@@ -390,6 +453,17 @@
       <span class="who"><b id="who">—</b></span>
       <span class="save-state" id="save-state"></span>
       <button type="button" class="btn" id="btn-edit">éditer</button>
+      <div class="theme-wrap">
+        <button type="button" class="btn icon" id="btn-theme" title="thème / couleur">◑ thème</button>
+        <div id="theme-pop">
+          <div class="lbl">couleur du thème</div>
+          <div class="swatches" id="swatches"></div>
+          <div class="theme-custom">
+            <label for="theme-color">perso</label>
+            <input type="color" id="theme-color" value="#d3d6d3">
+          </div>
+        </div>
+      </div>
       <button type="button" class="btn" id="btn-visitors">visiteurs</button>
       <button type="button" class="btn danger" id="btn-out">logout</button>
     </div>
@@ -397,7 +471,7 @@
 
   <main id="wrap">
     <div class="hero-title"><h1 id="site-title">grossepute.org</h1></div>
-    <div class="hero-sub" id="site-sub">transmission en cours</div>
+    <div class="hero-sub" id="site-sub"></div>
 
     <div id="content"></div>
 
@@ -450,7 +524,8 @@
     const sb = getSb();
 
     /* ————————————————— état ————————————————— */
-    let state = { title: 'grossepute.org', subtitle: 'transmission en cours', blocks: [] };
+    const DEFAULT_THEME = '#d3d6d3';
+    let state = { title: 'grossepute.org', subtitle: '', blocks: [], theme: DEFAULT_THEME };
     let editMode = false;
     let isAdmin = false;
 
@@ -469,6 +544,9 @@
     function renderAll() {
       titleEl.textContent = state.title || 'grossepute.org';
       subEl.textContent = state.subtitle || '';
+      // sous-titre masqué s'il est vide (sauf en édition, pour pouvoir le remplir)
+      subEl.style.display = (state.subtitle || editMode) ? '' : 'none';
+      subEl.dataset.placeholder = 'sous-titre (optionnel)';
       contentEl.innerHTML = '';
 
       if (!state.blocks.length && !editMode) {
@@ -617,10 +695,59 @@
     function scheduleSave() {
       if (!isAdmin) return;
       window.HOA_STORE.scheduleSave(
-        { title: state.title, subtitle: state.subtitle, blocks: state.blocks },
+        { title: state.title, subtitle: state.subtitle, blocks: state.blocks, theme: state.theme },
         (s, err) => { setSaveState(s); if (err) console.warn('[save]', err); }
       );
     }
+
+    /* ————————————————— thème / couleur ————————————————— */
+    const THEME_PRESETS = [
+      '#d3d6d3', '#ffffff', '#8a8f8a', '#9cff9c',
+      '#ffcf6b', '#e07a7a', '#7ad3ff', '#c99cff',
+      '#ff9ecb', '#7affc0', '#ff8a5c', '#6b8cff',
+    ];
+    function hexToRgb(hex) {
+      let h = (hex || '').replace('#', '').trim();
+      if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+      if (!/^[0-9a-fA-F]{6}$/.test(h)) return '211,214,211';
+      const n = parseInt(h, 16);
+      return ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255);
+    }
+    function applyTheme(hex, opts) {
+      const color = /^#[0-9a-fA-F]{6}$/.test(hex || '') ? hex : DEFAULT_THEME;
+      const root = document.documentElement;
+      root.style.setProperty('--glow', color);
+      root.style.setProperty('--glow-rgb', hexToRgb(color));
+      state.theme = color;
+      const picker = $('theme-color'); if (picker) picker.value = color;
+      document.querySelectorAll('.swatch').forEach((s) => {
+        s.classList.toggle('sel', s.dataset.color.toLowerCase() === color.toLowerCase());
+        s.style.color = s.dataset.color;
+      });
+      if (opts && opts.save) scheduleSave();
+    }
+    function buildSwatches() {
+      const wrap = $('swatches');
+      wrap.innerHTML = '';
+      THEME_PRESETS.forEach((c) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'swatch';
+        b.dataset.color = c;
+        b.style.background = c;
+        b.title = c;
+        b.onclick = () => applyTheme(c, { save: true });
+        wrap.appendChild(b);
+      });
+    }
+    buildSwatches();
+
+    const themePop = $('theme-pop');
+    $('btn-theme').onclick = (e) => { e.stopPropagation(); themePop.classList.toggle('on'); };
+    themePop.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', () => themePop.classList.remove('on'));
+    $('theme-color').oninput = (e) => applyTheme(e.target.value, { save: false });
+    $('theme-color').onchange = (e) => applyTheme(e.target.value, { save: true });
 
     // titre / sous-titre éditables
     titleEl.addEventListener('input', () => { state.title = titleEl.innerText.trim(); scheduleSave(); });
@@ -952,15 +1079,17 @@
       const SUB = 0.5; // sur-échantillonnage anti-trous
 
       const pre = $('donut-pre');
-      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      let A = -0.35, t = 0;
+      // rotation pilotée à la souris (aucune rotation automatique)
+      let A = -0.35;      // yaw
+      let pitch = -0.14;  // inclinaison
+      let vA = 0;         // vitesse résiduelle (inertie)
+      let dragging = false, lastX = 0, lastY = 0, dirty = true;
 
       function frame() {
         const out = new Array(OW * OH).fill(' ');
         const zb = new Array(OW * OH).fill(-Infinity);
         const cA = Math.cos(A), sA = Math.sin(A);
-        const tx = -0.14 + 0.05 * Math.sin(t * 0.6); // légère inclinaison vivante
-        const cT = Math.cos(tx), sT = Math.sin(tx);
+        const cT = Math.cos(pitch), sT = Math.sin(pitch);
 
         for (let r = 0; r < H; r++) {
           const row = grid[r];
@@ -971,13 +1100,10 @@
               for (let sx = 0; sx < 1; sx += SUB) {
                 const lx = (c + sx) - cx0;
                 const ly = (r + sy) - cy0;
-                // rotation Y
-                let X = lx * cA;
-                let Z = -lx * sA;
-                // inclinaison X
+                const X = lx * cA;
+                const Z = -lx * sA;
                 const Y2 = ly * cT - Z * sT;
                 const Z2 = ly * sT + Z * cT;
-                // perspective
                 const persp = camDist / (camDist - Z2);
                 const ox = Math.round(ocx + X * persp * fit);
                 const oy = Math.round(ocy + Y2 * persp * fit);
@@ -994,24 +1120,50 @@
         pre.textContent = s;
       }
 
-      // ~30 fps, vitesse indépendante du framerate (rotation lente et régulière)
+      // ~30 fps, ne redessine que quand ça bouge (drag ou inertie)
       let last = 0;
-      const SPEED = 0.34;   // rad/s — tour complet ~18,5 s
       function loop(now) {
         requestAnimationFrame(loop);
         if (now - last < 33) return;
-        const dt = last ? Math.min((now - last) / 1000, 0.1) : 0;
         last = now;
-        A += SPEED * dt;
-        t += dt;
-        frame();
+        if (!dragging && vA !== 0) {
+          A += vA;
+          vA *= 0.90;                 // friction → s'arrête tout seul
+          if (Math.abs(vA) < 0.00018) vA = 0;
+          dirty = true;
+        }
+        if (dirty) { frame(); dirty = false; }
       }
-      frame();
-      if (!reduce) requestAnimationFrame(loop);
+      frame();  // premier rendu immédiat
+      requestAnimationFrame(loop);
+
+      // interactions
+      function draggable(target) {
+        return !target.closest('#bar, #panel, #modal-back, #theme-pop, a, button, input, textarea, select, [contenteditable="true"]');
+      }
+      window.addEventListener('pointerdown', (e) => {
+        if (!draggable(e.target)) return;
+        dragging = true; vA = 0; lastX = e.clientX; lastY = e.clientY;
+        document.body.classList.add('dragging');
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        e.preventDefault();
+        const dx = e.clientX - lastX, dy = e.clientY - lastY;
+        A += dx * 0.006;
+        pitch = Math.max(-0.9, Math.min(0.9, pitch + dy * 0.004));
+        vA = dx * 0.006;
+        lastX = e.clientX; lastY = e.clientY;
+        dirty = true;
+      }, { passive: false });
+      function endDrag() { dragging = false; document.body.classList.remove('dragging'); }
+      window.addEventListener('pointerup', endDrag);
+      window.addEventListener('pointercancel', endDrag);
     })();
 
     /* ————————————————— init ————————————————— */
     async function init() {
+      applyTheme(state.theme);
       renderAll();
       if (!sb) { console.warn('Supabase non configuré'); return; }
 
@@ -1019,12 +1171,16 @@
       window.HOA_STORE.setClient(sb);
 
       const site = await window.HOA_STORE.loadSite();
-      if (site && !site.error) { state = { ...state, ...site }; renderAll(); }
-      else if (site?.error) console.warn('[init]', site.error);
+      if (site && !site.error) {
+        state = { ...state, ...site };
+        applyTheme(state.theme || DEFAULT_THEME);
+        renderAll();
+      } else if (site?.error) console.warn('[init]', site.error);
 
       window.HOA_STORE.onRemote((remote) => {
         if (editMode) return; // ne pas écraser l'édition en cours
         state = { ...state, ...remote };
+        applyTheme(state.theme || DEFAULT_THEME);
         renderAll();
       });
       window.HOA_STORE.subscribeRealtime();

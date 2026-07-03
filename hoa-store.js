@@ -21,31 +21,33 @@
 
   async function loadSite() {
     if (!sb) return null;
+    // select('*') : tolérant aux colonnes manquantes (pas d'erreur si blocks/theme absents)
     const { data, error } = await sb
       .from('site_config')
-      .select('title, subtitle, blocks')
+      .select('*')
       .eq('id', ROW_ID)
       .maybeSingle();
 
     if (error) {
       const msg = error.message || 'Erreur Supabase';
-      const hint = msg.includes('does not exist') || msg.includes('column')
+      const hint = msg.includes('does not exist')
         ? msg + ' — lance supabase/setup.sql dans le SQL Editor.'
         : msg;
       console.warn('[hoa-store] load failed:', hint);
       return { error: hint };
     }
 
-    if (!data) return { title: 'grossepute.org', subtitle: '', blocks: [] };
+    if (!data) return { title: 'grossepute.org', subtitle: '', blocks: [], theme: null };
 
     return {
       title: data.title || 'grossepute.org',
       subtitle: data.subtitle || '',
       blocks: normalizeBlocks(data.blocks),
+      theme: data.theme || null,
     };
   }
 
-  async function persist({ title, subtitle, blocks }) {
+  async function persist({ title, subtitle, blocks, theme }) {
     if (!sb) return { error: 'Supabase non configuré' };
     if (!canWrite) return { error: 'Connecte-toi en admin pour enregistrer.' };
 
@@ -55,6 +57,7 @@
       title,
       subtitle,
       blocks: normalizeBlocks(blocks),
+      theme: theme || null,
       updated_at: new Date().toISOString(),
     };
 
@@ -121,6 +124,7 @@
             title: row.title || 'grossepute.org',
             subtitle: row.subtitle || '',
             blocks: normalizeBlocks(row.blocks),
+            theme: row.theme || null,
           });
         }
       )

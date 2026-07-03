@@ -16,6 +16,7 @@ alter table public.site_config
 -- Nouveau moteur de contenu : blocs éditables (texte, titre, image, ascii, emoji, lien)
 alter table public.site_config
   add column if not exists blocks jsonb not null default '[]'::jsonb,
+  add column if not exists theme text,
   add column if not exists updated_at timestamptz not null default now();
 
 -- Ligne unique du site (id = 1) si absente
