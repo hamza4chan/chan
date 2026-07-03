@@ -133,24 +133,15 @@
       background: linear-gradient(90deg, transparent 0%, rgba(var(--glow-rgb),.55) 50%, transparent 100%);
       opacity: .6;
     }
-    #bar .brand {
-      display: flex; align-items: center; gap: 9px;
-      color: var(--text);
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      font-size: 11px;
-      font-weight: 500;
-      white-space: nowrap;
-    }
+    /* logo minimal : juste un point lumineux (pas de wordmark) */
+    #bar .brand { display: flex; align-items: center; }
     #bar .brand .dot {
-      width: 8px; height: 8px; border-radius: 50%;
+      width: 9px; height: 9px; border-radius: 50%;
       background: var(--glow);
-      box-shadow: 0 0 8px rgba(var(--glow-rgb),.8), 0 0 16px rgba(var(--glow-rgb),.4);
+      box-shadow: 0 0 8px rgba(var(--glow-rgb),.85), 0 0 18px rgba(var(--glow-rgb),.45);
       animation: pulse 2.6s ease-in-out infinite;
     }
-    @keyframes pulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
-    #bar .brand b { color: var(--glow); }
-    #bar .brand span { color: var(--dim); }
+    @keyframes pulse { 0%,100% { opacity: .5; transform: scale(.92); } 50% { opacity: 1; transform: scale(1); } }
 
     .spacer { flex: 1 1 auto; }
 
@@ -190,13 +181,16 @@
     .btn.danger:hover { border-color: var(--danger); color: var(--danger); background: transparent; }
     .btn.sm { padding: 5px 9px; font-size: 11px; }
     .btn.icon { padding: 8px 12px; }
+    #bar .btn { letter-spacing: .04em; }
 
-    .session { display: none; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .session { display: none; align-items: center; gap: 7px; flex-wrap: wrap; }
     .session.on { display: flex; }
-    .who { color: var(--dim); font-size: 11px; }
-    .who b { color: var(--glow); }
+    .who { color: var(--dim); font-size: 11px; letter-spacing: .03em; display: inline-flex; align-items: center; }
+    .who::before { content: "@"; color: var(--dimmer); margin-right: 1px; }
+    .who b { color: var(--glow); font-weight: 500; }
+    .bar-sep { width: 1px; height: 18px; background: var(--line2); margin: 0 5px; }
 
-    .save-state { font-size: 10px; color: var(--dim); min-width: 74px; }
+    .save-state { font-size: 10px; color: var(--dim); min-width: 66px; text-align: right; }
     .save-state.saved { color: var(--glow); }
     .save-state.error { color: var(--danger); }
 
@@ -450,7 +444,7 @@
   <div id="toplight" aria-hidden="true"></div>
 
   <header id="bar">
-    <span class="brand"><span class="dot"></span> grossepute<b>.</b><span>org</span></span>
+    <span class="brand"><span class="dot"></span></span>
     <span class="spacer"></span>
 
     <form id="auth" class="auth-form">
@@ -462,6 +456,7 @@
     <div id="session" class="session">
       <span class="who"><b id="who">—</b></span>
       <span class="save-state" id="save-state"></span>
+      <span class="bar-sep"></span>
       <button type="button" class="btn" id="btn-edit">éditer</button>
       <div class="theme-wrap">
         <button type="button" class="btn" id="btn-theme" title="thème / couleur">thème</button>
