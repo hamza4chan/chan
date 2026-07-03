@@ -7,255 +7,366 @@
   <title>grossepute.org</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./supabase-config.js"></script>
   <script src="./hoa-analytics.js"></script>
+  <script src="./hoa-store.js"></script>
   <style>
     :root {
-      --bg: #000;
-      --panel: #0a0a0a;
-      --line: #1a1a1a;
-      --text: #c8c8c8;
-      --dim: #555;
-      --accent: #fff;
-      --bar-h: 48px;
+      --bg: #050505;
+      --bg2: #0a0a0c;
+      --panel: rgba(10,10,12,.72);
+      --line: #1c1c20;
+      --line2: #2a2a30;
+      --text: #cfd2cf;
+      --dim: #6b6f6b;
+      --dimmer: #3a3d3a;
+      --accent: #e8ffe8;
+      --glow: #9cff9c;
+      --danger: #ff6b6b;
+      --bar-h: 46px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      height: 100%;
+      min-height: 100%;
       background: var(--bg);
       color: var(--text);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12px;
-      overflow: hidden;
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 13px;
+      line-height: 1.55;
     }
 
-    /* ——— emoji rond ——— */
-    #hero {
+    body {
+      background:
+        radial-gradient(120% 90% at 50% -10%, #0d120d 0%, #050505 55%, #030303 100%);
+      overflow-x: hidden;
+    }
+
+    /* grain / scanlines CRT */
+    body::after {
+      content: "";
       position: fixed;
       inset: 0;
+      pointer-events: none;
+      z-index: 60;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.015) 0px,
+        rgba(255,255,255,.015) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      mix-blend-mode: overlay;
+      opacity: .55;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 61;
+      background: radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(0,0,0,.7) 100%);
+    }
+
+    /* ————— donut 3D ascii ————— */
+    #donut {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
       display: grid;
       place-items: center;
-      padding-top: var(--bar-h);
-      user-select: none;
       pointer-events: none;
+      user-select: none;
+    }
+    #donut pre {
+      margin: 0;
+      font-family: inherit;
+      font-size: clamp(6px, 1.35vw, 12px);
+      line-height: 1;
+      letter-spacing: .05em;
+      white-space: pre;
+      color: var(--glow);
+      text-shadow: 0 0 6px rgba(120,255,120,.35), 0 0 14px rgba(60,200,60,.15);
+      opacity: .38;
+      transform: translateZ(0);
     }
 
-    .emoji-face {
-      position: relative;
-      width: clamp(140px, 32vw, 220px);
-      height: clamp(140px, 32vw, 220px);
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 30%, #ffe566 0%, #ffd028 45%, #f0b800 100%);
-      box-shadow:
-        0 0 0 3px rgba(255,255,255,.08),
-        inset -12px -16px 28px rgba(0,0,0,.12),
-        0 24px 48px rgba(0,0,0,.35);
-    }
-
-    .emoji-face .eye {
-      position: absolute;
-      top: 30%;
-      width: 18%;
-      height: 18%;
-      background: #fff;
-      border-radius: 50%;
-      box-shadow: inset 0 -2px 4px rgba(0,0,0,.08);
-    }
-
-    .emoji-face .eye-l { left: 24%; }
-    .emoji-face .eye-r { right: 24%; }
-
-    .emoji-face .pupil {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 46%;
-      height: 46%;
-      background: #1a1a1a;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      will-change: transform;
-    }
-
-    .emoji-face .mouth {
-      position: absolute;
-      left: 50%;
-      bottom: 24%;
-      width: 38%;
-      height: 19%;
-      transform: translateX(-50%);
-      border: 3px solid transparent;
-      border-bottom: 4px solid #5c3d00;
-      border-radius: 0 0 100% 100%;
-    }
-
-    /* ——— barre dashboard ——— */
+    /* ————— barre top ————— */
     #bar {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 20;
+      top: 0; left: 0; right: 0;
+      z-index: 40;
       height: var(--bar-h);
-      background: rgba(0,0,0,.92);
+      background: rgba(4,4,5,.82);
       border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       padding: 0 14px;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
     }
-
-    .auth-form {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: auto;
+    #bar .brand {
+      color: var(--dim);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-size: 10px;
+      white-space: nowrap;
     }
+    #bar .brand b { color: var(--glow); text-shadow: 0 0 8px rgba(120,255,120,.4); }
 
+    .spacer { flex: 1 1 auto; }
+
+    .auth-form { display: flex; align-items: center; gap: 8px; }
     .auth-form input {
-      background: #111;
-      border: 1px solid var(--line);
+      background: #0c0c0e;
+      border: 1px solid var(--line2);
       color: var(--accent);
-      padding: 6px 10px;
+      padding: 6px 9px;
       font: inherit;
-      width: 120px;
+      font-size: 12px;
+      width: 150px;
     }
-
-    .auth-form input[type="email"] {
-      width: 200px;
-    }
-
-    .auth-form input:focus {
-      outline: none;
-      border-color: #444;
-    }
+    .auth-form input[type="email"] { width: 190px; }
+    .auth-form input:focus { outline: none; border-color: var(--glow); box-shadow: 0 0 0 1px rgba(120,255,120,.25); }
 
     .btn {
-      background: #111;
-      border: 1px solid var(--line);
+      background: #0c0c0e;
+      border: 1px solid var(--line2);
       color: var(--text);
-      padding: 6px 12px;
+      padding: 6px 11px;
       font: inherit;
+      font-size: 12px;
       cursor: pointer;
+      white-space: nowrap;
+      transition: border-color .15s, color .15s, background .15s;
     }
-
-    .btn:hover { border-color: #444; color: #fff; }
+    .btn:hover { border-color: var(--glow); color: var(--accent); }
     .btn:disabled { opacity: .4; cursor: wait; }
+    .btn.on { border-color: var(--glow); color: var(--glow); background: rgba(120,255,120,.06); }
+    .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+    .btn.sm { padding: 3px 7px; font-size: 11px; }
 
-    .session {
-      display: none;
-      align-items: center;
-      gap: 12px;
-      margin-left: auto;
-      flex-wrap: wrap;
-    }
-
+    .session { display: none; align-items: center; gap: 8px; flex-wrap: wrap; }
     .session.on { display: flex; }
+    .who { color: var(--dim); font-size: 11px; }
+    .who b { color: var(--glow); }
 
-    .session .who { color: var(--dim); }
-    .session .who b { color: #fff; }
+    .save-state { font-size: 10px; color: var(--dim); min-width: 74px; }
+    .save-state.saved { color: var(--glow); }
+    .save-state.error { color: var(--danger); }
 
-    .stats {
-      color: var(--dim);
-      font-size: 10px;
+    /* ————— contenu ————— */
+    #wrap {
+      position: relative;
+      z-index: 10;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: calc(var(--bar-h) + 48px) 20px 140px;
+      min-height: 100vh;
     }
 
-    /* ——— panneau logs ——— */
+    .hero-title {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .hero-title h1 {
+      font-size: clamp(26px, 6vw, 52px);
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: var(--accent);
+      text-shadow: 0 0 18px rgba(120,255,120,.25);
+    }
+    .hero-sub {
+      text-align: center;
+      color: var(--dim);
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      font-size: 10px;
+      margin-bottom: 46px;
+    }
+    .hero-title h1[contenteditable="true"],
+    .hero-sub[contenteditable="true"] {
+      outline: 1px dashed var(--dimmer);
+      outline-offset: 6px;
+      cursor: text;
+    }
+    .hero-title h1[contenteditable="true"]:focus,
+    .hero-sub[contenteditable="true"]:focus { outline-color: var(--glow); }
+
+    #content { display: flex; flex-direction: column; gap: 22px; }
+
+    .block {
+      position: relative;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 20px 22px;
+      backdrop-filter: blur(3px);
+    }
+    .block.b-divider,
+    .block.b-emoji { background: transparent; border: none; padding: 8px 0; text-align: center; }
+
+    .block h2 { font-size: 20px; color: var(--accent); letter-spacing: .02em; }
+    .block .text { white-space: pre-wrap; word-break: break-word; color: var(--text); }
+    .block .cap { color: var(--dim); font-size: 11px; margin-top: 10px; text-align: center; }
+
+    .block img {
+      display: block;
+      max-width: 100%;
+      margin: 0 auto;
+      border: 1px solid var(--line2);
+      filter: grayscale(.15) contrast(1.05);
+    }
+
+    .ascii-art {
+      font-family: inherit;
+      font-size: clamp(4px, 1.1vw, 9px);
+      line-height: 1;
+      letter-spacing: .02em;
+      white-space: pre;
+      overflow-x: auto;
+      color: var(--glow);
+      text-shadow: 0 0 4px rgba(120,255,120,.25);
+      text-align: center;
+    }
+
+    .block .emoji { font-size: clamp(48px, 14vw, 110px); line-height: 1; filter: drop-shadow(0 0 20px rgba(120,255,120,.15)); }
+
+    .block a.linkbtn {
+      display: inline-block;
+      color: var(--glow);
+      text-decoration: none;
+      border: 1px solid var(--line2);
+      padding: 8px 16px;
+      transition: border-color .15s, background .15s;
+    }
+    .block a.linkbtn:hover { border-color: var(--glow); background: rgba(120,255,120,.06); }
+
+    .divline { color: var(--dimmer); letter-spacing: .4em; user-select: none; }
+
+    [contenteditable="true"].editable {
+      outline: 1px dashed var(--dimmer);
+      outline-offset: 4px;
+      cursor: text;
+    }
+    [contenteditable="true"].editable:focus { outline-color: var(--glow); }
+
+    /* controls d'édition par bloc */
+    .block .ctrls {
+      position: absolute;
+      top: -12px; right: 8px;
+      display: none;
+      gap: 4px;
+      z-index: 5;
+    }
+    body.editing .block:hover .ctrls,
+    body.editing .block.b-divider:hover .ctrls,
+    body.editing .block.b-emoji:hover .ctrls { display: flex; }
+    body.editing .block { border-style: dashed; border-color: var(--line2); }
+    .ctrls .btn.sm { background: #0c0c0e; }
+
+    /* barre d'ajout */
+    #add-bar {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 30px;
+      padding-top: 22px;
+      border-top: 1px dashed var(--line2);
+    }
+    body.editing #add-bar { display: flex; }
+    #add-bar .lbl { width: 100%; text-align: center; color: var(--dim); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 4px; }
+
+    .empty-hint { text-align: center; color: var(--dim); padding: 40px 0; font-size: 12px; }
+
+    /* ————— modal ————— */
+    #modal-back {
+      position: fixed; inset: 0; z-index: 80;
+      background: rgba(0,0,0,.78);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    #modal-back.on { display: flex; }
+    .modal {
+      width: min(560px, 100%);
+      max-height: 90vh; overflow: auto;
+      background: var(--bg2);
+      border: 1px solid var(--line2);
+      padding: 22px;
+      box-shadow: 0 0 40px rgba(0,0,0,.6), 0 0 0 1px rgba(120,255,120,.05);
+    }
+    .modal h3 { color: var(--accent); font-size: 14px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 16px; }
+    .modal label { display: block; color: var(--dim); font-size: 11px; margin: 12px 0 5px; letter-spacing: .05em; }
+    .modal input[type="text"], .modal input[type="url"], .modal textarea {
+      width: 100%;
+      background: #0c0c0e; border: 1px solid var(--line2); color: var(--accent);
+      padding: 9px 10px; font: inherit; font-size: 13px;
+    }
+    .modal textarea { min-height: 90px; resize: vertical; }
+    .modal input:focus, .modal textarea:focus { outline: none; border-color: var(--glow); }
+    .modal .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .modal .row > * { flex: 1 1 auto; }
+    .modal .range-row { display: flex; align-items: center; gap: 10px; }
+    .modal input[type="range"] { flex: 1; accent-color: var(--glow); }
+    .modal .prev {
+      margin-top: 14px; border: 1px solid var(--line); background: #000; padding: 10px;
+      max-height: 260px; overflow: auto;
+    }
+    .modal .prev pre { font-size: 5px; line-height: 1; white-space: pre; color: var(--glow); }
+    .modal .prev img { max-width: 100%; display: block; margin: 0 auto; }
+    .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .modal .hint { color: var(--dim); font-size: 10px; margin-top: 6px; }
+    .modal .filebtn { display: inline-block; }
+
+    /* ————— panneau visiteurs ————— */
     #panel {
       display: none;
       position: fixed;
-      top: var(--bar-h);
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 15;
-      background: rgba(0,0,0,.88);
+      top: var(--bar-h); left: 0; right: 0; bottom: 0;
+      z-index: 50;
+      background: rgba(3,3,4,.94);
       overflow: auto;
-      padding: 12px 14px 24px;
+      padding: 14px;
     }
-
     #panel.on { display: block; }
-
-    .tbl-wrap {
-      overflow: auto;
-      border: 1px solid var(--line);
-      background: var(--panel);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 11px;
-    }
-
-    th, td {
-      text-align: left;
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-
-    th {
-      position: sticky;
-      top: 0;
-      background: #0e0e0e;
-      color: var(--dim);
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      font-size: 9px;
-    }
-
-    tr:hover td { background: #111; }
-
-    .tag {
-      display: inline-block;
-      padding: 2px 6px;
-      border: 1px solid var(--line);
-      font-size: 9px;
-      white-space: nowrap;
-    }
-
+    #panel .phead { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    #panel .phead h2 { color: var(--accent); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
+    #panel .stats { color: var(--dim); font-size: 11px; }
+    .tbl-wrap { overflow: auto; border: 1px solid var(--line); background: var(--bg2); }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { position: sticky; top: 0; background: #0e0e10; color: var(--dim); font-weight: 500; text-transform: uppercase; letter-spacing: .08em; font-size: 9px; }
+    tr:hover td { background: #101012; }
+    .tag { display: inline-block; padding: 2px 6px; border: 1px solid var(--line2); font-size: 9px; white-space: nowrap; }
     .tag.mobile { border-color: #4a3030; color: #ff8a8a; }
     .tag.box { border-color: #2a3a2a; color: #8aff8a; }
     .tag.unk { color: var(--dim); }
-
-    .err {
-      color: #ff6b6b;
-      padding: 12px;
-      border: 1px solid #3a1a1a;
-      margin-bottom: 10px;
-    }
-
-    .ua {
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      color: var(--dim);
-    }
-
-    .detail {
-      color: var(--dim);
-      font-size: 10px;
-      line-height: 1.5;
-      max-width: 220px;
-    }
+    .err { color: var(--danger); padding: 12px; border: 1px solid #3a1a1a; margin-bottom: 10px; }
+    .ua { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dim); }
+    .detail { color: var(--dim); font-size: 10px; line-height: 1.5; max-width: 220px; }
 
     @media (max-width: 720px) {
-      .auth-form input { width: 90px; }
+      .auth-form input { width: 110px; }
+      .auth-form input[type="email"] { width: 140px; }
+      #bar .brand { display: none; }
       th, td { padding: 6px; font-size: 10px; }
+      #wrap { padding-left: 14px; padding-right: 14px; }
     }
   </style>
 </head>
 <body>
 
+  <div id="donut" aria-hidden="true"><pre id="donut-pre"></pre></div>
+
   <header id="bar">
+    <span class="brand"><b>▚</b> grossepute<b>.</b>org</span>
+    <span class="spacer"></span>
+
     <form id="auth" class="auth-form">
       <input name="email" type="email" placeholder="email" autocomplete="username" required>
       <input name="password" type="password" placeholder="password" autocomplete="current-password" required>
@@ -264,35 +375,46 @@
 
     <div id="session" class="session">
       <span class="who"><b id="who">—</b></span>
-      <span class="stats" id="stats">—</span>
-      <button type="button" class="btn" id="btn-toggle">visiteurs</button>
-      <button type="button" class="btn" id="btn-refresh">↻</button>
-      <button type="button" class="btn" id="btn-out">logout</button>
+      <span class="save-state" id="save-state"></span>
+      <button type="button" class="btn" id="btn-edit">éditer</button>
+      <button type="button" class="btn" id="btn-visitors">visiteurs</button>
+      <button type="button" class="btn danger" id="btn-out">logout</button>
     </div>
   </header>
 
-  <div id="hero" aria-hidden="true">
-    <div class="emoji-face">
-      <div class="eye eye-l" id="socket-l"><span class="pupil" id="pupil-l"></span></div>
-      <div class="eye eye-r" id="socket-r"><span class="pupil" id="pupil-r"></span></div>
-      <div class="mouth"></div>
+  <main id="wrap">
+    <div class="hero-title"><h1 id="site-title">grossepute.org</h1></div>
+    <div class="hero-sub" id="site-sub">transmission en cours</div>
+
+    <div id="content"></div>
+
+    <div id="add-bar">
+      <span class="lbl">+ ajouter un bloc</span>
+      <button class="btn sm" data-add="heading">titre</button>
+      <button class="btn sm" data-add="text">texte</button>
+      <button class="btn sm" data-add="image">image</button>
+      <button class="btn sm" data-add="ascii">photo → ascii</button>
+      <button class="btn sm" data-add="emoji">emoji</button>
+      <button class="btn sm" data-add="link">lien</button>
+      <button class="btn sm" data-add="divider">séparateur</button>
     </div>
-  </div>
+  </main>
 
   <div id="panel">
+    <div class="phead">
+      <h2>journal des visiteurs</h2>
+      <span class="stats" id="stats">—</span>
+      <span class="spacer"></span>
+      <button class="btn sm" id="btn-refresh">↻ actualiser</button>
+      <button class="btn sm" id="btn-close-panel">fermer</button>
+    </div>
     <div id="panel-err" class="err" hidden></div>
     <div class="tbl-wrap">
       <table>
         <thead>
           <tr>
-            <th>date</th>
-            <th>ip</th>
-            <th>type</th>
-            <th>fai / org</th>
-            <th>lieu ip</th>
-            <th>gps</th>
-            <th>user agent</th>
-            <th>appareil</th>
+            <th>date</th><th>ip</th><th>type</th><th>fai / org</th>
+            <th>lieu ip</th><th>gps</th><th>user agent</th><th>appareil</th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -300,92 +422,418 @@
     </div>
   </div>
 
+  <!-- modal générique -->
+  <div id="modal-back"><div class="modal" id="modal"></div></div>
+
   <script>
+    'use strict';
     const ADMIN_EMAIL = 'hamza4chan@grossepute.org';
 
+    /* ————————————————— Supabase ————————————————— */
     function getSb() {
       if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY || !window.supabase) return null;
       return window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
     }
-
     const sb = getSb();
-    const authForm = document.getElementById('auth');
-    const sessionEl = document.getElementById('session');
-    const panel = document.getElementById('panel');
-    const rowsEl = document.getElementById('rows');
-    const panelErr = document.getElementById('panel-err');
 
-    let panelOpen = false;
+    /* ————————————————— état ————————————————— */
+    let state = { title: 'grossepute.org', subtitle: 'transmission en cours', blocks: [] };
+    let editMode = false;
+    let isAdmin = false;
 
-    // Yeux → curseur
-    const pupils = [
-      document.getElementById('pupil-l'),
-      document.getElementById('pupil-r'),
-    ];
-    const sockets = [
-      document.getElementById('socket-l'),
-      document.getElementById('socket-r'),
-    ];
-    let mx = innerWidth / 2;
-    let my = innerHeight / 2;
+    const $ = (id) => document.getElementById(id);
+    const contentEl = $('content');
+    const titleEl = $('site-title');
+    const subEl = $('site-sub');
+    const saveStateEl = $('save-state');
 
-    function moveEyes() {
-      sockets.forEach((socket, i) => {
-        const r = socket.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-        const dx = mx - cx;
-        const dy = my - cy;
-        const angle = Math.atan2(dy, dx);
-        const max = Math.min(r.width, r.height) * 0.32;
-        const dist = Math.min(Math.hypot(dx, dy) * 0.05, max);
-        const px = Math.cos(angle) * dist;
-        const py = Math.sin(angle) * dist;
-        pupils[i].style.transform = 'translate(calc(-50% + ' + px + 'px), calc(-50% + ' + py + 'px))';
+    function genId() {
+      return (crypto.randomUUID ? crypto.randomUUID() : 'b' + Date.now() + Math.random().toString(36).slice(2));
+    }
+    function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+
+    /* ————————————————— rendu des blocs ————————————————— */
+    function renderAll() {
+      titleEl.textContent = state.title || 'grossepute.org';
+      subEl.textContent = state.subtitle || '';
+      contentEl.innerHTML = '';
+
+      if (!state.blocks.length && !editMode) {
+        const h = document.createElement('div');
+        h.className = 'empty-hint';
+        h.textContent = 'y a rien encore ici';
+        contentEl.appendChild(h);
+        return;
+      }
+
+      state.blocks.forEach((b) => contentEl.appendChild(renderBlock(b)));
+      applyEditableState();
+    }
+
+    function renderBlock(b) {
+      const el = document.createElement('section');
+      el.className = 'block b-' + b.type;
+      el.dataset.id = b.id;
+
+      if (b.type === 'heading') {
+        const h = document.createElement('h2');
+        h.textContent = b.text || '';
+        h.dataset.field = 'text';
+        el.appendChild(h);
+      } else if (b.type === 'text') {
+        const p = document.createElement('div');
+        p.className = 'text';
+        p.textContent = b.text || '';
+        p.dataset.field = 'text';
+        el.appendChild(p);
+      } else if (b.type === 'image') {
+        if (b.url) {
+          const img = document.createElement('img');
+          img.src = b.url; img.alt = b.caption || '';
+          if (b.width) img.style.maxWidth = b.width + '%';
+          el.appendChild(img);
+        }
+        appendCaption(el, b);
+      } else if (b.type === 'ascii') {
+        const pre = document.createElement('pre');
+        pre.className = 'ascii-art';
+        pre.textContent = b.art || '';
+        el.appendChild(pre);
+        appendCaption(el, b);
+      } else if (b.type === 'emoji') {
+        const e = document.createElement('div');
+        e.className = 'emoji';
+        e.textContent = b.text || '🙂';
+        e.dataset.field = 'text';
+        el.appendChild(e);
+      } else if (b.type === 'link') {
+        const a = document.createElement('a');
+        a.className = 'linkbtn';
+        a.href = b.url || '#';
+        a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.textContent = b.label || b.url || 'lien';
+        el.appendChild(a);
+      } else if (b.type === 'divider') {
+        const d = document.createElement('div');
+        d.className = 'divline';
+        d.textContent = '· · · ─────────── ✦ ─────────── · · ·';
+        el.appendChild(d);
+      }
+
+      // contrôles d'édition
+      const ctrls = document.createElement('div');
+      ctrls.className = 'ctrls';
+      ctrls.innerHTML =
+        '<button class="btn sm" data-act="up" title="monter">↑</button>' +
+        '<button class="btn sm" data-act="down" title="descendre">↓</button>' +
+        (['image','ascii','link'].includes(b.type) ? '<button class="btn sm" data-act="edit" title="modifier">✎</button>' : '') +
+        '<button class="btn sm danger" data-act="del" title="supprimer">✕</button>';
+      ctrls.addEventListener('click', (e) => {
+        const act = e.target.dataset.act;
+        if (!act) return;
+        if (act === 'up') moveBlock(b.id, -1);
+        else if (act === 'down') moveBlock(b.id, 1);
+        else if (act === 'del') deleteBlock(b.id);
+        else if (act === 'edit') openBlockModal(b.type, b);
       });
+      el.appendChild(ctrls);
+      return el;
     }
 
-    document.addEventListener('mousemove', (e) => {
-      mx = e.clientX;
-      my = e.clientY;
-      moveEyes();
+    function appendCaption(el, b) {
+      const c = document.createElement('div');
+      c.className = 'cap';
+      c.textContent = b.caption || '';
+      c.dataset.field = 'caption';
+      if (!b.caption && !editMode) c.style.display = 'none';
+      el.appendChild(c);
+    }
+
+    /* rend éditables les champs texte en mode édition (sans re-render au clavier) */
+    function applyEditableState() {
+      const editableFields = contentEl.querySelectorAll('[data-field]');
+      editableFields.forEach((node) => {
+        const on = editMode;
+        node.contentEditable = on ? 'true' : 'false';
+        node.classList.toggle('editable', on);
+        if (on && !node._bound) {
+          node._bound = true;
+          node.addEventListener('input', () => {
+            const blockEl = node.closest('.block');
+            const b = state.blocks.find((x) => x.id === blockEl.dataset.id);
+            if (!b) return;
+            b[node.dataset.field] = node.innerText;
+            scheduleSave();
+          });
+        }
+        if (on && node.classList.contains('cap')) node.style.display = '';
+      });
+      titleEl.contentEditable = subEl.contentEditable = editMode ? 'true' : 'false';
+    }
+
+    /* ————————————————— mutations ————————————————— */
+    function moveBlock(id, dir) {
+      const i = state.blocks.findIndex((b) => b.id === id);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= state.blocks.length) return;
+      [state.blocks[i], state.blocks[j]] = [state.blocks[j], state.blocks[i]];
+      renderAll();
+      scheduleSave();
+    }
+    function deleteBlock(id) {
+      state.blocks = state.blocks.filter((b) => b.id !== id);
+      renderAll();
+      scheduleSave();
+    }
+    function addBlock(block) {
+      block.id = genId();
+      state.blocks.push(block);
+      renderAll();
+      scheduleSave();
+      const el = contentEl.querySelector('.block[data-id="' + block.id + '"] [data-field]');
+      if (el) { el.focus(); }
+    }
+
+    /* ————————————————— sauvegarde ————————————————— */
+    function setSaveState(s) {
+      saveStateEl.className = 'save-state ' + (s === 'saved' ? 'saved' : s === 'error' ? 'error' : '');
+      saveStateEl.textContent =
+        s === 'pending' ? '…' : s === 'saving' ? 'envoi…' : s === 'saved' ? '✓ enregistré' : s === 'error' ? '✕ erreur' : '';
+      if (s === 'saved') setTimeout(() => { if (saveStateEl.textContent === '✓ enregistré') saveStateEl.textContent = ''; }, 2500);
+    }
+    function scheduleSave() {
+      if (!isAdmin) return;
+      window.HOA_STORE.scheduleSave(
+        { title: state.title, subtitle: state.subtitle, blocks: state.blocks },
+        (s, err) => { setSaveState(s); if (err) console.warn('[save]', err); }
+      );
+    }
+
+    // titre / sous-titre éditables
+    titleEl.addEventListener('input', () => { state.title = titleEl.innerText.trim(); scheduleSave(); });
+    subEl.addEventListener('input', () => { state.subtitle = subEl.innerText.trim(); scheduleSave(); });
+
+    /* ————————————————— modal ————————————————— */
+    const modalBack = $('modal-back');
+    const modal = $('modal');
+    function closeModal() { modalBack.classList.remove('on'); modal.innerHTML = ''; }
+    modalBack.addEventListener('click', (e) => { if (e.target === modalBack) closeModal(); });
+
+    function openBlockModal(type, existing) {
+      if (type === 'link') return linkModal(existing);
+      if (type === 'image') return imageModal(existing);
+      if (type === 'ascii') return asciiModal(existing);
+    }
+
+    function linkModal(existing) {
+      modal.innerHTML =
+        '<h3>' + (existing ? 'modifier le lien' : 'nouveau lien') + '</h3>' +
+        '<label>texte affiché</label><input type="text" id="m-label">' +
+        '<label>url</label><input type="url" id="m-url" placeholder="https://">' +
+        '<div class="actions"><button class="btn" id="m-cancel">annuler</button><button class="btn on" id="m-ok">ok</button></div>';
+      modalBack.classList.add('on');
+      $('m-label').value = existing?.label || '';
+      $('m-url').value = existing?.url || '';
+      $('m-cancel').onclick = closeModal;
+      $('m-ok').onclick = () => {
+        const label = $('m-label').value.trim();
+        const url = $('m-url').value.trim();
+        if (!url) return;
+        if (existing) { existing.label = label; existing.url = url; renderAll(); }
+        else addBlock({ type: 'link', label, url });
+        scheduleSave(); closeModal();
+      };
+    }
+
+    function imageModal(existing) {
+      modal.innerHTML =
+        '<h3>' + (existing ? 'modifier l\'image' : 'nouvelle image') + '</h3>' +
+        '<label>fichier</label><input type="file" id="m-file" accept="image/*">' +
+        '<div class="hint" id="m-status"></div>' +
+        '<div class="prev" id="m-prev" hidden></div>' +
+        '<label>largeur (%)</label><div class="range-row"><input type="range" id="m-w" min="20" max="100" step="5"><span id="m-wv"></span></div>' +
+        '<label>légende</label><input type="text" id="m-cap">' +
+        '<div class="actions"><button class="btn" id="m-cancel">annuler</button><button class="btn on" id="m-ok" disabled>ok</button></div>';
+      modalBack.classList.add('on');
+      let url = existing?.url || '';
+      const w = $('m-w'), wv = $('m-wv'), prev = $('m-prev'), ok = $('m-ok'), status = $('m-status');
+      w.value = existing?.width || 100; wv.textContent = w.value + '%';
+      $('m-cap').value = existing?.caption || '';
+      w.oninput = () => { wv.textContent = w.value + '%'; };
+      if (url) { prev.hidden = false; prev.innerHTML = '<img src="' + esc(url) + '">'; ok.disabled = false; }
+
+      $('m-file').onchange = async (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        status.textContent = 'upload en cours…'; ok.disabled = true;
+        const res = await window.HOA_STORE.uploadMedia(file);
+        if (res.error) {
+          // fallback base64 si le bucket manque
+          status.textContent = 'bucket indispo, image intégrée en base64…';
+          url = await fileToDataUrl(file);
+        } else {
+          url = res.url; status.textContent = '✓ uploadé';
+        }
+        prev.hidden = false; prev.innerHTML = '<img src="' + esc(url) + '">';
+        ok.disabled = false;
+      };
+      $('m-cancel').onclick = closeModal;
+      $('m-ok').onclick = () => {
+        if (!url) return;
+        const caption = $('m-cap').value.trim();
+        const width = parseInt(w.value, 10);
+        if (existing) { existing.url = url; existing.caption = caption; existing.width = width; renderAll(); }
+        else addBlock({ type: 'image', url, caption, width });
+        scheduleSave(); closeModal();
+      };
+    }
+
+    function asciiModal(existing) {
+      modal.innerHTML =
+        '<h3>' + (existing ? 'modifier l\'ascii' : 'photo → ascii') + '</h3>' +
+        '<label>fichier image</label><input type="file" id="m-file" accept="image/*">' +
+        '<div class="range-row"><span style="color:var(--dim);font-size:11px">largeur</span><input type="range" id="m-cols" min="40" max="160" step="4"><span id="m-colsv" style="color:var(--dim);font-size:11px"></span></div>' +
+        '<label style="display:inline-flex;align-items:center;gap:8px;margin-top:6px"><input type="checkbox" id="m-inv"> inverser (fond clair)</label>' +
+        '<div class="prev" id="m-prev" hidden><pre id="m-pre"></pre></div>' +
+        '<label>légende</label><input type="text" id="m-cap">' +
+        '<div class="actions"><button class="btn" id="m-cancel">annuler</button><button class="btn on" id="m-ok" disabled>ok</button></div>';
+      modalBack.classList.add('on');
+
+      const cols = $('m-cols'), colsv = $('m-colsv'), inv = $('m-inv');
+      const prev = $('m-prev'), pre = $('m-pre'), ok = $('m-ok');
+      cols.value = existing?.cols || 100; colsv.textContent = cols.value;
+      $('m-cap').value = existing?.caption || '';
+      let sourceImg = null;
+      let art = existing?.art || '';
+      if (art) { prev.hidden = false; pre.textContent = art; ok.disabled = false; }
+
+      function regen() {
+        if (!sourceImg) return;
+        art = imageToAscii(sourceImg, parseInt(cols.value, 10), inv.checked);
+        pre.textContent = art; prev.hidden = false; ok.disabled = false;
+      }
+      cols.oninput = () => { colsv.textContent = cols.value; regen(); };
+      inv.onchange = regen;
+      $('m-file').onchange = (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const img = new Image();
+        img.onload = () => { sourceImg = img; regen(); };
+        img.src = URL.createObjectURL(file);
+      };
+      $('m-cancel').onclick = closeModal;
+      $('m-ok').onclick = () => {
+        if (!art) return;
+        const caption = $('m-cap').value.trim();
+        const c = parseInt(cols.value, 10);
+        if (existing) { existing.art = art; existing.caption = caption; existing.cols = c; renderAll(); }
+        else addBlock({ type: 'ascii', art, caption, cols: c });
+        scheduleSave(); closeModal();
+      };
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(file); });
+    }
+
+    /* image → ascii (canvas + rampe de luminance) */
+    function imageToAscii(img, cols, invert) {
+      const ramp = invert ? '@%#*+=-:. ' : ' .:-=+*#%@';
+      const ratio = img.height / img.width;
+      const rows = Math.max(1, Math.round(cols * ratio * 0.5)); // 0.5 = correction ratio caractère
+      const cvs = document.createElement('canvas');
+      cvs.width = cols; cvs.height = rows;
+      const ctx = cvs.getContext('2d');
+      ctx.drawImage(img, 0, 0, cols, rows);
+      const data = ctx.getImageData(0, 0, cols, rows).data;
+      let out = '';
+      for (let y = 0; y < rows; y++) {
+        let line = '';
+        for (let x = 0; x < cols; x++) {
+          const i = (y * cols + x) * 4;
+          const lum = (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255;
+          line += ramp[Math.min(ramp.length - 1, Math.max(0, Math.floor(lum * (ramp.length - 1))))];
+        }
+        out += line + '\n';
+      }
+      return out.replace(/\s+$/, '');
+    }
+
+    /* barre d'ajout */
+    $('add-bar').addEventListener('click', (e) => {
+      const type = e.target.dataset.add;
+      if (!type) return;
+      if (type === 'heading') addBlock({ type: 'heading', text: 'nouveau titre' });
+      else if (type === 'text') addBlock({ type: 'text', text: 'écris ici…' });
+      else if (type === 'emoji') addBlock({ type: 'emoji', text: '🙂' });
+      else if (type === 'divider') addBlock({ type: 'divider' });
+      else openBlockModal(type, null);
     });
-    window.addEventListener('resize', moveEyes);
-    moveEyes();
 
-    function esc(s) {
-      const d = document.createElement('div');
-      d.textContent = s ?? '';
-      return d.innerHTML;
+    /* ————————————————— session / auth ————————————————— */
+    const authForm = $('auth');
+    const sessionEl = $('session');
+
+    function displayName(user) {
+      return user?.user_metadata?.username || user?.email?.split('@')[0] || 'admin';
     }
+    function enterSession(user) {
+      isAdmin = true;
+      authForm.style.display = 'none';
+      sessionEl.classList.add('on');
+      $('who').textContent = displayName(user);
+      window.HOA_STORE.setCanWrite(true);
+    }
+    function leaveSession() {
+      isAdmin = false; editMode = false;
+      document.body.classList.remove('editing');
+      $('btn-edit').classList.remove('on');
+      authForm.style.display = 'flex';
+      sessionEl.classList.remove('on');
+      $('panel').classList.remove('on');
+      window.HOA_STORE.setCanWrite(false);
+      renderAll();
+    }
+
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!sb) return alert('Supabase non configuré');
+      const btn = authForm.querySelector('.btn');
+      btn.disabled = true;
+      const email = authForm.email.value.trim().toLowerCase();
+      if (email !== ADMIN_EMAIL) { btn.disabled = false; return alert('accès réservé à l\'admin'); }
+      const { error } = await sb.auth.signInWithPassword({ email, password: authForm.password.value });
+      btn.disabled = false;
+      if (error) alert(error.message === 'Invalid login credentials' ? 'identifiants invalides' : error.message);
+    });
+
+    $('btn-out').onclick = () => sb?.auth.signOut();
+    $('btn-edit').onclick = () => {
+      editMode = !editMode;
+      document.body.classList.toggle('editing', editMode);
+      $('btn-edit').classList.toggle('on', editMode);
+      renderAll();
+    };
+
+    /* ————————————————— panneau visiteurs ————————————————— */
+    const panel = $('panel');
+    const rowsEl = $('rows');
+    const panelErr = $('panel-err');
 
     function fmtDate(iso) {
       if (!iso) return '—';
-      const d = new Date(iso);
-      return d.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      return new Date(iso).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
     }
-
-    function connTag(guess) {
-      const g = (guess || '').toLowerCase();
-      if (g.includes('4g') || g.includes('mobile')) return '<span class="tag mobile">' + esc(guess) + '</span>';
-      if (g.includes('box') || g.includes('fixe')) return '<span class="tag box">' + esc(guess) + '</span>';
-      return '<span class="tag unk">' + esc(guess || '?') + '</span>';
+    function connTag(g) {
+      const x = (g || '').toLowerCase();
+      if (x.includes('4g') || x.includes('mobile')) return '<span class="tag mobile">' + esc(g) + '</span>';
+      if (x.includes('box') || x.includes('fixe')) return '<span class="tag box">' + esc(g) + '</span>';
+      return '<span class="tag unk">' + esc(g || '?') + '</span>';
     }
-
     function deviceSummary(d) {
       if (!d || typeof d !== 'object') return '—';
-      const parts = [
-        d.platform,
-        d.screen,
-        d.language,
-        d.timezone,
-        d.connection_type && ('net:' + d.connection_type),
-        d.effective_type,
-        d.mobile_ua ? 'mobile UA' : 'desktop UA',
-      ].filter(Boolean);
-      return parts.join(' · ');
+      return [d.platform, d.screen, d.language, d.timezone,
+        d.connection_type && ('net:' + d.connection_type), d.effective_type,
+        d.mobile_ua ? 'mobile UA' : 'desktop UA'].filter(Boolean).join(' · ');
     }
-
     function renderRows(rows) {
       rowsEl.innerHTML = rows.map((r) => {
         const loc = [r.city, r.region, r.country].filter(Boolean).join(', ') || '—';
@@ -404,82 +852,86 @@
           '<td class="detail">' + esc(deviceSummary(r.device)) + '</td>' +
           '</tr>';
       }).join('');
-      const uniq = new Set(rows.map(r => r.ip)).size;
-      document.getElementById('stats').textContent = rows.length + ' visites · ' + uniq + ' IP';
+      const uniq = new Set(rows.map((r) => r.ip)).size;
+      $('stats').textContent = rows.length + ' visites · ' + uniq + ' ip';
     }
-
     async function loadVisitors() {
       panelErr.hidden = true;
       const { rows, error } = await window.HOA_ANALYTICS.loadVisitors();
-      if (error) {
-        panelErr.textContent = error;
-        panelErr.hidden = false;
-        rowsEl.innerHTML = '';
-        return;
-      }
+      if (error) { panelErr.textContent = error; panelErr.hidden = false; rowsEl.innerHTML = ''; return; }
       renderRows(rows);
     }
+    $('btn-visitors').onclick = () => { panel.classList.add('on'); loadVisitors(); };
+    $('btn-close-panel').onclick = () => panel.classList.remove('on');
+    $('btn-refresh').onclick = loadVisitors;
 
-    function displayName(user) {
-      return user?.user_metadata?.username || user?.email?.split('@')[0] || 'admin';
-    }
+    /* ————————————————— donut 3D ascii ————————————————— */
+    (function donut() {
+      const pre = $('donut-pre');
+      const COLS = 80, ROWS = 40;
+      const chars = '.,-~:;=!*#$@';
+      let A = 0, B = 0;
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function enterSession(user) {
-      authForm.style.display = 'none';
-      sessionEl.classList.add('on');
-      document.getElementById('who').textContent = displayName(user);
-      loadVisitors();
-    }
-
-    function leaveSession() {
-      authForm.style.display = 'flex';
-      sessionEl.classList.remove('on');
-      panel.classList.remove('on');
-      panelOpen = false;
-      rowsEl.innerHTML = '';
-    }
-
-    authForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!sb) return alert('Supabase non configuré');
-      const btn = authForm.querySelector('.btn');
-      btn.disabled = true;
-      const email = authForm.email.value.trim().toLowerCase();
-      if (email !== ADMIN_EMAIL) {
-        btn.disabled = false;
-        return alert('Accès réservé à l\'admin.');
+      function frame() {
+        const b = new Array(COLS * ROWS).fill(' ');
+        const zbuf = new Array(COLS * ROWS).fill(0);
+        const cA = Math.cos(A), sA = Math.sin(A), cB = Math.cos(B), sB = Math.sin(B);
+        const R1 = 1, R2 = 2, K2 = 5;
+        const K1 = COLS * K2 * 3 / (8 * (R1 + R2));
+        for (let t = 0; t < 6.283; t += 0.07) {
+          const ct = Math.cos(t), st = Math.sin(t);
+          for (let p = 0; p < 6.283; p += 0.02) {
+            const cp = Math.cos(p), sp = Math.sin(p);
+            const cx = R2 + R1 * ct, cy = R1 * st;
+            const x = cx * (cB * cp + sA * sB * sp) - cy * cA * sB;
+            const y = cx * (sB * cp - sA * cB * sp) + cy * cA * cB;
+            const oz = 1 / (K2 + cA * cx * sp + sA * cy);
+            const xp = Math.floor(COLS / 2 + K1 * oz * x);
+            const yp = Math.floor(ROWS / 2 - K1 * oz * y / 2);
+            const L = cp * ct * sB - cA * ct * sp - sA * st + cB * (cA * st - ct * sA * sp);
+            const idx = xp + COLS * yp;
+            if (yp >= 0 && yp < ROWS && xp >= 0 && xp < COLS && oz > zbuf[idx]) {
+              zbuf[idx] = oz;
+              b[idx] = chars[Math.max(0, Math.min(chars.length - 1, Math.floor(L * 8)))];
+            }
+          }
+        }
+        let out = '';
+        for (let j = 0; j < ROWS; j++) out += b.slice(j * COLS, j * COLS + COLS).join('') + '\n';
+        pre.textContent = out;
       }
-      const { error } = await sb.auth.signInWithPassword({
-        email,
-        password: authForm.password.value,
-      });
-      btn.disabled = false;
-      if (error) alert(error.message === 'Invalid login credentials' ? 'Identifiants invalides' : error.message);
-    });
 
-    document.getElementById('btn-out').addEventListener('click', () => sb?.auth.signOut());
-    document.getElementById('btn-refresh').addEventListener('click', () => loadVisitors());
-    document.getElementById('btn-toggle').addEventListener('click', () => {
-      panelOpen = !panelOpen;
-      panel.classList.toggle('on', panelOpen);
-      if (panelOpen) loadVisitors();
-    });
+      function loop() { A += 0.045; B += 0.025; frame(); requestAnimationFrame(loop); }
+      frame();
+      if (!reduce) requestAnimationFrame(loop);
+    })();
 
+    /* ————————————————— init ————————————————— */
     async function init() {
-      if (!sb) return;
+      renderAll();
+      if (!sb) { console.warn('Supabase non configuré'); return; }
+
       window.HOA_ANALYTICS.setClient(sb);
+      window.HOA_STORE.setClient(sb);
+
+      const site = await window.HOA_STORE.loadSite();
+      if (site && !site.error) { state = { ...state, ...site }; renderAll(); }
+      else if (site?.error) console.warn('[init]', site.error);
+
+      window.HOA_STORE.onRemote((remote) => {
+        if (editMode) return; // ne pas écraser l'édition en cours
+        state = { ...state, ...remote };
+        renderAll();
+      });
+      window.HOA_STORE.subscribeRealtime();
 
       const { data: { session } } = await sb.auth.getSession();
       if (session?.user) enterSession(session.user);
-
-      sb.auth.onAuthStateChange((_e, session) => {
-        if (session?.user) enterSession(session.user);
-        else leaveSession();
-      });
+      sb.auth.onAuthStateChange((_e, s) => { if (s?.user) enterSession(s.user); else leaveSession(); });
 
       window.HOA_ANALYTICS.trackVisit();
     }
-
     init();
   </script>
 </body>

@@ -1,10 +1,27 @@
 -- Hall of Autism — lance ça dans Supabase SQL Editor (UNE FOIS)
 -- https://supabase.com/dashboard/project/ajdykmhacevepykrmseo/sql/new
 
+-- Table du site (créée si absente)
+create table if not exists public.site_config (
+  id bigint primary key,
+  title text default 'grossepute.org',
+  subtitle text default ''
+);
+
 -- Colonnes manquantes pour les fiches et les photos
 alter table public.site_config
   add column if not exists people jsonb not null default '[]'::jsonb,
   add column if not exists images jsonb not null default '{}'::jsonb;
+
+-- Nouveau moteur de contenu : blocs éditables (texte, titre, image, ascii, emoji, lien)
+alter table public.site_config
+  add column if not exists blocks jsonb not null default '[]'::jsonb,
+  add column if not exists updated_at timestamptz not null default now();
+
+-- Ligne unique du site (id = 1) si absente
+insert into public.site_config (id, title, subtitle, blocks)
+  values (1, 'grossepute.org', 'transmission en cours', '[]'::jsonb)
+  on conflict (id) do nothing;
 
 -- Permissions lecture publique / écriture admin connecté
 alter table public.site_config enable row level security;
@@ -90,4 +107,33 @@ create policy "visitor_logs_admin_read"
 grant insert on public.visitor_logs to anon, authenticated;
 grant select on public.visitor_logs to authenticated;
 grant all on public.visitor_logs to service_role;
+
+-- ————————————————————————————————————————————————
+-- Stockage des médias (photos uploadées par l'admin)
+-- Bucket public « media » : lecture pour tous, écriture pour l'admin connecté
+-- ————————————————————————————————————————————————
+insert into storage.buckets (id, name, public)
+  values ('media', 'media', true)
+  on conflict (id) do update set public = true;
+
+drop policy if exists "media_public_read" on storage.objects;
+create policy "media_public_read"
+  on storage.objects for select
+  using (bucket_id = 'media');
+
+drop policy if exists "media_auth_insert" on storage.objects;
+create policy "media_auth_insert"
+  on storage.objects for insert to authenticated
+  with check (bucket_id = 'media');
+
+drop policy if exists "media_auth_update" on storage.objects;
+create policy "media_auth_update"
+  on storage.objects for update to authenticated
+  using (bucket_id = 'media')
+  with check (bucket_id = 'media');
+
+drop policy if exists "media_auth_delete" on storage.objects;
+create policy "media_auth_delete"
+  on storage.objects for delete to authenticated
+  using (bucket_id = 'media');
 

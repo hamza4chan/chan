@@ -1,67 +1,67 @@
-// Persistance Supabase — site + images
+// Persistance Supabase — contenu du site (blocs) + upload médias
 (function () {
   const ROW_ID = 1;
+  const BUCKET = 'media';
+
   let sb = null;
   let canWrite = false;
-  let images = {};
-  let saveImagesTimer = null;
   let onRemoteChange = null;
+  let saveTimer = null;
+  let lastLocalWrite = 0;
 
-  function setClient(client) {
-    sb = client;
-  }
+  function setClient(client) { sb = client; }
+  function setCanWrite(v) { canWrite = !!v; }
+  function onRemote(cb) { onRemoteChange = cb; }
+  function isWriter() { return canWrite; }
 
-  function setCanWrite(v) {
-    canWrite = !!v;
-    if (window.HOA_IMAGE_STORE) window.HOA_IMAGE_STORE.canSave = () => canWrite;
-  }
-
-  function onRemote(cb) {
-    onRemoteChange = cb;
+  function normalizeBlocks(raw) {
+    if (!Array.isArray(raw)) return [];
+    return raw.filter((b) => b && typeof b === 'object' && typeof b.type === 'string');
   }
 
   async function loadSite() {
     if (!sb) return null;
     const { data, error } = await sb
       .from('site_config')
-      .select('title, subtitle, people, images')
+      .select('title, subtitle, blocks')
       .eq('id', ROW_ID)
       .maybeSingle();
+
     if (error) {
       const msg = error.message || 'Erreur Supabase';
-      const hint = msg.includes('does not exist')
-        ? msg + ' — Lance supabase/setup.sql dans le SQL Editor.'
+      const hint = msg.includes('does not exist') || msg.includes('column')
+        ? msg + ' — lance supabase/setup.sql dans le SQL Editor.'
         : msg;
       console.warn('[hoa-store] load failed:', hint);
       return { error: hint };
     }
-    if (!data) return null;
-    images = data.images && typeof data.images === 'object' ? data.images : {};
-    if (window.HOA_IMAGE_STORE) window.HOA_IMAGE_STORE._hydrate(images);
+
+    if (!data) return { title: 'grossepute.org', subtitle: '', blocks: [] };
+
     return {
-      title: data.title,
-      subtitle: data.subtitle,
-      people: data.people,
+      title: data.title || 'grossepute.org',
+      subtitle: data.subtitle || '',
+      blocks: normalizeBlocks(data.blocks),
     };
   }
 
-  async function saveSite({ title, subtitle, people }) {
+  async function persist({ title, subtitle, blocks }) {
     if (!sb) return { error: 'Supabase non configuré' };
     if (!canWrite) return { error: 'Connecte-toi en admin pour enregistrer.' };
 
+    lastLocalWrite = Date.now();
     const payload = {
       id: ROW_ID,
       title,
       subtitle,
-      people,
-      images,
+      blocks: normalizeBlocks(blocks),
       updated_at: new Date().toISOString(),
     };
 
     const { error } = await sb.from('site_config').upsert(payload, { onConflict: 'id' });
     if (error) {
-      const hint = error.message?.includes('does not exist')
-        ? error.message + ' — Lance supabase/setup.sql dans le SQL Editor.'
+      const hint = error.message?.includes('does not exist') || error.message?.includes('column')
+        ? error.message + ' — lance supabase/setup.sql dans le SQL Editor.'
         : error.message;
       console.warn('[hoa-store] save failed:', hint);
       return { error: hint };
@@ -69,20 +69,40 @@
     return { error: null };
   }
 
-  async function flushImages(slots) {
-    if (!sb || !canWrite) return;
-    images = slots;
-    const { error } = await sb
-      .from('site_config')
-      .update({ images, updated_at: new Date().toISOString() })
-      .eq('id', ROW_ID);
-    if (error) console.warn('[hoa-store] images save failed:', error.message);
+  // Sauvegarde différée (débounce) — renvoie via callback l'état d'enregistrement
+  function scheduleSave(state, statusCb) {
+    if (!canWrite) return;
+    clearTimeout(saveTimer);
+    if (statusCb) statusCb('pending');
+    saveTimer = setTimeout(async () => {
+      if (statusCb) statusCb('saving');
+      const { error } = await persist(state);
+      if (statusCb) statusCb(error ? 'error' : 'saved', error);
+    }, 500);
   }
 
-  function scheduleImageSave(slots) {
-    images = slots;
-    clearTimeout(saveImagesTimer);
-    saveImagesTimer = setTimeout(() => flushImages(slots), 600);
+  // Upload d'un fichier image vers le bucket, renvoie l'URL publique
+  async function uploadMedia(file) {
+    if (!sb) return { error: 'Supabase non configuré' };
+    if (!canWrite) return { error: 'Connecte-toi en admin.' };
+
+    const ext = (file.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const id = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2));
+    const path = `${id}.${ext || 'png'}`;
+
+    const { error } = await sb.storage.from(BUCKET).upload(path, file, {
+      cacheControl: '31536000',
+      upsert: false,
+      contentType: file.type || undefined,
+    });
+
+    if (error) {
+      console.warn('[hoa-store] upload failed:', error.message);
+      return { error: error.message };
+    }
+
+    const { data } = sb.storage.from(BUCKET).getPublicUrl(path);
+    return { url: data.publicUrl, path };
   }
 
   function subscribeRealtime() {
@@ -95,14 +115,12 @@
         (payload) => {
           const row = payload.new;
           if (!row || !onRemoteChange) return;
-          if (row.images && typeof row.images === 'object') {
-            images = row.images;
-            if (window.HOA_IMAGE_STORE) window.HOA_IMAGE_STORE._hydrate(images);
-          }
+          // Ignore l'écho de notre propre écriture récente pour ne pas écraser l'édition en cours
+          if (Date.now() - lastLocalWrite < 1500) return;
           onRemoteChange({
-            title: row.title,
-            subtitle: row.subtitle,
-            people: row.people,
+            title: row.title || 'grossepute.org',
+            subtitle: row.subtitle || '',
+            blocks: normalizeBlocks(row.blocks),
           });
         }
       )
@@ -112,25 +130,12 @@
   window.HOA_STORE = {
     setClient,
     setCanWrite,
+    isWriter,
     onRemote,
     loadSite,
-    saveSite,
+    persist,
+    scheduleSave,
+    uploadMedia,
     subscribeRealtime,
-  };
-
-  window.HOA_IMAGE_STORE = {
-    canSave: () => canWrite,
-    _hydrate(newImages) {
-      images = newImages && typeof newImages === 'object' ? newImages : {};
-      window.dispatchEvent(new CustomEvent('hoa-images-updated', { detail: images }));
-    },
-    load() {
-      return Promise.resolve(images);
-    },
-    save(slots) {
-      if (!canWrite) return Promise.resolve();
-      scheduleImageSave(slots);
-      return Promise.resolve();
-    },
   };
 })();
