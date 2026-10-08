@@ -1,4 +1,4 @@
-// Journal des visites — IP, FAI, device
+// Journal des visites — IPv4, IPv6, FAI, zone, user-agent
 (function () {
   const SESSION_KEY = 'hoa-visit-logged';
   let sb = null;
@@ -28,13 +28,8 @@
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       timezone_offset: new Date().getTimezoneOffset(),
       online: nav.onLine,
-      pdf_viewer: nav.pdfViewerEnabled ?? null,
-      webdriver: nav.webdriver || false,
       connection_type: conn?.type || null,
       effective_type: conn?.effectiveType || null,
-      downlink: conn?.downlink ?? null,
-      rtt: conn?.rtt ?? null,
-      save_data: conn?.saveData ?? null,
       mobile_ua: /Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini/i.test(nav.userAgent),
     };
   }
@@ -43,41 +38,35 @@
     const isp = (ipData.connection?.isp || ipData.isp || '').toLowerCase();
     const org = (ipData.connection?.org || ipData.org || '').toLowerCase();
     const hay = isp + ' ' + org;
+    const mobileKw = ['mobile', 'cellular', '4g', 'lte', '5g', 'wireless', 'free mobile', 'bouygues'];
+    const boxKw = ['fibre', 'fiber', 'adsl', 'dsl', 'cable', 'ftth', 'broadband', 'fixed'];
 
-    const mobileKw = [
-      'mobile', 'cellular', '4g', 'lte', '5g', 'wireless', 'gsm', 'umts',
-      'bouygues telecom', 'free mobile', 'sfr', 'orange', 'vodafone',
-      'telekom', 't-mobile', 'o2', 'three', 'ee limited', 'proximus',
-    ];
-    const boxKw = [
-      'fibre', 'fiber', 'adsl', 'dsl', 'cable', 'ftth', 'broadband',
-      'residential', 'fixed', 'landline', 'numericable', 'free sas',
-      'orange sa', 'societe francaise du radiotelephone',
-    ];
-
-    if (device.connection_type === 'cellular') return '4G/mobile (réseau)';
-    if (device.connection_type === 'wifi' || device.connection_type === 'ethernet') {
-      if (device.mobile_ua) return '4G/mobile (WiFi partagé ?)';
-      return 'Box/fixe (réseau local)';
-    }
-    if (device.effective_type === '4g' || device.effective_type === '3g') return '4G/mobile (navigateur)';
+    if (device.connection_type === 'cellular') return '4G/mobile';
+    if (device.effective_type === '4g' || device.effective_type === '3g') return '4G/mobile';
     if (mobileKw.some((k) => hay.includes(k)) && device.mobile_ua) return 'Probable 4G/mobile';
     if (boxKw.some((k) => hay.includes(k))) return 'Probable box/fixe';
-    if (device.mobile_ua) return 'Probable 4G/mobile (UA)';
-    if (!device.mobile_ua) return 'Probable box/fixe (UA desktop)';
-    return 'Inconnu';
+    if (device.mobile_ua) return 'Probable 4G/mobile';
+    return 'Probable box/fixe';
+  }
+
+  function isV6(ip) {
+    return typeof ip === 'string' && ip.includes(':');
+  }
+
+  async function fetchJson(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(url + ' ' + res.status);
+    return res.json();
   }
 
   async function fetchIpWho() {
-    const res = await fetch('https://ipwho.is/');
-    const d = await res.json();
-    if (d.success && d.ip) return d;
-    throw new Error('ipwho.is failed');
+    const d = await fetchJson('https://ipwho.is/');
+    if (!d.success || !d.ip) throw new Error('ipwho.is failed');
+    return d;
   }
 
   async function fetchIpApiCo() {
-    const res = await fetch('https://ipapi.co/json/');
-    const d = await res.json();
+    const d = await fetchJson('https://ipapi.co/json/');
     if (!d.ip) throw new Error('ipapi.co failed');
     return {
       success: true,
@@ -88,31 +77,48 @@
       country_code: d.country_code,
       latitude: d.latitude,
       longitude: d.longitude,
-      type: d.version || 'IPv4',
-      connection: {
-        isp: d.org,
-        org: d.org,
-        asn: d.asn,
-      },
+      type: d.version || (isV6(d.ip) ? 'IPv6' : 'IPv4'),
+      connection: { isp: d.org, org: d.org, asn: d.asn },
     };
   }
 
+  async function fetchIpify(v6) {
+    const url = v6 ? 'https://api64.ipify.org?format=json' : 'https://api.ipify.org?format=json';
+    const d = await fetchJson(url);
+    if (!d.ip) throw new Error('ipify failed');
+    return d.ip;
+  }
+
   async function fetchIpInfo() {
-    const providers = [fetchIpWho, fetchIpApiCo];
-    let lastErr;
-    for (const fn of providers) {
+    let base = null;
+    for (const fn of [fetchIpWho, fetchIpApiCo]) {
       try {
-        return await fn();
-      } catch (e) {
-        lastErr = e;
-      }
+        base = await fn();
+        break;
+      } catch (_) { /* next */ }
     }
-    throw lastErr || new Error('IP lookup failed');
+    if (!base) throw new Error('IP lookup failed');
+
+    let ipv4 = isV6(base.ip) ? null : base.ip;
+    let ipv6 = isV6(base.ip) ? base.ip : null;
+
+    try {
+      const v4 = await fetchIpify(false);
+      if (!isV6(v4)) ipv4 = v4;
+    } catch (_) { /* optional */ }
+
+    try {
+      const v6 = await fetchIpify(true);
+      if (isV6(v6)) ipv6 = v6;
+    } catch (_) { /* optional */ }
+
+    return { ...base, ipv4: ipv4 || null, ipv6: ipv6 || null };
   }
 
   function buildRow(ipData, device) {
+    const deviceOut = { ...device, ipv4: ipData.ipv4, ipv6: ipData.ipv6 };
     return {
-      ip: ipData.ip,
+      ip: ipData.ipv4 || ipData.ip,
       isp: ipData.connection?.isp || null,
       org: ipData.connection?.org || null,
       city: ipData.city || null,
@@ -122,11 +128,11 @@
       latitude: ipData.latitude ?? null,
       longitude: ipData.longitude ?? null,
       asn: ipData.connection?.asn ? String(ipData.connection.asn) : null,
-      ip_type: ipData.type || null,
+      ip_type: ipData.ipv4 && ipData.ipv6 ? 'IPv4+IPv6' : (ipData.ipv6 ? 'IPv6' : 'IPv4'),
       connection_guess: guessConnectionType(ipData, device),
       user_agent: device.user_agent,
       page: location.pathname || '/',
-      device,
+      device: deviceOut,
       geo_lat: null,
       geo_lng: null,
       geo_accuracy: null,
@@ -152,6 +158,7 @@
         connection_guess: row.connection_guess,
         user_agent: row.user_agent,
         page: row.page,
+        device: row.device,
         geo_status: row.geo_status,
       },
       {
@@ -177,15 +184,12 @@
 
   async function trackVisit() {
     if (!sb || sessionStorage.getItem(SESSION_KEY)) return;
-
     try {
       const [ipData, device] = await Promise.all([
         fetchIpInfo(),
         Promise.resolve(collectDevice()),
       ]);
-
-      const row = buildRow(ipData, device);
-      const error = await insertVisit(row);
+      const error = await insertVisit(buildRow(ipData, device));
       if (error) {
         console.warn('[hoa-analytics] insert failed:', error.message);
         return;
@@ -208,23 +212,21 @@
     if (!full.error) return { rows: full.data || [], error: null };
 
     const msg = full.error.message || '';
-    if (!/column|schema|visitor_logs/i.test(msg)) {
-      return { rows: [], error: msg };
-    }
-
     const basic = await sb
       .from('visitor_logs')
-      .select('id, ip, isp, org, city, country, user_agent, created_at')
+      .select('id, ip, isp, org, city, region, country, user_agent, device, created_at, connection_guess')
       .order('created_at', { ascending: false })
       .limit(limit);
 
     if (basic.error) {
-      const friendly = msg.includes('visitor_logs')
-        ? 'Table visitor_logs manquante — lance supabase/visitor_logs.sql dans Supabase SQL Editor.'
-        : basic.error.message;
+      const friendly =
+        /visitor_logs|relation|does not exist/i.test(msg)
+          ? 'Table visitor_logs manquante — lance supabase/visitor_logs.sql dans Supabase.'
+          : /permission|policy|RLS|JWT/i.test(msg + ' ' + (basic.error.message || ''))
+            ? 'Lecture bloquée (RLS) — reconnecte-toi ou vérifie les policies Supabase.'
+            : basic.error.message || msg;
       return { rows: [], error: friendly };
     }
-
     return { rows: basic.data || [], error: null };
   }
 
@@ -233,6 +235,6 @@
     trackVisit,
     loadVisitors,
     collectDevice,
-    guessConnectionType,
+    fetchIpInfo,
   };
 })();

@@ -6,15 +6,388 @@
   <title>grossepute.org</title>
   <link rel="canonical" href="https://grossepute.org/">
   <meta name="theme-color" content="#000000">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-config.js"></script>
+  <script src="./hoa-analytics.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      width: 100%;
-      height: 100%;
-      background: #000;
-      overflow: hidden;
+    :root {
+      --bg: #000;
+      --line: #222;
+      --text: #c8c8c8;
+      --dim: #666;
+      --white: #fff;
     }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      background: #000;
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+    }
+
+    #bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 16px;
+      background: #000;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .btn {
+      background: #000;
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 8px 14px;
+      font: inherit;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: #444; color: #fff; }
+    .btn:disabled { opacity: .4; cursor: wait; }
+
+    #login-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(0,0,0,.85);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    #login-modal.on { display: flex; }
+
+    .box {
+      width: min(340px, 100%);
+      background: #000;
+      border: 1px solid var(--line);
+      padding: 20px;
+    }
+    .box h2 {
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 16px;
+    }
+    .box label {
+      display: block;
+      font-size: 10px;
+      color: var(--dim);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .box input {
+      width: 100%;
+      background: #000;
+      border: 1px solid var(--line);
+      color: #fff;
+      padding: 10px 12px;
+      font: inherit;
+      margin-bottom: 12px;
+    }
+    .box input:focus { outline: none; border-color: #555; }
+    .box .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+    .box .err { color: #ff6b6b; font-size: 11px; min-height: 16px; margin-bottom: 4px; }
+
+    #dash {
+      display: none;
+      position: fixed;
+      top: 48px; left: 0; right: 0; bottom: 0;
+      z-index: 10;
+      overflow: auto;
+      padding: 16px;
+      background: #000;
+    }
+    #dash.on { display: block; }
+
+    .phead {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .phead h1 {
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .stats { color: var(--dim); font-size: 11px; margin-left: auto; }
+
+    .banner-err {
+      display: none;
+      color: #ff6b6b;
+      border: 1px solid #3a1a1a;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+    .banner-err.on { display: block; }
+
+    .tbl-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #000;
+      color: var(--dim);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 9px;
+    }
+    tr:hover td { background: #0a0a0a; }
+    .mono { font-family: inherit; word-break: break-all; }
+    .dim { color: var(--dim); }
+    .ua { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dim); }
   </style>
 </head>
-<body></body>
+<body>
+
+  <header id="bar">
+    <button type="button" class="btn" id="btn-login">login</button>
+    <div id="session" hidden style="display:none;align-items:center;gap:8px">
+      <button type="button" class="btn" id="btn-refresh">↻</button>
+      <button type="button" class="btn" id="btn-logout">logout</button>
+    </div>
+  </header>
+
+  <div id="login-modal">
+    <form class="box" id="login-form">
+      <h2>login</h2>
+      <label for="user">identifiant</label>
+      <input id="user" name="user" autocomplete="username" required>
+      <label for="pass">mot de passe</label>
+      <input id="pass" name="pass" type="password" autocomplete="current-password" required>
+      <div class="err" id="login-err"></div>
+      <div class="actions">
+        <button type="button" class="btn" id="btn-cancel">annuler</button>
+        <button type="submit" class="btn">entrer</button>
+      </div>
+    </form>
+  </div>
+
+  <section id="dash">
+    <div class="phead">
+      <h1>connexions</h1>
+      <span class="stats" id="stats">—</span>
+    </div>
+    <div class="banner-err" id="panel-err"></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>date</th>
+            <th>ipv4</th>
+            <th>ipv6</th>
+            <th>fai</th>
+            <th>zone</th>
+            <th>type</th>
+            <th>user agent</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <script>
+    const ADMIN_USER = 'admin';
+    const ADMIN_PASS = '1234';
+    const SB_EMAIL = 'admin@hoa.local';
+    const SESSION = 'hoa-admin';
+
+    function getSb() {
+      if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY || !window.supabase) return null;
+      return window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    }
+
+    const sb = getSb();
+    const modal = document.getElementById('login-modal');
+    const dash = document.getElementById('dash');
+    const btnLogin = document.getElementById('btn-login');
+    const sessionEl = document.getElementById('session');
+    const rowsEl = document.getElementById('rows');
+    const panelErr = document.getElementById('panel-err');
+    const loginErr = document.getElementById('login-err');
+    const form = document.getElementById('login-form');
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s ?? '';
+      return d.innerHTML;
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleString('fr-FR', {
+        day: '2-digit', month: '2-digit', year: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+      });
+    }
+
+    function zoneOf(r) {
+      return [r.city, r.region, r.country].filter(Boolean).join(', ') || '—';
+    }
+
+    function ipv4Of(r) {
+      if (r.device?.ipv4) return r.device.ipv4;
+      if (r.ip && !String(r.ip).includes(':')) return r.ip;
+      return '—';
+    }
+
+    function ipv6Of(r) {
+      if (r.device?.ipv6) return r.device.ipv6;
+      if (r.ip && String(r.ip).includes(':')) return r.ip;
+      return '—';
+    }
+
+    function faiOf(r) {
+      return [r.isp, r.org].filter(Boolean).join(' / ') || '—';
+    }
+
+    function renderRows(rows) {
+      rowsEl.innerHTML = rows.map((r) => {
+        return '<tr>' +
+          '<td>' + esc(fmtDate(r.created_at)) + '</td>' +
+          '<td class="mono">' + esc(ipv4Of(r)) + '</td>' +
+          '<td class="mono dim">' + esc(ipv6Of(r)) + '</td>' +
+          '<td>' + esc(faiOf(r)) + '</td>' +
+          '<td>' + esc(zoneOf(r)) + '</td>' +
+          '<td class="dim">' + esc(r.connection_guess || '—') + '</td>' +
+          '<td class="ua" title="' + esc(r.user_agent) + '">' + esc(r.user_agent || '—') + '</td>' +
+          '</tr>';
+      }).join('') || '<tr><td colspan="7" class="dim">aucune visite pour l\'instant</td></tr>';
+
+      const uniq = new Set(rows.map((r) => ipv4Of(r) + '|' + ipv6Of(r))).size;
+      document.getElementById('stats').textContent = rows.length + ' visites · ' + uniq + ' IP';
+    }
+
+    async function loadVisitors() {
+      panelErr.classList.remove('on');
+      panelErr.textContent = '';
+      const { rows, error } = await window.HOA_ANALYTICS.loadVisitors();
+      if (error) {
+        panelErr.textContent = error;
+        panelErr.classList.add('on');
+        rowsEl.innerHTML = '';
+        return;
+      }
+      renderRows(rows);
+    }
+
+    function showLoggedIn() {
+      sessionStorage.setItem(SESSION, '1');
+      modal.classList.remove('on');
+      btnLogin.hidden = true;
+      sessionEl.hidden = false;
+      sessionEl.style.display = 'flex';
+      dash.classList.add('on');
+      loadVisitors();
+    }
+
+    function showLoggedOut() {
+      sessionStorage.removeItem(SESSION);
+      btnLogin.hidden = false;
+      sessionEl.hidden = true;
+      sessionEl.style.display = 'none';
+      dash.classList.remove('on');
+      rowsEl.innerHTML = '';
+    }
+
+    async function ensureSbAdmin() {
+      if (!sb) return;
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) return;
+      let { error } = await sb.auth.signInWithPassword({ email: SB_EMAIL, password: ADMIN_PASS });
+      if (!error) return;
+      await sb.auth.signUp({
+        email: SB_EMAIL,
+        password: ADMIN_PASS,
+        options: { data: { username: 'admin' } },
+      });
+      await sb.auth.signInWithPassword({ email: SB_EMAIL, password: ADMIN_PASS });
+    }
+
+    btnLogin.addEventListener('click', () => {
+      loginErr.textContent = '';
+      form.reset();
+      modal.classList.add('on');
+      document.getElementById('user').focus();
+    });
+
+    document.getElementById('btn-cancel').addEventListener('click', () => {
+      modal.classList.remove('on');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('on');
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginErr.textContent = '';
+      const user = form.user.value.trim();
+      const pass = form.pass.value;
+      const btn = form.querySelector('[type="submit"]');
+      if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
+        loginErr.textContent = 'identifiants invalides';
+        return;
+      }
+      btn.disabled = true;
+      try {
+        await ensureSbAdmin();
+        showLoggedIn();
+      } catch (err) {
+        showLoggedIn();
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+      try { await sb?.auth.signOut(); } catch (_) {}
+      showLoggedOut();
+    });
+
+    document.getElementById('btn-refresh').addEventListener('click', () => loadVisitors());
+
+    async function init() {
+      if (sb) window.HOA_ANALYTICS.setClient(sb);
+      window.HOA_ANALYTICS.trackVisit();
+      if (sessionStorage.getItem(SESSION) === '1') {
+        try { await ensureSbAdmin(); } catch (_) {}
+        showLoggedIn();
+      }
+    }
+
+    init();
+  </script>
+</body>
 </html>
